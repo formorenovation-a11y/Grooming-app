@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>PerreoLand — Reservas & Gestión para grooming móvil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   PERREOLAND  —  diseño "feminismo juvenil elegante"
+   Malva / blush / burgundy + dorado mate.
+   Demo en memoria (STATE). Para producción: Firestore + Auth.
+   ============================================================ */
+:root{
+  --cream:#FBF6F2;--blush:#F4DEE4;--blush-soft:#FBEDF0;
+  --mauve:#A8688A;--mauve-deep:#823F61;--burgundy:#43202F;
+  --ink:#3C2530;--muted:#9A7C87;--gold:#C2A24F;
+  --line:#EAD7DC;--white:#FFFFFF;--ok:#4F8A6B;--warn:#B07A1E;--bad:#C0556B;
+  --shadow:0 12px 40px -18px rgba(67,32,47,.35);
+  --shadow-sm:0 4px 18px -10px rgba(67,32,47,.30);
+  --r:18px;--r-sm:12px;--r-pill:999px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom)}
+h1,h2,h3,.display{font-family:'Fraunces',Georgia,serif;font-weight:500;letter-spacing:-.01em;color:var(--burgundy)}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+input,select,textarea{font-family:inherit;font-size:16px}
+::selection{background:var(--blush);color:var(--burgundy)}
+a{color:var(--mauve-deep)}
+
+/* ---------- Demo switcher ---------- */
+.demo-bar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px calc(10px + env(safe-area-inset-top));background:rgba(251,246,242,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.demo-bar .pl{font-family:'Fraunces';font-weight:600;font-size:15px;color:var(--mauve-deep);margin-right:auto;display:flex;align-items:center;gap:6px}
+.demo-bar .pl small{font-family:'Inter';font-weight:600;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.seg{display:flex;background:var(--blush-soft);border:1px solid var(--line);border-radius:var(--r-pill);padding:3px}
+.seg button{padding:7px 15px;border-radius:var(--r-pill);font-size:13px;font-weight:600;color:var(--mauve-deep);transition:.2s}
+.seg button.on{background:var(--burgundy);color:#fff;box-shadow:var(--shadow-sm)}
+
+.wrap{max-width:1080px;margin:0 auto;padding:22px 18px 70px}
+.view{display:none;animation:fade .35s ease}
+.view.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ---------- LOGIN (marca PerreoLand) ---------- */
+#login{position:fixed;inset:0;z-index:200;background:linear-gradient(160deg,#2c1420,#43202F 55%,#5c2c44);display:flex;align-items:center;justify-content:center;padding:24px;animation:fade .4s}
+#login.hide{display:none}
+.login-card{width:100%;max-width:380px;text-align:center}
+.login-logo{font-family:'Fraunces';font-size:42px;color:#fff;letter-spacing:-.02em;margin-bottom:4px}
+.login-logo .paw{color:var(--gold)}
+.login-sub{color:#E7C9D4;font-size:13.5px;margin-bottom:30px}
+.login-box{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:var(--r);padding:26px 22px;backdrop-filter:blur(8px)}
+.login-box .field{margin-bottom:14px;text-align:left}
+.login-box label{display:block;font-size:12px;color:#E7C9D4;font-weight:600;margin-bottom:6px}
+.login-box input{width:100%;padding:13px 15px;border:1.5px solid rgba(255,255,255,.18);border-radius:var(--r-sm);background:rgba(255,255,255,.08);color:#fff;outline:none}
+.login-box input::placeholder{color:#c9a9b6}
+.login-box input:focus{border-color:var(--gold)}
+.login-btn{width:100%;padding:14px;border-radius:var(--r-pill);background:var(--gold);color:#3a2e10;font-weight:700;font-size:15px;margin-top:6px}
+.login-alt{margin-top:18px;font-size:13px;color:#E7C9D4}
+.login-alt button{color:#fff;font-weight:600;text-decoration:underline}
+.login-feat{display:flex;gap:18px;justify-content:center;margin-top:26px;color:#d9b9c6;font-size:11.5px;flex-wrap:wrap}
+.login-feat span{display:flex;align-items:center;gap:5px}
+
+/* ---------- Brand header (cliente) ---------- */
+.brand{display:flex;align-items:center;gap:13px;margin:8px 0 24px}
+.brand .mark{width:50px;height:50px;border-radius:16px;flex:none;background:linear-gradient(150deg,var(--mauve),var(--mauve-deep));display:grid;place-items:center;color:#fff;font-family:'Fraunces';font-size:24px;box-shadow:var(--shadow-sm)}
+.brand .name{font-family:'Fraunces';font-size:22px;color:var(--burgundy);line-height:1.1}
+.brand .tag{font-size:12.5px;color:var(--muted)}
+
+/* ---------- Wizard ---------- */
+.steps{display:flex;gap:6px;margin-bottom:22px}
+.steps .s{flex:1;height:4px;border-radius:4px;background:var(--line)}
+.steps .s.done{background:var(--gold)}.steps .s.cur{background:var(--mauve)}
+.card{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:22px;box-shadow:var(--shadow)}
+.eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mauve);font-weight:600;margin-bottom:6px}
+.step h2{font-size:25px;margin:0 0 4px}
+.step .sub{color:var(--muted);font-size:14px;margin-bottom:20px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--burgundy);margin-bottom:7px}
+.field .opt-note{color:var(--muted);font-weight:400}
+.input,select.input,textarea.input{width:100%;padding:13px 15px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--cream);color:var(--ink);transition:.15s;outline:none}
+.input:focus{border-color:var(--mauve);background:#fff;box-shadow:0 0 0 4px var(--blush-soft)}
+textarea.input{resize:vertical;min-height:74px}
+
+.combo{position:relative}
+.combo .results{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:20;background:#fff;border:1px solid var(--line);border-radius:var(--r-sm);box-shadow:var(--shadow);max-height:240px;overflow:auto;display:none}
+.combo .results.show{display:block}
+.combo .results button{display:flex;width:100%;justify-content:space-between;align-items:center;padding:11px 15px;text-align:left;border-bottom:1px solid var(--blush-soft);font-size:14.5px;color:var(--ink)}
+.combo .results button:hover,.combo .results button.hl{background:var(--blush-soft)}
+.combo .results button:last-child{border-bottom:none}
+.combo .results .sz{font-size:11px;color:var(--muted);background:var(--blush-soft);padding:3px 9px;border-radius:var(--r-pill)}
+.empty-res{padding:14px 15px;color:var(--muted);font-size:13.5px}
+
+.opt-grid{display:grid;gap:10px}
+.opt{display:flex;align-items:center;gap:13px;padding:14px 16px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--cream);text-align:left;width:100%;transition:.15s}
+.opt:hover{border-color:var(--mauve)}
+.opt.sel{border-color:var(--mauve);background:var(--blush-soft);box-shadow:0 0 0 3px var(--blush-soft)}
+.opt .ic{width:38px;height:38px;border-radius:11px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;font-size:19px;flex:none}
+.opt .tl{font-weight:600;color:var(--burgundy);font-size:15px}
+.opt .ds{font-size:12.5px;color:var(--muted)}
+.opt .pr{margin-left:auto;font-weight:700;color:var(--mauve-deep);font-family:'Fraunces'}
+.opt .dur{font-size:11px;color:var(--muted);display:block;text-align:right}
+
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:9px}
+.slot{padding:11px 8px;text-align:center;border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--cream);font-size:14px;font-weight:600;color:var(--burgundy);transition:.15s}
+.slot:hover{border-color:var(--mauve)}.slot.sel{background:var(--burgundy);color:#fff;border-color:var(--burgundy)}
+.slot.off{opacity:.32;cursor:not-allowed;text-decoration:line-through}
+.row{display:flex;gap:12px}.row>*{flex:1}
+.check-line{display:flex;align-items:center;gap:11px;padding:13px 15px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--cream);cursor:pointer;margin-bottom:10px}
+.check-line input{width:20px;height:20px;accent-color:var(--mauve);flex:none}
+.check-line .t{font-size:14px;font-weight:600;color:var(--burgundy)}
+.check-line .d{font-size:12px;color:var(--muted)}
+.sub-inline{margin-top:10px;display:none}.sub-inline.show{display:block}
+
+.actions{display:flex;gap:10px;margin-top:22px}
+.btn{padding:14px 22px;border-radius:var(--r-pill);font-weight:600;font-size:15px;transition:.18s;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary{background:var(--burgundy);color:#fff;flex:1;box-shadow:var(--shadow-sm)}
+.btn-primary:hover{background:#341824}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--mauve-deep);border:1.5px solid var(--line)}
+.btn-gold{background:var(--gold);color:#3a2e10}
+.btn-sm{padding:9px 15px;font-size:13px}
+.btn-danger{background:#fff;color:var(--bad);border:1.5px solid #F0CDD4}
+
+.summary{background:var(--blush-soft);border-radius:var(--r-sm);padding:16px 18px;margin-bottom:18px}
+.summary .ln{display:flex;justify-content:space-between;padding:7px 0;font-size:14px;border-bottom:1px dashed var(--line);gap:12px}
+.summary .ln:last-child{border:none}
+.summary .ln .k{color:var(--muted);flex:none}.summary .ln .v{font-weight:600;color:var(--burgundy);text-align:right}
+.summary .total{display:flex;justify-content:space-between;align-items:baseline;margin-top:10px;padding-top:12px;border-top:1.5px solid var(--line)}
+.summary .total .t{font-family:'Fraunces';font-size:26px;color:var(--mauve-deep)}
+.deposit-tag{font-size:12.5px;color:var(--warn);margin-top:6px;font-weight:600}
+
+.done-state{text-align:center;padding:18px 8px}
+.done-state .check{width:70px;height:70px;border-radius:50%;background:var(--ok);color:#fff;display:grid;place-items:center;font-size:34px;margin:0 auto 16px;box-shadow:0 10px 30px -10px rgba(79,138,107,.6)}
+
+/* ---------- Business panel ---------- */
+.biz-head{display:flex;align-items:flex-end;justify-content:space-between;margin:6px 0 20px;flex-wrap:wrap;gap:12px}
+.biz-head h1{font-size:30px;margin:0}
+.biz-head .meta{font-size:13px;color:var(--muted)}
+.biz-head .pl-badge{font-family:'Fraunces';font-size:13px;color:var(--mauve);border:1px solid var(--line);padding:6px 13px;border-radius:var(--r-pill);background:#fff}
+.tabs{display:flex;gap:4px;background:var(--blush-soft);border:1px solid var(--line);border-radius:var(--r-pill);padding:4px;margin-bottom:22px;overflow:auto}
+.tabs button{padding:9px 15px;border-radius:var(--r-pill);font-size:13.5px;font-weight:600;color:var(--mauve-deep);white-space:nowrap;transition:.18s}
+.tabs button.on{background:#fff;color:var(--burgundy);box-shadow:var(--shadow-sm)}
+.panel{display:none}.panel.on{display:block;animation:fade .3s ease}
+
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:13px;margin-bottom:22px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:17px 18px;box-shadow:var(--shadow-sm)}
+.stat .k{font-size:12px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;font-weight:600}
+.stat .v{font-family:'Fraunces';font-size:29px;color:var(--burgundy);margin-top:4px;line-height:1}
+.stat .d{font-size:12px;margin-top:5px;font-weight:600}
+.stat .up{color:var(--ok)}.stat .gold{color:var(--gold)}
+
+.sec-title{font-size:15px;font-family:'Fraunces';color:var(--burgundy);margin:24px 0 12px;display:flex;align-items:center;gap:8px}
+.sec-title:first-child{margin-top:0}
+.sec-title::after{content:"";flex:1;height:1px;background:var(--line)}
+
+.appt{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:var(--r-sm);padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow-sm);text-align:left;width:100%;transition:.15s}
+.appt:hover{border-color:var(--mauve);transform:translateY(-1px)}
+.appt .when{text-align:center;flex:none;width:58px}
+.appt .when .d{font-family:'Fraunces';font-size:21px;color:var(--mauve-deep);line-height:1}
+.appt .when .m{font-size:11px;text-transform:uppercase;color:var(--muted);letter-spacing:.08em}
+.appt .when .h{font-size:12px;color:var(--burgundy);font-weight:600;margin-top:3px}
+.appt .info{flex:1;min-width:0}
+.appt .info .pet{font-weight:700;color:var(--burgundy);font-size:15px}
+.appt .info .det{font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.appt .rgt{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none}
+.badge{font-size:11px;font-weight:600;padding:4px 10px;border-radius:var(--r-pill)}
+.b-conf{background:#E9F3ED;color:var(--ok)}.b-pend{background:#FBF0E1;color:var(--warn)}
+.b-done{background:#EEE7F0;color:var(--mauve-deep)}.b-paid{background:#E9F3ED;color:var(--ok)}.b-unpaid{background:#FBE7EB;color:var(--bad)}
+.appt .price{font-family:'Fraunces';font-weight:600;color:var(--mauve-deep)}
+
+/* chart */
+.chart{display:flex;align-items:flex-end;gap:10px;height:170px;padding:14px 4px 0;margin-top:6px}
+.chart .bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;height:100%;justify-content:flex-end}
+.chart .bar .fill{width:100%;max-width:42px;border-radius:8px 8px 4px 4px;background:linear-gradient(180deg,var(--mauve),var(--mauve-deep));transition:height .6s cubic-bezier(.2,.8,.2,1)}
+.chart .bar .lab{font-size:11px;color:var(--muted);font-weight:600}
+.chart .bar .val{font-size:10.5px;color:var(--mauve-deep);font-weight:700}
+
+.fin-rows{margin-top:8px}
+.fin-row{display:flex;align-items:center;justify-content:space-between;padding:12px 2px;border-bottom:1px solid var(--blush-soft)}
+.fin-row .lft{display:flex;align-items:center;gap:11px}
+.fin-row .dot{width:10px;height:10px;border-radius:50%;flex:none}
+.fin-row .nm{font-size:14px;color:var(--burgundy);font-weight:500}
+.fin-row .sub{font-size:12px;color:var(--muted)}
+.fin-row .amt{font-weight:700;font-family:'Fraunces'}
+.amt.in{color:var(--ok)}.amt.out{color:var(--bad)}
+
+/* CRM */
+.cli-card{display:flex;align-items:center;gap:13px;background:#fff;border:1px solid var(--line);border-radius:var(--r-sm);padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow-sm);text-align:left;width:100%;transition:.15s}
+.cli-card:hover{border-color:var(--mauve);transform:translateY(-1px)}
+.cli-avatar{width:46px;height:46px;border-radius:14px;flex:none;display:grid;place-items:center;font-size:22px;background:var(--blush-soft);border:1px solid var(--line)}
+.cli-card .ci{flex:1;min-width:0}
+.cli-card .cn{font-weight:700;color:var(--burgundy);font-size:15px}
+.cli-card .cd{font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cli-card .cv{text-align:right;flex:none}
+.cli-card .cv .tot{font-family:'Fraunces';font-weight:600;color:var(--mauve-deep)}
+.cli-card .cv .vis{font-size:11px;color:var(--muted)}
+
+/* config */
+.cfg-card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:20px;margin-bottom:16px;box-shadow:var(--shadow-sm)}
+.cfg-card h3{font-size:17px;margin:0 0 4px}
+.cfg-card p.hint{font-size:13px;color:var(--muted);margin:0 0 16px}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.chip{display:inline-flex;align-items:center;gap:8px;background:var(--blush-soft);border:1px solid var(--line);color:var(--mauve-deep);padding:8px 13px;border-radius:var(--r-pill);font-size:13px;font-weight:600}
+.chip button{color:var(--mauve);font-size:15px;line-height:1;opacity:.7}.chip button:hover{opacity:1}
+.add-inline{display:flex;gap:8px;margin-top:10px}
+.add-inline .input{flex:1}.add-inline .btn{padding:13px 18px;flex:none}
+.svc-edit{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--blush-soft)}
+.svc-edit .nm{flex:1;font-weight:600;color:var(--burgundy);font-size:14px}
+.svc-edit .price-in{width:84px}.svc-edit .dur-in{width:70px}
+.swatches{display:flex;gap:10px;flex-wrap:wrap}
+.sw{width:42px;height:42px;border-radius:12px;cursor:pointer;border:3px solid transparent;transition:.15s}
+.sw.on{border-color:var(--burgundy);transform:scale(1.06)}
+.hours-grid{display:grid;gap:8px}
+.hour-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--blush-soft)}
+.hour-row .day{width:96px;font-weight:600;color:var(--burgundy);font-size:13.5px}
+.toggle{width:44px;height:26px;border-radius:var(--r-pill);background:var(--line);position:relative;transition:.2s;flex:none;cursor:pointer}
+.toggle.on{background:var(--mauve)}
+.toggle::after{content:"";position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.toggle.on::after{left:21px}
+.hour-row .times{display:flex;gap:6px;align-items:center;color:var(--muted);font-size:13px}
+.hour-row .times input{width:78px;padding:7px 9px}
+.hour-row.off .times{opacity:.35;pointer-events:none}
+.setting-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 0;border-bottom:1px solid var(--blush-soft)}
+.setting-row:last-child{border:none}
+.setting-row .sl{flex:1}
+.setting-row .st{font-weight:600;color:var(--burgundy);font-size:14px}
+.setting-row .ss{font-size:12px;color:var(--muted)}
+.setting-row .num{width:88px}
+.staff-row{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--blush-soft)}
+.staff-row .av{width:38px;height:38px;border-radius:11px;background:var(--blush-soft);display:grid;place-items:center;font-weight:700;color:var(--mauve-deep);flex:none}
+.staff-row .sn{flex:1;font-weight:600;color:var(--burgundy);font-size:14px}
+.staff-row .comm{width:74px}
+.reminder-preview{background:var(--blush-soft);border-radius:var(--r-sm);padding:14px 16px;font-size:13px;color:var(--ink);line-height:1.6;margin-top:12px}
+.reminder-preview .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:600;margin-bottom:6px}
+
+/* modal */
+.modal-bg{position:fixed;inset:0;z-index:150;background:rgba(43,20,32,.5);backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center;padding:0}
+.modal-bg.show{display:flex;animation:fade .25s}
+.modal{background:var(--cream);width:100%;max-width:520px;max-height:92vh;overflow:auto;border-radius:22px 22px 0 0;padding:8px 20px calc(24px + env(safe-area-inset-bottom));box-shadow:var(--shadow);animation:slideUp .3s cubic-bezier(.2,.8,.2,1)}
+@keyframes slideUp{from{transform:translateY(40px);opacity:.6}to{transform:none;opacity:1}}
+.modal .grab{width:42px;height:5px;border-radius:5px;background:var(--line);margin:8px auto 14px}
+.modal-head{display:flex;align-items:flex-start;gap:13px;margin-bottom:18px}
+.modal-head .av{width:54px;height:54px;border-radius:16px;background:linear-gradient(150deg,var(--mauve),var(--mauve-deep));display:grid;place-items:center;font-size:26px;flex:none}
+.modal-head h2{font-size:23px;margin:0}
+.modal-head .mh-sub{font-size:13px;color:var(--muted)}
+.modal-head .x{margin-left:auto;font-size:24px;color:var(--muted);line-height:1;padding:4px}
+.mrow{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
+.mrow .mi{width:34px;height:34px;border-radius:10px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;font-size:16px;flex:none}
+.mrow .mk{font-size:12px;color:var(--muted)}
+.mrow .mv{font-weight:600;color:var(--burgundy);font-size:14px}
+.mrow a.mv{text-decoration:none}
+.mrow .mr{margin-left:auto;text-align:right}
+.modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.modal-actions .btn{width:100%}
+.modal-actions .full{grid-column:1/-1}
+.pet-pill{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);border-radius:var(--r-pill);padding:6px 13px;font-size:13px;font-weight:600;color:var(--burgundy);margin:4px 6px 4px 0}
+.hist-item{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--blush-soft);font-size:13.5px}
+.hist-item .hk{color:var(--ink)}.hist-item .hv{color:var(--mauve-deep);font-weight:600}
+
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--burgundy);color:#fff;padding:13px 22px;border-radius:var(--r-pill);font-size:14px;font-weight:600;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.3s;z-index:300;max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.note{font-size:12px;color:var(--muted);text-align:center;margin-top:28px;line-height:1.6}
+.note b{color:var(--mauve-deep)}
+.empty{text-align:center;color:var(--muted);font-size:14px;padding:40px 20px}
+
+@media(max-width:560px){.row{flex-direction:column}.biz-head h1{font-size:25px}.wrap{padding:18px 14px 60px}.modal-actions{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN (marca del producto) ===== -->
+<div id="login">
+  <div class="login-card">
+    <div class="login-logo">Perreo<span class="paw">land</span> 🐾</div>
+    <div class="login-sub">El sistema de reservas y gestión para grooming móvil</div>
+    <div class="login-box">
+      <div class="field"><label>Correo</label><input id="logEmail" type="email" placeholder="hola@minegocio.com" value="demo@perreoland.com"></div>
+      <div class="field"><label>Contraseña</label><input id="logPass" type="password" placeholder="••••••••" value="demo1234"></div>
+      <button class="login-btn" onclick="doLogin()">Entrar al panel</button>
+      <div class="login-alt">¿Quieres ver el portal de reservas? <button onclick="doLogin('client')">Ver vista cliente</button></div>
+    </div>
+    <div class="login-feat">
+      <span>📅 Reservas 24/7</span><span>🔔 Recordatorios</span><span>📍 Rutas</span><span>💰 Finanzas</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Demo switcher ===== -->
+<div class="demo-bar">
+  <span class="pl">PerreoLand 🐾 <small>demo</small></span>
+  <div class="seg">
+    <button id="sw-client" onclick="showView('client')">Cliente</button>
+    <button id="sw-biz" class="on" onclick="showView('biz')">Negocio</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ============================================================
+     VISTA CLIENTE
+     ============================================================ -->
+<section id="view-client" class="view">
+  <div class="brand">
+    <div class="mark" id="brandMark">B</div>
+    <div><div class="name" id="brandName">Bella Paws</div><div class="tag" id="brandTag">Grooming móvil · a domicilio</div></div>
+  </div>
+
+  <div class="steps">
+    <div class="s cur" data-s="1"></div><div class="s" data-s="2"></div><div class="s" data-s="3"></div><div class="s" data-s="4"></div>
+  </div>
+
+  <div class="card">
+    <!-- Paso 1 -->
+    <div class="step" data-step="1">
+      <div class="eyebrow">Paso 1 de 4</div><h2>Cuéntanos de tu peludo</h2>
+      <p class="sub">Buscamos la raza para preparar el servicio ideal.</p>
+      <div class="field"><label>Nombre de la mascota</label><input class="input" id="petName" placeholder="Ej. Luna" autocomplete="off"></div>
+      <div class="field combo"><label>Raza</label><input class="input" id="breedInput" placeholder="Empieza a escribir… ej. poodle" autocomplete="off"><div class="results" id="breedResults"></div></div>
+      <div class="field"><label>Tamaño <span class="opt-note">(lo ajustamos por la raza)</span></label>
+        <select class="input" id="petSize"><option value="Toy">Toy · hasta 5 kg</option><option value="Pequeño">Pequeño · 5–11 kg</option><option value="Mediano" selected>Mediano · 11–25 kg</option><option value="Grande">Grande · 25–40 kg</option><option value="Gigante">Gigante · 40 kg +</option></select>
+      </div>
+      <div class="field"><label>Notas para el groomer <span class="opt-note">(opcional)</span></label><textarea class="input" id="petNotes" placeholder="Pelo enredado, le da miedo la secadora, alergias…"></textarea></div>
+      <div class="actions"><button class="btn btn-primary" id="next1" disabled onclick="goStep(2)">Continuar</button></div>
+    </div>
+
+    <!-- Paso 2 -->
+    <div class="step" data-step="2" style="display:none">
+      <div class="eyebrow">Paso 2 de 4</div><h2>Elige el servicio</h2>
+      <p class="sub">El precio se ajusta al tamaño de tu mascota.</p>
+      <div class="opt-grid" id="serviceList"></div>
+      <div class="actions"><button class="btn btn-ghost" onclick="goStep(1)">Atrás</button><button class="btn btn-primary" id="next2" disabled onclick="goStep(3)">Continuar</button></div>
+    </div>
+
+    <!-- Paso 3 -->
+    <div class="step" data-step="3" style="display:none">
+      <div class="eyebrow">Paso 3 de 4</div><h2>¿Dónde y cuándo?</h2>
+      <p class="sub">Vamos hasta tu puerta. Indícanos la dirección.</p>
+      <div class="field"><label>Zona de servicio</label><select class="input" id="zoneSelect"></select></div>
+      <div class="field"><label>Dirección exacta</label><input class="input" id="bookAddr" placeholder="Calle, número, edificio, apto, referencia"></div>
+      <div class="field"><label>Fecha</label><select class="input" id="dateSelect"></select></div>
+      <div class="field"><label>Horario disponible</label><div class="slots" id="slotList"></div></div>
+      <label class="check-line" id="recurWrap"><input type="checkbox" id="recurChk" onchange="toggleRecur()"><span><span class="t">Cita recurrente</span><span class="d">Repetir automáticamente</span></span></label>
+      <div class="sub-inline" id="recurOpts"><div class="field"><select class="input" id="recurEvery"><option value="2">Cada 2 semanas</option><option value="4" selected>Cada 4 semanas</option><option value="6">Cada 6 semanas</option><option value="8">Cada 8 semanas</option></select></div></div>
+      <div class="actions"><button class="btn btn-ghost" onclick="goStep(2)">Atrás</button><button class="btn btn-primary" id="next3" disabled onclick="goStep(4)">Continuar</button></div>
+    </div>
+
+    <!-- Paso 4 -->
+    <div class="step" data-step="4" style="display:none">
+      <div class="eyebrow">Paso 4 de 4</div><h2>Confirma tu reserva</h2>
+      <p class="sub">Te enviaremos recordatorios para que no se te pase.</p>
+      <div class="summary" id="bookSummary"></div>
+      <div class="row"><div class="field"><label>Tu nombre</label><input class="input" id="ownerName" placeholder="Nombre y apellido"></div><div class="field"><label>Teléfono</label><input class="input" id="ownerPhone" placeholder="+58 ..." inputmode="tel"></div></div>
+      <div class="field"><label>Email <span class="opt-note">(para el recordatorio)</span></label><input class="input" id="ownerEmail" placeholder="tu@correo.com" inputmode="email"></div>
+      <div class="actions"><button class="btn btn-ghost" onclick="goStep(3)">Atrás</button><button class="btn btn-primary" id="confirmBtn" onclick="confirmBooking()">Reservar cita</button></div>
+    </div>
+
+    <!-- Done -->
+    <div class="step" data-step="done" style="display:none">
+      <div class="done-state"><div class="check">✓</div><h2 style="font-size:26px">¡Reserva confirmada!</h2><p class="sub" id="doneMsg" style="margin-bottom:22px"></p><button class="btn btn-gold" style="width:100%" onclick="resetBooking()">Hacer otra reserva</button></div>
+    </div>
+  </div>
+  <p class="note">Recordatorios por <b>email</b> incluidos · <b>SMS</b> y <b>WhatsApp</b> como complemento.</p>
+</section>
+
+<!-- ============================================================
+     VISTA NEGOCIO
+     ============================================================ -->
+<section id="view-biz" class="view on">
+  <div class="biz-head">
+    <div><h1 id="bizName">Bella Paws</h1><div class="meta">Panel del negocio · <span id="todayLabel"></span></div></div>
+    <span class="pl-badge">PerreoLand 🐾</span>
+  </div>
+
+  <div class="tabs">
+    <button class="on" onclick="showTab('dash',this)">Inicio</button>
+    <button onclick="showTab('appts',this)">Reservas</button>
+    <button onclick="showTab('clients',this)">Clientes</button>
+    <button onclick="showTab('fin',this)">Finanzas</button>
+    <button onclick="showTab('cfg',this)">Ajustes</button>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="panel on" data-tab="dash">
+    <div class="stat-grid">
+      <div class="stat"><div class="k">Citas hoy</div><div class="v" id="stToday">—</div><div class="d up" id="stTodayD"></div></div>
+      <div class="stat"><div class="k">Esta semana</div><div class="v" id="stWeek">—</div><div class="d">reservas</div></div>
+      <div class="stat"><div class="k">Ingreso del mes</div><div class="v" id="stRev">—</div><div class="d up">▲ flujo activo</div></div>
+      <div class="stat"><div class="k">Clientes</div><div class="v" id="stClients">—</div><div class="d gold">registrados</div></div>
+    </div>
+    <div class="sec-title">Próximas citas</div>
+    <div id="upcomingList"></div>
+  </div>
+
+  <!-- Reservas -->
+  <div class="panel" data-tab="appts"><div id="allAppts"></div></div>
+
+  <!-- Clientes -->
+  <div class="panel" data-tab="clients">
+    <div class="sec-title">Directorio de clientes</div>
+    <div id="clientList"></div>
+  </div>
+
+  <!-- Finanzas -->
+  <div class="panel" data-tab="fin">
+    <div class="stat-grid">
+      <div class="stat"><div class="k">Ingresos</div><div class="v" id="finIn" style="color:var(--ok)">—</div><div class="d">este mes</div></div>
+      <div class="stat"><div class="k">Gastos</div><div class="v" id="finOut" style="color:var(--bad)">—</div><div class="d">incl. comisiones</div></div>
+      <div class="stat"><div class="k">Ganancia neta</div><div class="v" id="finNet">—</div><div class="d up" id="finMargin"></div></div>
+    </div>
+    <div class="cfg-card"><h3>Ingresos por semana</h3><p class="hint">Últimas 6 semanas</p><div class="chart" id="finChart"></div></div>
+    <div class="cfg-card"><h3>Desglose por servicio</h3><div class="fin-rows" id="svcBreakdown"></div></div>
+    <div class="cfg-card"><h3>Comisiones del equipo</h3><div class="fin-rows" id="commRows"></div></div>
+    <div class="cfg-card"><h3>Gastos del mes</h3><div class="fin-rows" id="expenseRows"></div>
+      <div class="add-inline"><input class="input" id="expName" placeholder="Concepto"><input class="input" id="expAmt" placeholder="$" inputmode="decimal" style="max-width:100px"><button class="btn btn-primary" onclick="addExpense()">Añadir</button></div>
+    </div>
+  </div>
+
+  <!-- Ajustes -->
+  <div class="panel" data-tab="cfg">
+    <div class="cfg-card"><h3>Identidad del negocio</h3><p class="hint">Re-tematiza el portal de tus clientes al instante.</p>
+      <div class="field"><label>Nombre del negocio</label><input class="input" id="cfgName" value="Bella Paws" oninput="applyBrand()"></div>
+      <div class="field"><label>Eslogan</label><input class="input" id="cfgTag" value="Grooming móvil · a domicilio" oninput="applyBrand()"></div>
+      <div class="field"><label>Color principal</label><div class="swatches" id="swatches"></div></div>
+    </div>
+
+    <div class="cfg-card"><h3>Zonas de servicio</h3><p class="hint">Áreas donde tu unidad móvil atiende.</p>
+      <div class="chip-row" id="zoneChips"></div>
+      <div class="add-inline"><input class="input" id="zoneInput" placeholder="Añadir zona"><button class="btn btn-primary" onclick="addZone()">Añadir</button></div>
+    </div>
+
+    <div class="cfg-card"><h3>Servicios, precios y duración</h3><p class="hint">El precio se ajusta automático por tamaño de mascota.</p><div id="svcEditor"></div></div>
+
+    <div class="cfg-card"><h3>Equipo</h3><p class="hint">Asigna citas y calcula comisiones automáticamente.</p>
+      <div id="staffEditor"></div>
+      <div class="add-inline"><input class="input" id="staffName" placeholder="Nombre del groomer"><input class="input" id="staffComm" placeholder="% com." inputmode="decimal" style="max-width:90px"><button class="btn btn-primary" onclick="addStaff()">Añadir</button></div>
+    </div>
+
+    <div class="cfg-card"><h3>Recordatorios automáticos</h3><p class="hint">Reduce inasistencias avisando a tus clientes.</p>
+      <div class="setting-row"><div class="sl"><div class="st">Email</div><div class="ss">Incluido sin costo</div></div><div class="toggle on" id="rmEmail" onclick="toggleReminder('email',this)"></div></div>
+      <div class="setting-row"><div class="sl"><div class="st">SMS</div><div class="ss">~$0.01 por mensaje</div></div><div class="toggle" id="rmSms" onclick="toggleReminder('sms',this)"></div></div>
+      <div class="setting-row"><div class="sl"><div class="st">WhatsApp</div><div class="ss">Vía WhatsApp Business</div></div><div class="toggle on" id="rmWa" onclick="toggleReminder('whatsapp',this)"></div></div>
+      <div class="setting-row"><div class="sl"><div class="st">Enviar aviso</div><div class="ss">Antes de la cita</div></div><select class="input num" id="rmTiming" style="width:140px" onchange="renderReminderPreview()"><option value="24">24 h antes</option><option value="48">48 h antes</option><option value="2">2 h antes</option></select></div>
+      <div class="reminder-preview" id="rmPreview"></div>
+    </div>
+
+    <div class="cfg-card"><h3>Reglas de reserva</h3><p class="hint">Controla tu agenda y protégete de inasistencias.</p>
+      <div class="setting-row"><div class="sl"><div class="st">Depósito al reservar</div><div class="ss">Se descuenta del total</div></div><div class="row" style="flex:none;align-items:center;gap:8px"><span style="color:var(--muted)">$</span><input class="input num" id="depAmt" type="number" value="10" min="0" onchange="updateRules()"></div></div>
+      <div class="setting-row"><div class="sl"><div class="st">Máx. citas por día</div><div class="ss">Por unidad móvil</div></div><input class="input num" id="maxDay" type="number" value="8" min="1" onchange="updateRules()"></div>
+      <div class="setting-row"><div class="sl"><div class="st">Ventana mínima</div><div class="ss">Anticipación para reservar</div></div><select class="input" id="minWindow" style="width:140px" onchange="updateRules()"><option value="2">2 horas</option><option value="12">12 horas</option><option value="24" selected>24 horas</option></select></div>
+    </div>
+
+    <div class="cfg-card"><h3>Horario de atención</h3><p class="hint">Define qué días y franjas pueden reservar.</p><div class="hours-grid" id="hoursGrid"></div></div>
+  </div>
+</section>
+
+</div>
+
+<!-- modal -->
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()"><div class="modal" id="modalBody"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   DATA — estado en memoria (demo). Producción → Firestore.
+   ============================================================ */
+const BREEDS=[
+ ["Affenpinscher","Pequeño"],["Akita","Grande"],["Alaskan Malamute","Gigante"],["American Bully","Mediano"],
+ ["Basset Hound","Mediano"],["Beagle","Pequeño"],["Bichón Frisé","Pequeño"],["Bóxer","Grande"],
+ ["Bobtail","Grande"],["Border Collie","Mediano"],["Boston Terrier","Pequeño"],["Boyero de Berna","Gigante"],
+ ["Bulldog Francés","Pequeño"],["Bulldog Inglés","Mediano"],["Bull Terrier","Mediano"],["Caniche / Poodle Toy","Toy"],
+ ["Caniche / Poodle Mediano","Mediano"],["Caniche / Poodle Estándar","Grande"],["Cavalier King Charles","Pequeño"],
+ ["Chihuahua","Toy"],["Chow Chow","Grande"],["Cocker Spaniel","Mediano"],["Collie","Grande"],
+ ["Corgi","Pequeño"],["Dálmata","Grande"],["Doberman","Grande"],["Dogo Argentino","Grande"],
+ ["Dogo de Burdeos","Gigante"],["Fox Terrier","Pequeño"],["Galgo","Grande"],["Golden Retriever","Grande"],
+ ["Gran Danés","Gigante"],["Husky Siberiano","Grande"],["Jack Russell","Pequeño"],["Labrador","Grande"],
+ ["Lhasa Apso","Pequeño"],["Maltés","Toy"],["Mastín","Gigante"],["Pastor Alemán","Grande"],
+ ["Pastor Australiano","Mediano"],["Pastor Belga","Grande"],["Pekinés","Pequeño"],["Pinscher Miniatura","Toy"],
+ ["Pitbull","Mediano"],["Pomerania","Toy"],["Pug","Pequeño"],["Rottweiler","Grande"],
+ ["Salchicha / Dachshund","Pequeño"],["Samoyedo","Grande"],["San Bernardo","Gigante"],["Schnauzer Mini","Pequeño"],
+ ["Schnauzer Gigante","Grande"],["Setter Irlandés","Grande"],["Shar Pei","Mediano"],["Shih Tzu","Pequeño"],
+ ["Shiba Inu","Mediano"],["Springer Spaniel","Mediano"],["Staffordshire","Mediano"],["Teckel","Pequeño"],
+ ["Terranova","Gigante"],["Weimaraner","Grande"],["West Highland / Westie","Pequeño"],["Whippet","Mediano"],
+ ["Yorkshire Terrier","Toy"],["Mestizo / Criollo","Mediano"]
+];
+const SIZE_MULT={Toy:1,"Pequeño":1.15,Mediano:1.45,Grande:1.85,Gigante:2.3};
+const PALETTE=["#A8688A","#B5526E","#9B6FB0","#C77B8B","#7E6BA8","#C2A24F"];
+const DOG_EMOJI=["🐶","🐕","🦮","🐩","🐕‍🦺"];
+const ADDR_SAMPLES=["Calle La Paz, Casa 4","Av. Sucre #12, Qta. Rosa","Res. El Mirador, Torre B Apt 5","Calle Bolívar, Casa 18","Av. Principal, Edif. Sol PB","Calle El Carmen #7","Urb. Los Pinos, Casa 22","Av. Las Flores, Qta. Luna"];
+
+let _id=0;const nid=()=>"a"+(++_id);
+
+const STATE={
+  brand:{name:"Bella Paws",tag:"Grooming móvil · a domicilio",color:"#A8688A"},
+  zones:["El Hatillo","Las Mercedes","La Lagunita","Los Naranjos"],
+  services:[
+    {id:"bano",name:"Baño & cepillado",desc:"Baño, secado y cepillado",icon:"🛁",base:25,dur:45},
+    {id:"full",name:"Grooming completo",desc:"Baño + corte + uñas + oídos",icon:"✂️",base:40,dur:90},
+    {id:"deslan",name:"Deslanado",desc:"Remoción de subpelo",icon:"🌬️",base:30,dur:60},
+    {id:"unas",name:"Corte de uñas & spa",desc:"Uñas, glándulas, perfume",icon:"💅",base:15,dur:25},
+  ],
+  staff:[{name:"Valentina R.",comm:40},{name:"Daniela P.",comm:35}],
+  hours:[
+    {day:"Lunes",on:true,from:"09:00",to:"17:00"},{day:"Martes",on:true,from:"09:00",to:"17:00"},
+    {day:"Miércoles",on:true,from:"09:00",to:"17:00"},{day:"Jueves",on:true,from:"09:00",to:"17:00"},
+    {day:"Viernes",on:true,from:"09:00",to:"18:00"},{day:"Sábado",on:true,from:"08:00",to:"14:00"},
+    {day:"Domingo",on:false,from:"09:00",to:"13:00"},
+  ],
+  settings:{reminders:{email:true,sms:false,whatsapp:true,timing:24},deposit:10,maxDay:8,minWindow:24},
+  appointments:[],
+  expenses:[{name:"Gasolina de la unidad",amt:180},{name:"Shampoo & insumos",amt:140},{name:"Mantenimiento van",amt:90}]
+};
+
+function addDays(n){const d=new Date();d.setDate(d.getDate()+n);return d.toISOString().slice(0,10);}
+function money(n){return "$"+Math.round(n).toLocaleString("en-US");}
+function fmtDate(iso){const d=new Date(iso+"T12:00");return d.toLocaleDateString("es",{weekday:"short",day:"numeric",month:"short"});}
+function svcById(id){return STATE.services.find(s=>s.id===id)||{};}
+function priceFor(svc,size){return Math.round((svc.base||0)*(SIZE_MULT[size]||1));}
+function initials(n){return n.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase();}
+function phoneGen(r){return "+58 41"+(2+Math.floor(r()*6))+"-"+(1000000+Math.floor(r()*8999999));}
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2400);}
+
+/* seed: citas próximas + historial del mes */
+function seed(){
+  let s=7;const r=()=>{s=(s*9301+49297)%233280;return s/233280;};
+  const mkAddr=()=>ADDR_SAMPLES[Math.floor(r()*ADDR_SAMPLES.length)];
+  const grm=()=>STATE.staff[Math.floor(r()*STATE.staff.length)].name;
+  // próximas (manuales)
+  const up=[
+    ["Coco","Caniche / Poodle Toy","Toy","full",0,"10:00","conf"],
+    ["Rocky","Golden Retriever","Grande","bano",0,"13:30","conf"],
+    ["Nala","Shih Tzu","Pequeño","full",1,"11:00","pend"],
+    ["Max","Labrador","Grande","deslan",2,"09:30","conf"],
+    ["Toby","Yorkshire Terrier","Toy","unas",3,"15:00","pend"],
+  ];
+  const owners=["María González","José Pérez","Ana Rodríguez","Carla Méndez","Luis Díaz"];
+  up.forEach((a,i)=>{const sv=svcById(a[3]);STATE.appointments.push({
+    id:nid(),pet:a[0],breed:a[1],size:a[2],svc:a[3],owner:owners[i],phone:phoneGen(r),email:"",
+    addr:mkAddr(),zone:STATE.zones[Math.floor(r()*STATE.zones.length)],when:addDays(a[4]),time:a[5],
+    price:priceFor(sv,a[2]),groomer:grm(),status:a[6],paid:false,recurring:null});});
+  // historial (completadas)
+  const pets=["Kira","Bruno","Lola","Thor","Maya","Zeus","Canela","Simba","Frida","Duke","Mia","Oso","Chloe","Niko","Pepa","Tobías","Cookie","Balto"];
+  const ow2=["Pedro S.","Sofía L.","Diego H.","Valeria C.","Andrés T.","Gaby M.","Rafael O.","Daniela V.","Marco A.","Isabel R."];
+  for(let i=0;i<30;i++){
+    const day=-(1+Math.floor(r()*41));const b=BREEDS[Math.floor(r()*BREEDS.length)];const sv=STATE.services[Math.floor(r()*STATE.services.length)];
+    STATE.appointments.push({id:nid(),pet:pets[i%pets.length],breed:b[0],size:b[1],svc:sv.id,
+      owner:ow2[Math.floor(r()*ow2.length)],phone:phoneGen(r),email:"",addr:mkAddr(),
+      zone:STATE.zones[Math.floor(r()*STATE.zones.length)],when:addDays(day),time:"10:00",
+      price:priceFor(sv,b[1]),groomer:grm(),status:"done",paid:true,recurring:null});
+  }
+}
+seed();
+
+const SEL={pet:"",breed:"",size:"Mediano",notes:"",svc:null,zone:null,addr:"",date:null,time:null,recur:null};
+
+/* ---------- login & views ---------- */
+function doLogin(target){
+  document.getElementById("login").classList.add("hide");
+  if(target==="client")showView("client");else showView("biz");
+}
+function showView(v){
+  document.getElementById("view-client").classList.toggle("on",v==="client");
+  document.getElementById("view-biz").classList.toggle("on",v==="biz");
+  document.getElementById("sw-client").classList.toggle("on",v==="client");
+  document.getElementById("sw-biz").classList.toggle("on",v==="biz");
+  if(v==="biz")refreshBiz();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* ============================================================
+   CLIENTE — wizard
+   ============================================================ */
+function goStep(n){
+  if(n===2)renderServices();
+  if(n===3){renderZones();buildDateOptions();}
+  if(n===4)buildSummary();
+  document.querySelectorAll('#view-client .step').forEach(s=>s.style.display=(s.dataset.step==String(n))?"block":"none");
+  document.querySelectorAll('.steps .s').forEach(s=>{const i=+s.dataset.s;s.classList.toggle('done',i<n);s.classList.toggle('cur',i===n);});
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+const bi=document.getElementById("breedInput"),br=document.getElementById("breedResults");
+let hlIndex=-1,curMatches=[];
+bi.addEventListener("input",()=>{
+  const q=bi.value.trim().toLowerCase();hlIndex=-1;
+  if(!q){br.classList.remove("show");checkStep1();return;}
+  curMatches=BREEDS.filter(b=>b[0].toLowerCase().includes(q)).slice(0,8);
+  if(!curMatches.length){br.innerHTML='<div class="empty-res">Sin coincidencias — la registramos igual.</div>';br.classList.add("show");checkStep1();return;}
+  br.innerHTML=curMatches.map((b,i)=>'<button onclick="pickBreed('+i+')"><span>'+b[0]+'</span><span class="sz">'+b[1]+'</span></button>').join("");
+  br.classList.add("show");checkStep1();
+});
+bi.addEventListener("keydown",e=>{
+  if(!br.classList.contains("show"))return;const btns=br.querySelectorAll("button");if(!btns.length)return;
+  if(e.key==="ArrowDown"){e.preventDefault();hlIndex=Math.min(hlIndex+1,btns.length-1);}
+  else if(e.key==="ArrowUp"){e.preventDefault();hlIndex=Math.max(hlIndex-1,0);}
+  else if(e.key==="Enter"&&hlIndex>=0){e.preventDefault();pickBreed(hlIndex);return;}else return;
+  btns.forEach((b,i)=>b.classList.toggle("hl",i===hlIndex));
+});
+function pickBreed(i){const b=curMatches[i];if(!b)return;bi.value=b[0];SEL.breed=b[0];SEL.size=b[1];document.getElementById("petSize").value=b[1];br.classList.remove("show");checkStep1();}
+document.addEventListener("click",e=>{if(!e.target.closest(".combo"))br.classList.remove("show");});
+document.getElementById("petName").addEventListener("input",checkStep1);
+document.getElementById("petSize").addEventListener("change",e=>SEL.size=e.target.value);
+function checkStep1(){SEL.pet=document.getElementById("petName").value.trim();SEL.breed=bi.value.trim();document.getElementById("next1").disabled=!(SEL.pet&&SEL.breed);}
+
+function renderServices(){
+  SEL.size=document.getElementById("petSize").value;
+  document.getElementById("serviceList").innerHTML=STATE.services.map(s=>{
+    const p=priceFor(s,SEL.size);
+    return '<button class="opt '+(SEL.svc===s.id?'sel':'')+'" onclick="pickService(\''+s.id+'\')"><span class="ic">'+s.icon+'</span><span><span class="tl">'+s.name+'</span><br><span class="ds">'+s.desc+'</span></span><span><span class="pr">'+money(p)+'</span><span class="dur">'+s.dur+' min</span></span></button>';
+  }).join("");
+}
+function pickService(id){SEL.svc=id;renderServices();document.getElementById("next2").disabled=false;}
+
+function renderZones(){document.getElementById("zoneSelect").innerHTML=STATE.zones.map(z=>'<option>'+z+'</option>').join("");if(!SEL.zone)SEL.zone=STATE.zones[0];}
+document.getElementById("zoneSelect").addEventListener("change",e=>SEL.zone=e.target.value);
+document.getElementById("bookAddr").addEventListener("input",e=>{SEL.addr=e.target.value.trim();validateStep3();});
+
+function buildDateOptions(){
+  const sel=document.getElementById("dateSelect");const opts=[];
+  for(let i=0;i<14;i++){const d=new Date();d.setDate(d.getDate()+i);const dow=(d.getDay()+6)%7;
+    if(STATE.hours[dow].on){const iso=d.toISOString().slice(0,10);opts.push('<option value="'+iso+'">'+(i===0?'Hoy · ':'')+d.toLocaleDateString("es",{weekday:"long",day:"numeric",month:"long"})+'</option>');}}
+  sel.innerHTML=opts.join("");SEL.date=sel.value;buildSlots();
+}
+document.getElementById("dateSelect").addEventListener("change",e=>{SEL.date=e.target.value;buildSlots();});
+function buildSlots(){
+  const d=new Date(SEL.date+"T12:00");const dow=(d.getDay()+6)%7;const h=STATE.hours[dow];
+  const fromH=+h.from.slice(0,2),toH=+h.to.slice(0,2);
+  const taken=STATE.appointments.filter(a=>a.when===SEL.date).map(a=>a.time);
+  let html="";
+  for(let hr=fromH;hr<toH;hr++)for(const mm of ["00","30"]){const t=String(hr).padStart(2,"0")+":"+mm;const off=taken.includes(t);
+    html+='<button class="slot '+(off?'off':'')+' '+(SEL.time===t?'sel':'')+'" '+(off?'disabled':'onclick="pickSlot(\''+t+'\')"')+'>'+t+'</button>';}
+  document.getElementById("slotList").innerHTML=html;validateStep3();
+}
+function pickSlot(t){SEL.time=t;buildSlots();}
+function toggleRecur(){const on=document.getElementById("recurChk").checked;document.getElementById("recurOpts").classList.toggle("show",on);}
+function validateStep3(){document.getElementById("next3").disabled=!(SEL.zone&&SEL.addr&&SEL.date&&SEL.time);}
+
+function buildSummary(){
+  const s=svcById(SEL.svc);const p=priceFor(s,SEL.size);SEL.price=p;
+  const dep=STATE.settings.deposit;
+  const recurTxt=document.getElementById("recurChk").checked?('Sí · cada '+document.getElementById("recurEvery").value+' sem'):'No';
+  document.getElementById("bookSummary").innerHTML=
+    '<div class="ln"><span class="k">Mascota</span><span class="v">'+SEL.pet+' · '+SEL.breed+'</span></div>'+
+    '<div class="ln"><span class="k">Servicio</span><span class="v">'+s.name+' ('+SEL.size+')</span></div>'+
+    '<div class="ln"><span class="k">Dirección</span><span class="v">'+SEL.addr+'</span></div>'+
+    '<div class="ln"><span class="k">Fecha</span><span class="v">'+fmtDate(SEL.date)+' · '+SEL.time+'</span></div>'+
+    '<div class="ln"><span class="k">Recurrente</span><span class="v">'+recurTxt+'</span></div>'+
+    '<div class="total"><span class="k">Total estimado</span><span class="t">'+money(p)+'</span></div>'+
+    (dep>0?'<div class="deposit-tag">Depósito para reservar: '+money(dep)+' (se descuenta del total)</div>':'');
+}
+function confirmBooking(){
+  const name=document.getElementById("ownerName").value.trim();
+  const phone=document.getElementById("ownerPhone").value.trim();
+  const email=document.getElementById("ownerEmail").value.trim();
+  if(!name||!phone){toast("Completa nombre y teléfono");return;}
+  const groomer=(STATE.staff[0]||{}).name||"—";
+  const recurOn=document.getElementById("recurChk").checked;
+  const every=+document.getElementById("recurEvery").value;
+  const base={pet:SEL.pet,breed:SEL.breed,size:SEL.size,svc:SEL.svc,owner:name,phone:phone,email:email,
+    addr:SEL.addr,zone:SEL.zone,price:SEL.price,groomer:groomer,recurring:recurOn?('cada '+every+' sem'):null};
+  STATE.appointments.push(Object.assign({id:nid(),when:SEL.date,time:SEL.time,status:"pend",paid:false},base));
+  if(recurOn){const base0=new Date(SEL.date+"T12:00");
+    for(let k=1;k<=3;k++){const d=new Date(base0);d.setDate(d.getDate()+every*7*k);
+      STATE.appointments.push(Object.assign({id:nid(),when:d.toISOString().slice(0,10),time:SEL.time,status:"pend",paid:false},base));}}
+  // ► Producción: addDoc(...) + disparar recordatorio (EmailJS/Cloud Function)
+  document.getElementById("doneMsg").innerHTML='Te esperamos el <b>'+fmtDate(SEL.date)+'</b> a las <b>'+SEL.time+'</b>.<br>'+
+    (recurOn?'Programamos también tus próximas citas. ':'')+'Enviamos la confirmación a tu correo.';
+  goStep("done");document.querySelectorAll('.steps .s').forEach(s=>{s.classList.add('done');s.classList.remove('cur');});
+}
+function resetBooking(){
+  Object.assign(SEL,{pet:"",breed:"",size:"Mediano",notes:"",svc:null,zone:STATE.zones[0],addr:"",date:null,time:null,recur:null});
+  ["petName","breedInput","petNotes","bookAddr","ownerName","ownerPhone","ownerEmail"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("petSize").value="Mediano";document.getElementById("recurChk").checked=false;document.getElementById("recurOpts").classList.remove("show");
+  document.getElementById("next1").disabled=true;document.getElementById("next2").disabled=true;goStep(1);
+}
+
+/* ============================================================
+   NEGOCIO
+   ============================================================ */
+function showTab(t,btn){
+  document.querySelectorAll('#view-biz .tabs button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
+  document.querySelectorAll('#view-biz .panel').forEach(p=>p.classList.toggle('on',p.dataset.tab===t));
+}
+function refreshBiz(){
+  document.getElementById("bizName").textContent=STATE.brand.name;
+  document.getElementById("todayLabel").textContent=new Date().toLocaleDateString("es",{weekday:"long",day:"numeric",month:"long"});
+  renderDash();renderAllAppts();renderClients();renderFinance();renderConfig();
+}
+function clientsFromAppts(){
+  const m={};
+  STATE.appointments.forEach(a=>{const k=a.owner;if(!m[k])m[k]={owner:a.owner,phone:a.phone,addr:a.addr,zone:a.zone,pets:{},visits:0,spent:0,last:"",appts:[]};
+    const c=m[k];c.appts.push(a);c.pets[a.pet]=a.breed;if(a.status==="done"){c.visits++;c.spent+=a.price;}if(a.when>c.last)c.last=a.when;});
+  return Object.values(m).sort((a,b)=>b.spent-a.spent);
+}
+function renderDash(){
+  const today=addDays(0);
+  const todays=STATE.appointments.filter(a=>a.when===today);
+  const week=STATE.appointments.filter(a=>[...Array(7)].map((_,i)=>addDays(i)).includes(a.when));
+  const monthRev=STATE.appointments.filter(a=>a.when<=today&&a.when>=addDays(-30)).reduce((s,a)=>s+a.price,0);
+  document.getElementById("stToday").textContent=todays.length;
+  document.getElementById("stTodayD").textContent=todays.length?("▲ "+money(todays.reduce((s,a)=>s+a.price,0))+" agendado"):"sin citas";
+  document.getElementById("stWeek").textContent=week.length;
+  document.getElementById("stRev").textContent=money(monthRev);
+  document.getElementById("stClients").textContent=clientsFromAppts().length;
+  const up=STATE.appointments.filter(a=>a.when>=today).sort((a,b)=>(a.when+a.time).localeCompare(b.when+b.time)).slice(0,6);
+  document.getElementById("upcomingList").innerHTML=up.length?up.map(apptRow).join(""):'<div class="empty">No hay citas próximas.</div>';
+}
+function apptRow(a){
+  const d=new Date(a.when+"T12:00");const s=svcById(a.svc);
+  const st=a.status==="conf"?'<span class="badge b-conf">Confirmada</span>':a.status==="done"?'<span class="badge b-done">Completada</span>':'<span class="badge b-pend">Pendiente</span>';
+  const pay=a.paid?'<span class="badge b-paid">Pagada</span>':'<span class="badge b-unpaid">Por cobrar</span>';
+  return '<button class="appt" onclick="openAppt(\''+a.id+'\')"><div class="when"><div class="d">'+d.getDate()+'</div><div class="m">'+d.toLocaleDateString("es",{month:"short"})+'</div><div class="h">'+a.time+'</div></div>'+
+    '<div class="info"><div class="pet">'+a.pet+' <span style="color:var(--muted);font-weight:400">· '+a.breed+'</span></div><div class="det">'+(s.icon||'')+' '+(s.name||a.svc)+' · '+a.owner+' · '+(a.zone||'')+'</div></div>'+
+    '<div class="rgt">'+st+pay+'<span class="price">'+money(a.price)+'</span></div></button>';
+}
+function renderAllAppts(){
+  const today=addDays(0);
+  const up=STATE.appointments.filter(a=>a.when>=today).sort((a,b)=>(a.when+a.time).localeCompare(b.when+b.time));
+  const past=STATE.appointments.filter(a=>a.when<today).sort((a,b)=>(b.when+b.time).localeCompare(a.when+a.time)).slice(0,8);
+  let h="";if(up.length)h+='<div class="sec-title">Próximas ('+up.length+')</div>'+up.map(apptRow).join("");
+  if(past.length)h+='<div class="sec-title">Completadas recientes</div>'+past.map(apptRow).join("");
+  document.getElementById("allAppts").innerHTML=h||'<div class="empty">Aún no hay reservas.</div>';
+}
+function renderClients(){
+  const cs=clientsFromAppts();
+  document.getElementById("clientList").innerHTML=cs.map((c,i)=>{
+    const petNames=Object.keys(c.pets);const em=DOG_EMOJI[i%DOG_EMOJI.length];
+    return '<button class="cli-card" onclick="openClient(\''+encodeURIComponent(c.owner)+'\')"><div class="cli-avatar">'+em+'</div>'+
+      '<div class="ci"><div class="cn">'+c.owner+'</div><div class="cd">'+petNames.join(", ")+' · '+c.zone+'</div></div>'+
+      '<div class="cv"><div class="tot">'+money(c.spent)+'</div><div class="vis">'+c.visits+' visitas</div></div></button>';
+  }).join("")||'<div class="empty">Aún no hay clientes.</div>';
+}
+
+function renderFinance(){
+  const today=addDays(0);
+  const month=STATE.appointments.filter(a=>a.when<=today&&a.when>=addDays(-30));
+  const income=month.reduce((s,a)=>s+a.price,0);
+  const comm={};let commTotal=0;
+  month.filter(a=>a.status==="done").forEach(a=>{const g=STATE.staff.find(x=>x.name===a.groomer);if(g){const c=a.price*g.comm/100;comm[g.name]=(comm[g.name]||0)+c;commTotal+=c;}});
+  const exp=STATE.expenses.reduce((s,e)=>s+e.amt,0);
+  const out=exp+commTotal;const net=income-out;const margin=income?Math.round(net/income*100):0;
+  document.getElementById("finIn").textContent=money(income);
+  document.getElementById("finOut").textContent=money(out);
+  document.getElementById("finNet").textContent=money(net);
+  const mEl=document.getElementById("finMargin");mEl.textContent=(net>=0?"▲ ":"▼ ")+margin+"% margen";mEl.style.color=net>=0?"var(--ok)":"var(--bad)";
+  const weeks=[0,0,0,0,0,0];
+  STATE.appointments.forEach(a=>{const diff=Math.floor((new Date(today)-new Date(a.when))/86400000);if(diff>=0&&diff<42)weeks[5-Math.floor(diff/7)]+=a.price;});
+  const max=Math.max(...weeks,1);
+  document.getElementById("finChart").innerHTML=weeks.map((v,i)=>'<div class="bar"><span class="val">'+money(v)+'</span><div class="fill" style="height:'+Math.round(v/max*100)+'%"></div><span class="lab">S'+(i+1)+'</span></div>').join("");
+  const by={};month.forEach(a=>{by[a.svc]=(by[a.svc]||0)+a.price;});
+  const cols=["#A8688A","#C2A24F","#823F61","#D08CA6"];
+  document.getElementById("svcBreakdown").innerHTML=Object.entries(by).sort((a,b)=>b[1]-a[1]).map(([id,v],i)=>{
+    const sv=svcById(id);const cnt=month.filter(a=>a.svc===id).length;
+    return '<div class="fin-row"><div class="lft"><span class="dot" style="background:'+cols[i%4]+'"></span><div><div class="nm">'+(sv.name||id)+'</div><div class="sub">'+cnt+' '+(cnt===1?'cita':'citas')+'</div></div></div><span class="amt in">'+money(v)+'</span></div>';
+  }).join("");
+  document.getElementById("commRows").innerHTML=Object.entries(comm).map(([n,v])=>{const g=STATE.staff.find(x=>x.name===n);
+    return '<div class="fin-row"><div class="lft"><span class="dot" style="background:var(--mauve)"></span><div><div class="nm">'+n+'</div><div class="sub">'+(g?g.comm:0)+'% comisión</div></div></div><span class="amt out">−'+money(v)+'</span></div>';}).join("")||'<p class="hint">Sin comisiones este mes.</p>';
+  document.getElementById("expenseRows").innerHTML=STATE.expenses.map(e=>'<div class="fin-row"><div class="lft"><span class="dot" style="background:var(--bad)"></span><div class="nm">'+e.name+'</div></div><span class="amt out">−'+money(e.amt)+'</span></div>').join("")||'<p class="hint">Sin gastos.</p>';
+}
+function addExpense(){
+  const n=document.getElementById("expName").value.trim();const a=parseFloat(document.getElementById("expAmt").value);
+  if(!n||!a||a<=0){toast("Escribe concepto y monto");return;}
+  STATE.expenses.push({name:n,amt:a});document.getElementById("expName").value="";document.getElementById("expAmt").value="";renderFinance();toast("Gasto registrado");
+}
+
+/* ---------- modal: cita ---------- */
+function openAppt(id){
+  const a=STATE.appointments.find(x=>x.id===id);if(!a)return;const s=svcById(a.svc);
+  const st=a.status==="conf"?'<span class="badge b-conf">Confirmada</span>':a.status==="done"?'<span class="badge b-done">Completada</span>':'<span class="badge b-pend">Pendiente</span>';
+  const mapUrl="https://maps.google.com/?q="+encodeURIComponent(a.addr+" "+a.zone);
+  const opts=STATE.staff.map(g=>'<option '+(g.name===a.groomer?'selected':'')+'>'+g.name+'</option>').join("");
+  openModal(
+    '<div class="modal-head"><div class="av">'+(s.icon||"🐾")+'</div><div><h2>'+a.pet+'</h2><div class="mh-sub">'+a.breed+' · '+a.size+'</div></div><button class="x" onclick="closeModal()">×</button></div>'+
+    '<div class="mrow"><div class="mi">📅</div><div><div class="mk">Fecha & hora</div><div class="mv">'+fmtDate(a.when)+' · '+a.time+'</div></div><div class="mr">'+st+'</div></div>'+
+    '<div class="mrow"><div class="mi">✂️</div><div><div class="mk">Servicio</div><div class="mv">'+(s.name||a.svc)+' · '+(s.dur||"")+' min</div></div><div class="mr"><span class="price" style="font-family:Fraunces;color:var(--mauve-deep);font-weight:600">'+money(a.price)+'</span></div></div>'+
+    '<div class="mrow"><div class="mi">👤</div><div><div class="mk">Cliente</div><div class="mv">'+a.owner+'</div></div><div class="mr"><a class="mv" href="tel:'+a.phone+'">'+a.phone+'</a></div></div>'+
+    '<div class="mrow"><div class="mi">📍</div><div><div class="mk">Dirección · '+a.zone+'</div><a class="mv" href="'+mapUrl+'" target="_blank">'+a.addr+' ↗</a></div></div>'+
+    (a.recurring?'<div class="mrow"><div class="mi">🔁</div><div><div class="mk">Recurrencia</div><div class="mv">'+a.recurring+'</div></div></div>':'')+
+    '<div class="mrow"><div class="mi">🧑‍🔧</div><div style="flex:1"><div class="mk">Groomer asignado</div><select class="input" style="margin-top:4px" onchange="setGroomer(\''+a.id+'\',this.value)">'+opts+'</select></div></div>'+
+    '<div class="modal-actions">'+
+      (a.status!=="conf"&&a.status!=="done"?'<button class="btn btn-ghost btn-sm" onclick="setStatus(\''+a.id+'\',\'conf\')">Confirmar</button>':'')+
+      (a.status!=="done"?'<button class="btn btn-ghost btn-sm" onclick="setStatus(\''+a.id+'\',\'done\')">Marcar completada</button>':'')+
+      (!a.paid?'<button class="btn btn-gold btn-sm" onclick="markPaid(\''+a.id+'\')">Cobrar '+money(a.price)+'</button>':'<button class="btn btn-ghost btn-sm" disabled>✓ Pagada</button>')+
+      '<button class="btn btn-danger btn-sm" onclick="cancelAppt(\''+a.id+'\')">Cancelar cita</button>'+
+    '</div>');
+}
+function setStatus(id,st){const a=STATE.appointments.find(x=>x.id===id);if(a){a.status=st;if(st==="done")a.paid=true;}refreshBiz();openAppt(id);toast(st==="conf"?"Cita confirmada":"Cita completada");}
+function markPaid(id){const a=STATE.appointments.find(x=>x.id===id);if(a)a.paid=true;refreshBiz();openAppt(id);toast("Pago registrado");}
+function setGroomer(id,g){const a=STATE.appointments.find(x=>x.id===id);if(a)a.groomer=g;refreshBiz();toast("Groomer: "+g);}
+function cancelAppt(id){STATE.appointments=STATE.appointments.filter(x=>x.id!==id);closeModal();refreshBiz();toast("Cita cancelada");}
+
+/* ---------- modal: cliente ---------- */
+function openClient(enc){
+  const owner=decodeURIComponent(enc);const c=clientsFromAppts().find(x=>x.owner===owner);if(!c)return;
+  const pets=Object.entries(c.pets).map(([n,b])=>'<span class="pet-pill">🐾 '+n+' · '+b+'</span>').join("");
+  const hist=c.appts.slice().sort((a,b)=>b.when.localeCompare(a.when)).slice(0,6).map(a=>{
+    const s=svcById(a.svc);return '<div class="hist-item"><span class="hk">'+fmtDate(a.when)+' · '+(s.name||a.svc)+'</span><span class="hv">'+money(a.price)+'</span></div>';}).join("");
+  const mapUrl="https://maps.google.com/?q="+encodeURIComponent(c.addr+" "+c.zone);
+  openModal(
+    '<div class="modal-head"><div class="av">👤</div><div><h2>'+c.owner+'</h2><div class="mh-sub">'+c.visits+' visitas · '+money(c.spent)+' en total</div></div><button class="x" onclick="closeModal()">×</button></div>'+
+    '<div class="mrow"><div class="mi">📞</div><div><div class="mk">Teléfono</div><a class="mv" href="tel:'+c.phone+'">'+c.phone+'</a></div></div>'+
+    '<div class="mrow"><div class="mi">📍</div><div><div class="mk">Dirección · '+c.zone+'</div><a class="mv" href="'+mapUrl+'" target="_blank">'+c.addr+' ↗</a></div></div>'+
+    '<div style="padding:14px 0 4px"><div class="mk" style="font-size:12px;color:var(--muted);margin-bottom:8px">Mascotas</div>'+pets+'</div>'+
+    '<div class="sec-title" style="font-size:14px">Historial</div>'+hist+
+    '<div class="modal-actions"><button class="btn btn-primary full" onclick="reactivate(\''+enc+'\')">Enviar recordatorio de regreso</button></div>');
+}
+function reactivate(enc){const owner=decodeURIComponent(enc);closeModal();toast("Mensaje enviado a "+owner.split(" ")[0]+" 💌");}
+
+function openModal(html){document.getElementById("modalBody").innerHTML='<div class="grab"></div>'+html;document.getElementById("modalBg").classList.add("show");}
+function closeModal(){document.getElementById("modalBg").classList.remove("show");}
+
+/* ---------- Ajustes ---------- */
+function renderConfig(){
+  document.getElementById("swatches").innerHTML=PALETTE.map(c=>'<div class="sw '+(STATE.brand.color===c?'on':'')+'" style="background:'+c+'" onclick="pickColor(\''+c+'\')"></div>').join("");
+  renderZoneChips();
+  document.getElementById("svcEditor").innerHTML=STATE.services.map(s=>'<div class="svc-edit"><span style="font-size:18px">'+s.icon+'</span><span class="nm">'+s.name+'</span><input class="input dur-in" type="number" value="'+s.dur+'" min="5" step="5" onchange="updateDur(\''+s.id+'\',this.value)" title="minutos"><input class="input price-in" type="number" value="'+s.base+'" min="0" onchange="updatePrice(\''+s.id+'\',this.value)" title="precio base"></div>').join("");
+  document.getElementById("staffEditor").innerHTML=STATE.staff.map((g,i)=>'<div class="staff-row"><div class="av">'+initials(g.name)+'</div><span class="sn">'+g.name+'</span><input class="input comm" type="number" value="'+g.comm+'" min="0" max="100" onchange="updateComm('+i+',this.value)" title="% comisión"><button class="chip" style="background:none;border:none;padding:4px" onclick="removeStaff('+i+')">✕</button></div>').join("");
+  document.getElementById("hoursGrid").innerHTML=STATE.hours.map((h,i)=>'<div class="hour-row '+(h.on?'':'off')+'"><span class="day">'+h.day+'</span><div class="toggle '+(h.on?'on':'')+'" onclick="toggleDay('+i+')"></div><div class="times"><input class="input" type="time" value="'+h.from+'" onchange="setHour('+i+',\'from\',this.value)">–<input class="input" type="time" value="'+h.to+'" onchange="setHour('+i+',\'to\',this.value)"></div></div>').join("");
+  document.getElementById("depAmt").value=STATE.settings.deposit;
+  document.getElementById("maxDay").value=STATE.settings.maxDay;
+  document.getElementById("minWindow").value=STATE.settings.minWindow;
+  document.getElementById("rmTiming").value=STATE.settings.reminders.timing;
+  document.getElementById("rmEmail").classList.toggle("on",STATE.settings.reminders.email);
+  document.getElementById("rmSms").classList.toggle("on",STATE.settings.reminders.sms);
+  document.getElementById("rmWa").classList.toggle("on",STATE.settings.reminders.whatsapp);
+  renderReminderPreview();
+}
+function renderZoneChips(){document.getElementById("zoneChips").innerHTML=STATE.zones.map((z,i)=>'<span class="chip">'+z+'<button onclick="removeZone('+i+')">×</button></span>').join("")||'<span class="hint">Añade tu primera zona.</span>';}
+function addZone(){const v=document.getElementById("zoneInput").value.trim();if(!v)return;STATE.zones.push(v);document.getElementById("zoneInput").value="";renderZoneChips();renderZones();toast("Zona añadida");}
+function removeZone(i){STATE.zones.splice(i,1);renderZoneChips();renderZones();}
+function updatePrice(id,v){svcById(id).base=parseFloat(v)||0;toast("Precio actualizado");}
+function updateDur(id,v){svcById(id).dur=parseInt(v)||30;}
+function addStaff(){const n=document.getElementById("staffName").value.trim();const c=parseFloat(document.getElementById("staffComm").value)||35;if(!n)return;STATE.staff.push({name:n,comm:c});document.getElementById("staffName").value="";document.getElementById("staffComm").value="";renderConfig();toast("Groomer añadido");}
+function removeStaff(i){STATE.staff.splice(i,1);renderConfig();}
+function updateComm(i,v){STATE.staff[i].comm=parseFloat(v)||0;renderFinance();}
+function toggleReminder(k,el){STATE.settings.reminders[k]=!STATE.settings.reminders[k];el.classList.toggle("on");renderReminderPreview();}
+function renderReminderPreview(){
+  STATE.settings.reminders.timing=+document.getElementById("rmTiming").value;
+  const ch=[];if(STATE.settings.reminders.email)ch.push("email");if(STATE.settings.reminders.sms)ch.push("SMS");if(STATE.settings.reminders.whatsapp)ch.push("WhatsApp");
+  const via=ch.length?ch.join(" + "):"ningún canal activo";
+  document.getElementById("rmPreview").innerHTML='<div class="lbl">Vista previa · '+via+'</div>"Hola 👋 Te recordamos la cita de grooming de <b>Luna</b> mañana a las <b>10:00</b> con '+(STATE.brand.name)+'. ¡Te esperamos! Responde para reagendar."';
+}
+function updateRules(){STATE.settings.deposit=parseFloat(document.getElementById("depAmt").value)||0;STATE.settings.maxDay=parseInt(document.getElementById("maxDay").value)||8;STATE.settings.minWindow=+document.getElementById("minWindow").value;toast("Reglas actualizadas");}
+function toggleDay(i){STATE.hours[i].on=!STATE.hours[i].on;renderConfig();}
+function setHour(i,k,v){STATE.hours[i][k]=v;}
+function pickColor(c){STATE.brand.color=c;applyColor(c);renderConfig();}
+function applyColor(c){document.documentElement.style.setProperty('--mauve',c);document.getElementById("brandMark").style.background='linear-gradient(150deg,'+c+','+shade(c,-28)+')';}
+function shade(hex,amt){let n=parseInt(hex.slice(1),16);let r=(n>>16)+amt,g=((n>>8)&255)+amt,b=(n&255)+amt;r=Math.max(0,Math.min(255,r));g=Math.max(0,Math.min(255,g));b=Math.max(0,Math.min(255,b));return "#"+((r<<16)|(g<<8)|b).toString(16).padStart(6,"0");}
+function applyBrand(){STATE.brand.name=document.getElementById("cfgName").value;STATE.brand.tag=document.getElementById("cfgTag").value;
+  document.getElementById("brandName").textContent=STATE.brand.name||"Tu negocio";document.getElementById("brandTag").textContent=STATE.brand.tag;
+  document.getElementById("brandMark").textContent=(STATE.brand.name[0]||"B").toUpperCase();document.getElementById("bizName").textContent=STATE.brand.name||"Tu negocio";
+  renderReminderPreview();}
+
+/* init */
+renderServices();renderZones();applyColor(STATE.brand.color);refreshBiz();
+</script>
+</body>
+</html>
