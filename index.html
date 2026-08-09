@@ -397,6 +397,52 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
 .ed-svc{display:flex;gap:8px;align-items:center;font-size:13.5px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;margin-bottom:6px;background:#fff}
 .ed-svc input{width:18px;height:18px}
 .slot.off{opacity:.45}
+/* --- selector de fecha tipo aerolínea --- */
+.daypick{border:1px solid var(--line);border-radius:14px;background:#fff;padding:10px 8px 8px}
+.dp-head{display:flex;align-items:center;justify-content:space-between;padding:0 4px 8px}
+.dp-month{font-family:'Fraunces';font-size:15px;font-weight:600;color:var(--burgundy);text-transform:capitalize}
+.dp-nav{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--mauve-deep);font-size:19px;line-height:1;cursor:pointer}
+.dp-nav:disabled{opacity:.3;cursor:default}
+.dp-strip{display:flex;gap:8px;overflow-x:auto;padding:2px 4px 8px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.dp-strip::-webkit-scrollbar{height:0}
+.dp-day{flex:0 0 62px;scroll-snap-align:center;border:1px solid var(--line);border-radius:14px;background:#fff;padding:9px 4px 8px;text-align:center;cursor:pointer;transition:.15s;font-family:inherit}
+.dp-day .dw{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.dp-day .dd{font-family:'Fraunces';font-size:21px;font-weight:600;color:var(--burgundy);line-height:1.15}
+.dp-day .df{font-size:9.5px;color:var(--muted);margin-top:2px;min-height:12px}
+.dp-day.on{background:var(--mauve);border-color:var(--mauve)}
+.dp-day.on .dw,.dp-day.on .dd,.dp-day.on .df{color:#fff}
+.dp-day.off{opacity:.4;cursor:not-allowed;background:var(--blush-soft)}
+.dp-day.off .df{color:#a2727f}
+.dp-day.cheap .df{color:#2f6b4a;font-weight:600}
+.dp-note{font-size:12px;color:var(--muted);padding:2px 6px 2px}
+/* --- direcciones verificadas --- */
+.addr-field{position:relative}
+.addr-sug{position:absolute;left:0;right:0;top:100%;z-index:60;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 30px rgba(67,32,47,.14);overflow:hidden;display:none;margin-top:4px}
+.addr-sug.show{display:block}
+.addr-sug button{display:block;width:100%;text-align:left;padding:11px 13px;border:0;background:#fff;font-family:inherit;font-size:13.5px;color:var(--burgundy);cursor:pointer;border-bottom:1px solid var(--blush-soft)}
+.addr-sug button:last-child{border-bottom:0}
+.addr-sug button:hover,.addr-sug button.hi{background:var(--blush-soft)}
+.addr-sug .sug-sub{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}
+.addr-state{font-size:12px;margin-top:6px;min-height:16px}
+.addr-state.okv{color:#2f6b4a;font-weight:600}
+.addr-state.warn{color:#8a6d1f}
+.addr-attrib{font-size:10px;color:var(--muted);padding:6px 13px;background:var(--cream)}
+/* --- vans multi-zona / precios por raza --- */
+.van-row2{border:1px solid var(--line);border-radius:14px;padding:10px;margin-bottom:10px;background:#fff}
+.van-top{display:flex;gap:8px;align-items:center}
+.van-zones{margin-top:9px;display:flex;gap:8px;align-items:flex-start}
+.vz-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;padding-top:6px;flex:0 0 auto}
+.zchips{display:flex;flex-wrap:wrap;gap:6px}
+.zchip{border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:20px;padding:5px 11px;font-size:12px;font-family:inherit;cursor:pointer}
+.zchip.on{background:var(--mauve);border-color:var(--mauve);color:#fff;font-weight:600}
+.bp-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;margin-bottom:6px;background:#fff;font-size:13px}
+.bp-row .bp-b{flex:1;font-weight:600;color:var(--burgundy)}
+.bp-row .bp-p{font-family:'Fraunces';color:var(--mauve-deep);font-weight:600}
+.bp-row .bp-m{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.install-steps{margin:6px 0 4px;padding-left:22px;font-size:14px;line-height:1.85;color:var(--burgundy)}
+.install-steps li{margin-bottom:4px}
+.install-steps b{color:var(--mauve-deep)}
+.se-breed{font-size:10px;background:var(--blush-soft);color:var(--mauve-deep);border-radius:10px;padding:1px 6px;margin-left:4px}
 </style>
 </head>
 <body>
@@ -446,7 +492,7 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
       <div class="field"><label data-i18n="petName_lbl"></label><input class="input" id="petName" data-ph="petName_ph" autocomplete="off"></div>
       <div class="field combo"><label data-i18n="breed_lbl"></label><input class="input" id="breedInput" data-ph="breed_ph" autocomplete="off"><div class="results" id="breedResults"></div></div>
       <div class="field"><label><span data-i18n="size_lbl"></span> <span class="opt-note" data-i18n="size_note"></span></label>
-        <select class="input" id="petSize"><option value="Toy" data-i18n="size_toy"></option><option value="Pequeño" data-i18n="size_small"></option><option value="Mediano" selected data-i18n="size_medium"></option><option value="Grande" data-i18n="size_large"></option><option value="Gigante" data-i18n="size_giant"></option></select>
+        <select class="input" id="petSize"><option value="Toy" data-i18n="size_toy"></option><option value="Small" data-i18n="size_small"></option><option value="Medium" selected data-i18n="size_medium"></option><option value="Large" data-i18n="size_large"></option><option value="Giant" data-i18n="size_giant"></option></select>
       </div>
       <div class="field"><label><span data-i18n="photo_lbl"></span> <span class="opt-note" style="color:var(--bad)" data-i18n="photo_req"></span></label>
         <div class="photo-up"><label class="pbox" id="petPhotoBox"><img id="petPhotoImg" style="display:none" alt=""><span class="ic" id="petPhotoIc">📷</span><input type="file" accept="image/*" onchange="onPetPhoto(this)"></label><span class="ptxt" data-i18n="photo_hint"></span></div>
@@ -467,8 +513,18 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
       <div class="eyebrow" data-i18n="step_3_4"></div><h2 data-i18n="s3_title"></h2>
       <p class="sub" data-i18n="s3_sub"></p>
       <div class="field"><label data-i18n="zone_lbl"></label><select class="input" id="zoneSelect"></select></div>
-      <div class="field"><label data-i18n="addr_lbl"></label><input class="input" id="bookAddr" data-ph="addr_ph"></div>
-      <div class="field"><label data-i18n="date_lbl"></label><select class="input" id="dateSelect"></select></div>
+      <div class="field addr-field"><label data-i18n="addr_lbl"></label>
+        <input class="input" id="bookAddr" data-ph="addr_ph" autocomplete="off">
+        <div class="addr-sug" id="addrSug"></div>
+        <div class="addr-state" id="addrState"></div>
+      </div>
+      <div class="field"><label data-i18n="date_lbl"></label>
+        <div class="daypick">
+          <div class="dp-head"><button class="dp-nav" onclick="dpShift(-1)" aria-label="prev">‹</button><span class="dp-month" id="dpMonth"></span><button class="dp-nav" onclick="dpShift(1)" aria-label="next">›</button></div>
+          <div class="dp-strip" id="dpStrip"></div>
+          <div class="dp-note" id="dpNote"></div>
+        </div>
+      </div>
       <div class="field"><label data-i18n="slots_lbl"></label><div class="slots" id="slotList"></div></div>
       <label class="check-line"><input type="checkbox" id="recurChk" onchange="toggleRecur()"><span><span class="t" data-i18n="recur_t"></span><span class="d" data-i18n="recur_d"></span></span></label>
       <div class="sub-inline" id="recurOpts"><div class="row"><div class="field"><select class="input" id="recurEvery" onchange="toggleCustomRecur()"><option value="2" data-i18n="every2"></option><option value="4" selected data-i18n="every4"></option><option value="6" data-i18n="every6"></option><option value="8" data-i18n="every8"></option><option value="custom" data-i18n="everyCustom"></option></select></div><div class="field" id="recurCustomWrap" style="display:none"><input class="input" id="recurCustom" type="number" min="1" max="52" value="3" placeholder="#"></div></div><div class="opt-note" id="recurEveryLbl" style="margin-top:-6px"></div></div>
@@ -619,6 +675,11 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
       <div class="field"><label data-i18n="cfg_payNote"></label><input class="input" id="payNote" data-ph="cfg_payNotePh" oninput="setPaySetting('payNote',this.value)"></div>
     </div>
 
+    <div class="cfg-card"><h3 data-i18n="cfg_addr"></h3><p class="hint" data-i18n="cfg_addr_h"></p>
+      <div class="field"><label data-i18n="cfg_mapsKey"></label><input class="input" id="mapsKey" placeholder="AIza..." oninput="setPaySetting('mapsKey',this.value)">
+        <p class="hint" style="margin:8px 0 0" data-i18n="cfg_mapsHelp"></p></div>
+    </div>
+
     <div class="cfg-card"><h3 data-i18n="cfg_slots"></h3><p class="hint" data-i18n="cfg_slots_h"></p>
       <div id="slotEditor" class="chip-row"></div>
       <div class="add-inline"><input class="input" id="slotInput" type="time" value="09:00" style="flex:none;width:140px"><button class="btn btn-primary" onclick="addSlot()" data-i18n="cfg_addSlot"></button></div>
@@ -643,6 +704,7 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
 
 </div>
 
+<datalist id="breedDatalist"></datalist>
 <div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()"><div class="modal" id="modalBody"></div></div>
 <div class="toast" id="toast"></div>
 
@@ -1033,10 +1095,32 @@ function setupPWA(){
 let _deferredPrompt=null;
 window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();_deferredPrompt=e;});
 function isStandalone(){return window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone;}
-function promptInstall(){
+async function promptInstall(){
+  if(isStandalone()){toast(t("pwa_already"));return;}
+  const iOS=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+  // Android/Chrome: instalación nativa en un toque
+  if(!iOS&&_deferredPrompt){_deferredPrompt.prompt();_deferredPrompt.userChoice.finally(()=>{_deferredPrompt=null;});return;}
+  // iOS/iPadOS: abrir la hoja de compartir, donde está "Añadir a pantalla de inicio"
+  if(navigator.share){
+    try{
+      await navigator.share({title:(STATE.brand.name||"Mobile Grooming"),url:location.href});
+      return;
+    }catch(e){
+      if(e&&e.name==="AbortError")return;   // el usuario cerró la hoja
+      console.warn("share:",e);
+    }
+  }
   if(_deferredPrompt){_deferredPrompt.prompt();_deferredPrompt.userChoice.finally(()=>{_deferredPrompt=null;});return;}
-  const iOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
-  toast(iOS?t("pwa_ios"):t("pwa_android"));
+  showInstallHelp(iOS);
+}
+function showInstallHelp(iOS){
+  const steps=iOS
+    ?['<li>'+t("pwa_s1_ios")+'</li>','<li>'+t("pwa_s2_ios")+'</li>','<li>'+t("pwa_s3_ios")+'</li>']
+    :['<li>'+t("pwa_s1_and")+'</li>','<li>'+t("pwa_s2_and")+'</li>','<li>'+t("pwa_s3_and")+'</li>'];
+  openModal(
+    '<div class="modal-head"><div class="av">📲</div><div><h2>'+t("pwa_install")+'</h2><div class="mh-sub">'+(STATE.brand.name||"")+'</div></div><button class="x" onclick="closeModal()">×</button></div>'+
+    '<ol class="install-steps">'+steps.join("")+'</ol>'+
+    '<div class="modal-actions"><button class="btn btn-primary full" onclick="closeModal()">'+t("ok_btn")+'</button></div>');
 }
 async function submitPublicRequest(data){
   let photo=data.photo||"";if(photo&&photo.startsWith("data:"))photo=await resizeImage(photo,700);
@@ -1081,14 +1165,14 @@ es:{
  sw_client:"Cliente",sw_biz:"Negocio",
  step_1_4:"Paso 1 de 4",step_2_4:"Paso 2 de 4",step_3_4:"Paso 3 de 4",step_4_4:"Paso 4 de 4",
  s1_title:"Cuéntanos de tu peludo",s1_sub:"Buscamos la raza para preparar el servicio ideal.",
- petName_lbl:"Nombre de la mascota",petName_ph:"Ej. Luna",breed_lbl:"Raza",breed_ph:"Empieza a escribir… ej. poodle",
+ petName_lbl:"Nombre de la mascota",petName_ph:"Ej. Bailey",breed_lbl:"Raza",breed_ph:"Empieza a escribir… ej. golden",
  size_lbl:"Tamaño",size_note:"(lo ajustamos por la raza)",
- size_toy:"Toy · hasta 5 kg",size_small:"Pequeño · 5–11 kg",size_medium:"Mediano · 11–25 kg",size_large:"Grande · 25–40 kg",size_giant:"Gigante · 40 kg +",
+ size_toy:"Toy · hasta 12 lb",size_small:"Pequeño · 12–25 lb",size_medium:"Mediano · 25–55 lb",size_large:"Grande · 55–90 lb",size_giant:"Gigante · 90 lb +",
  notes_lbl:"Notas para el groomer",optional:"(opcional)",notes_ph:"Pelo enredado, le da miedo la secadora, alergias…",
  continue:"Continuar",back:"Atrás",
  s2_title:"Elige el servicio",s2_sub:"El precio se ajusta al tamaño de tu mascota.",
  s3_title:"¿Dónde y cuándo?",s3_sub:"Vamos hasta tu puerta. Indícanos la dirección.",
- zone_lbl:"Zona de servicio",addr_lbl:"Dirección exacta",addr_ph:"Calle, número, edificio, apto, referencia",
+ zone_lbl:"Zona de servicio",addr_lbl:"Dirección exacta",addr_ph:"Ej. 412 Woodland St, Nashville, TN",
  date_lbl:"Fecha",slots_lbl:"Horario disponible",recur_t:"Cita recurrente",recur_d:"Repetir automáticamente",
  every2:"Cada 2 semanas",every4:"Cada 4 semanas",every6:"Cada 6 semanas",every8:"Cada 8 semanas",
  s4_title:"Confirma tu reserva",s4_sub:"Te enviaremos recordatorios para que no se te pase.",
@@ -1106,7 +1190,14 @@ es:{
  cfg_portal:"Portal público de reservas",cfg_portal_h:"Comparte este enlace con tus clientes para que reserven solos. Cada solicitud entra a tu pestaña Solicitudes.",cfg_copy:"Copiar",cfg_portal_ready:"Compártelo por WhatsApp, Instagram o tu bio.",cfg_portal_demo:"(Disponible al conectar tu cuenta)",cfg_portal_note:"El enlace aparece cuando inicias sesión con tu cuenta en la nube.",t_copied:"Enlace copiado ✓",
  cfg_pay:"Pagos",cfg_pay_h:"Configura cómo cobras. El checkout funciona como tu punto de venta en el teléfono.",cfg_payLink:"Link de pago (Stripe / PayPal)",cfg_payNote:"Datos de transferencia / Zelle",cfg_payNotePh:"Ej. Zelle: pagos@bellapaws.com",cfg_payHelp:"Para Stripe: entra a dashboard.stripe.com → Enlaces de pago → crea uno (activa «el cliente elige el monto») y pega aquí la URL. Se enviará al cliente por WhatsApp al cobrar.",
  co_title:"Cobro",co_tip:"Propina",co_noTip:"Sin propina",co_total:"Total a cobrar",co_method:"Método de pago",co_cash:"Efectivo",co_card:"Tarjeta",co_transfer:"Transfer.",co_link:"Link",co_markPaid:"Marcar pagado",co_sendWa:"Enviar link por WhatsApp",co_pickMethod:"Elige un método de pago",co_done:"Cobrado {amt} ✓",co_note:"El cobro con tarjeta real se procesa con tu link de Stripe/PayPal. Aquí registras el pago y lo envías.",co_waMsg:"¡Hola {owner}! Tu servicio de grooming con {brand} suma {amt}.",co_waPay:"Puedes pagar aquí:",co_waOpen:"Abriendo WhatsApp…",fin_tips:"Propinas",
- pwa_install:"Instalar app",pwa_ios:"En Safari: toca Compartir → «Añadir a inicio» 📲",pwa_android:"Toca el menú ⋮ del navegador → «Instalar app» / «Añadir a pantalla de inicio» 📲",
+ pwa_install:"Instalar app",pwa_ios:"Toca Compartir → «Añadir a pantalla de inicio» 📲",pwa_android:"Menú ⋮ del navegador → «Instalar app» 📲",
+ pwa_already:"Ya la tienes instalada ✓",ok_btn:"Entendido",
+ pwa_s1_ios:"Toca el botón <b>Compartir</b> ⬆️ de tu navegador (abajo en iPhone, arriba en iPad).",
+ pwa_s2_ios:"Desliza hacia abajo y elige <b>Añadir a pantalla de inicio</b>.",
+ pwa_s3_ios:"Toca <b>Añadir</b>. El ícono queda en tu pantalla como una app.",
+ pwa_s1_and:"Toca el menú <b>⋮</b> del navegador.",
+ pwa_s2_and:"Elige <b>Instalar app</b> o <b>Añadir a pantalla de inicio</b>.",
+ pwa_s3_and:"Confirma. El ícono queda en tu pantalla como una app.",
  svc_add:"+ Servicio",svc_addCat:"+ Categoría",svc_edit:"Editar servicio",svc_editCat:"Editar categoría",svc_icon:"Icono",svc_name:"Nombre",svc_cat:"Categoría",svc_dur:"Duración (min)",svc_desc:"Descripción",svc_prices:"Precio por tamaño",svc_availG:"Groomers que lo realizan",svc_availV:"Vans que lo realizan",svc_availHint:"Vacío = todos. Marca solo si quieres limitarlo.",svc_del:"Eliminar",svc_catName:"Nombre de la categoría",svc_emptyCat:"Sin servicios aún.",svc_needName:"Escribe un nombre",
  t_svcSaved:"Servicio guardado ✓",t_svcDeleted:"Servicio eliminado",t_catSaved:"Categoría guardada ✓",t_catDeleted:"Categoría eliminada",
  cal_today:"Hoy",cal_dow:["L","M","X","J","V","S","D"],cal_dayAppts:"Citas del {d}",cal_noDay:"Sin citas este día.",cal_legendDone:"Completada",cal_legendUp:"Próxima",
@@ -1153,14 +1244,14 @@ en:{
  sw_client:"Client",sw_biz:"Business",
  step_1_4:"Step 1 of 4",step_2_4:"Step 2 of 4",step_3_4:"Step 3 of 4",step_4_4:"Step 4 of 4",
  s1_title:"Tell us about your pup",s1_sub:"We look up the breed to prep the perfect service.",
- petName_lbl:"Pet's name",petName_ph:"e.g. Luna",breed_lbl:"Breed",breed_ph:"Start typing… e.g. poodle",
+ petName_lbl:"Pet's name",petName_ph:"e.g. Bailey",breed_lbl:"Breed",breed_ph:"Start typing… e.g. golden",
  size_lbl:"Size",size_note:"(we set it by breed)",
- size_toy:"Toy · up to 11 lb",size_small:"Small · 11–24 lb",size_medium:"Medium · 24–55 lb",size_large:"Large · 55–88 lb",size_giant:"Giant · 88 lb +",
+ size_toy:"Toy · up to 12 lb",size_small:"Small · 12–25 lb",size_medium:"Medium · 25–55 lb",size_large:"Large · 55–90 lb",size_giant:"Giant · 90 lb +",
  notes_lbl:"Notes for the groomer",optional:"(optional)",notes_ph:"Matted coat, scared of the dryer, allergies…",
  continue:"Continue",back:"Back",
  s2_title:"Choose a service",s2_sub:"Pricing adjusts to your pet's size.",
  s3_title:"Where & when?",s3_sub:"We come to your door. Give us the address.",
- zone_lbl:"Service area",addr_lbl:"Exact address",addr_ph:"Street, number, building, unit, landmark",
+ zone_lbl:"Service area",addr_lbl:"Exact address",addr_ph:"e.g. 412 Woodland St, Nashville, TN",
  date_lbl:"Date",slots_lbl:"Available times",recur_t:"Recurring appointment",recur_d:"Repeat automatically",
  every2:"Every 2 weeks",every4:"Every 4 weeks",every6:"Every 6 weeks",every8:"Every 8 weeks",
  s4_title:"Confirm your booking",s4_sub:"We'll send reminders so it doesn't slip your mind.",
@@ -1178,7 +1269,14 @@ en:{
  cfg_portal:"Public booking portal",cfg_portal_h:"Share this link so clients book on their own. Every request lands in your Requests tab.",cfg_copy:"Copy",cfg_portal_ready:"Share it on WhatsApp, Instagram or your bio.",cfg_portal_demo:"(Available once your account is connected)",cfg_portal_note:"The link appears when you sign in with your cloud account.",t_copied:"Link copied ✓",
  cfg_pay:"Payments",cfg_pay_h:"Set up how you charge. Checkout works as your phone point of sale.",cfg_payLink:"Payment link (Stripe / PayPal)",cfg_payNote:"Transfer / Zelle details",cfg_payNotePh:"e.g. Zelle: pay@bellapaws.com",cfg_payHelp:"For Stripe: go to dashboard.stripe.com → Payment Links → create one (enable “let customer choose amount”) and paste the URL here. It's sent to the client via WhatsApp at checkout.",
  co_title:"Checkout",co_tip:"Tip",co_noTip:"No tip",co_total:"Total to charge",co_method:"Payment method",co_cash:"Cash",co_card:"Card",co_transfer:"Transfer",co_link:"Link",co_markPaid:"Mark paid",co_sendWa:"Send link via WhatsApp",co_pickMethod:"Pick a payment method",co_done:"Charged {amt} ✓",co_note:"Real card charges run through your Stripe/PayPal link. Here you record the payment and send it.",co_waMsg:"Hi {owner}! Your grooming service with {brand} comes to {amt}.",co_waPay:"You can pay here:",co_waOpen:"Opening WhatsApp…",fin_tips:"Tips",
- pwa_install:"Install app",pwa_ios:"In Safari: tap Share → “Add to Home Screen” 📲",pwa_android:"Tap the browser ⋮ menu → “Install app” / “Add to Home screen” 📲",
+ pwa_install:"Install app",pwa_ios:"Tap Share → “Add to Home Screen” 📲",pwa_android:"Browser ⋮ menu → “Install app” 📲",
+ pwa_already:"It's already installed ✓",ok_btn:"Got it",
+ pwa_s1_ios:"Tap the <b>Share</b> button ⬆️ in your browser (bottom on iPhone, top on iPad).",
+ pwa_s2_ios:"Scroll down and choose <b>Add to Home Screen</b>.",
+ pwa_s3_ios:"Tap <b>Add</b>. The icon lands on your home screen like an app.",
+ pwa_s1_and:"Tap the browser <b>⋮</b> menu.",
+ pwa_s2_and:"Choose <b>Install app</b> or <b>Add to Home screen</b>.",
+ pwa_s3_and:"Confirm. The icon lands on your home screen like an app.",
  svc_add:"+ Service",svc_addCat:"+ Category",svc_edit:"Edit service",svc_editCat:"Edit category",svc_icon:"Icon",svc_name:"Name",svc_cat:"Category",svc_dur:"Duration (min)",svc_desc:"Description",svc_prices:"Price by size",svc_availG:"Groomers who perform it",svc_availV:"Vans that perform it",svc_availHint:"Empty = everyone. Check only to restrict it.",svc_del:"Delete",svc_catName:"Category name",svc_emptyCat:"No services yet.",svc_needName:"Enter a name",
  t_svcSaved:"Service saved ✓",t_svcDeleted:"Service deleted",t_catSaved:"Category saved ✓",t_catDeleted:"Category deleted",
  cal_today:"Today",cal_dow:["M","T","W","T","F","S","S"],cal_dayAppts:"Appointments on {d}",cal_noDay:"No appointments this day.",cal_legendDone:"Completed",cal_legendUp:"Upcoming",
@@ -1225,6 +1323,22 @@ es:{
  retry:"Reintentar",save_err:"No se pudo guardar. Revisa tu conexión.",
  load_rules:"Firestore rechazó la lectura (permisos). Publica las reglas de FIREBASE-SETUP.md en la consola de Firebase y reintenta. No se ha borrado nada.",
  migrated:"Datos actualizados al nuevo formato sin límite ✓",
+ van_zones:"Zonas",van_noZones:"Añade zonas de servicio primero",
+ svc_breedPrices:"Precio especial por raza",
+ svc_breedHint:"Ej. Husky a $230. Gana sobre el precio por tamaño. Se busca por coincidencia, no hace falta escribir la raza exacta.",
+ svc_breedPh:"Raza (ej. Husky)",svc_bpFixed:"Precio fijo",svc_bpAdd:"Recargo",
+ svc_breedNone:"Sin reglas por raza.",svc_breedNeed:"Escribe la raza y el monto.",
+ dp_free:"{n} libres",dp_full:"lleno",dp_closed:"cerrado",dp_pick:"Elige un día disponible.",
+ dp_picked:"Elegiste el {d}.",
+ addr_searching:"Buscando direcciones…",addr_choose:"Elige tu dirección de la lista para confirmarla.",
+ addr_none:"No encontramos esa dirección. Revisa que esté completa.",
+ addr_ok:"Dirección confirmada",addr_manual:"Dirección sin verificar",
+ addr_confirming:"Confirmando…",addr_needConfirm:"Confirma tu dirección para continuar.",
+ addr_useTyped:"Usarla como la escribí",
+ addr_byGoogle:"Direcciones de Google",addr_byOSM:"Direcciones de OpenStreetMap",
+ cfg_addr:"Direcciones",cfg_addr_h:"Verifica las direcciones de tus clientes al reservar y evita errores de ruta.",
+ cfg_mapsKey:"Clave de Google Maps (Places)",
+ cfg_mapsHelp:"Opcional. Con clave se usan las direcciones de Google (más precisas en EE. UU.). Sin clave se usa OpenStreetMap, que también funciona. Consíguela en console.cloud.google.com → API de Places y Maps JavaScript.",
  new_request:"🔔 {n} solicitud(es) nueva(s)",
  sl_past:"pasó",sl_busy:"ocupado",sl_full:"día lleno",sl_closed:"cerrado",sl_ok:"Horario disponible",
  no_days:"Sin días disponibles",slot_gone:"Ese horario ya no está libre. Elige otro.",
@@ -1248,6 +1362,22 @@ en:{
  retry:"Retry",save_err:"Couldn't save. Check your connection.",
  load_rules:"Firestore denied the read (permissions). Publish the rules from FIREBASE-SETUP.md in the Firebase console and retry. Nothing was deleted.",
  migrated:"Data upgraded to the new unlimited format ✓",
+ van_zones:"Zones",van_noZones:"Add service zones first",
+ svc_breedPrices:"Breed-specific price",
+ svc_breedHint:"E.g. Husky at $230. Overrides the size price. Matching is fuzzy, no need for the exact breed name.",
+ svc_breedPh:"Breed (e.g. Husky)",svc_bpFixed:"Flat price",svc_bpAdd:"Surcharge",
+ svc_breedNone:"No breed rules yet.",svc_breedNeed:"Enter the breed and the amount.",
+ dp_free:"{n} open",dp_full:"full",dp_closed:"closed",dp_pick:"Pick an available day.",
+ dp_picked:"You picked {d}.",
+ addr_searching:"Searching addresses…",addr_choose:"Pick your address from the list to confirm it.",
+ addr_none:"We couldn't find that address. Check that it's complete.",
+ addr_ok:"Address confirmed",addr_manual:"Unverified address",
+ addr_confirming:"Confirming…",addr_needConfirm:"Confirm your address to continue.",
+ addr_useTyped:"Use it as I typed it",
+ addr_byGoogle:"Addresses by Google",addr_byOSM:"Addresses by OpenStreetMap",
+ cfg_addr:"Addresses",cfg_addr_h:"Verify client addresses at booking time and avoid routing mistakes.",
+ cfg_mapsKey:"Google Maps key (Places)",
+ cfg_mapsHelp:"Optional. With a key you get Google addresses (more accurate in the US). Without one, OpenStreetMap is used and works too. Get it at console.cloud.google.com → Places API and Maps JavaScript API.",
  new_request:"🔔 {n} new request(s)",
  sl_past:"past",sl_busy:"booked",sl_full:"day full",sl_closed:"closed",sl_ok:"Slot available",
  no_days:"No days available",slot_gone:"That slot is no longer free. Pick another one.",
@@ -1265,52 +1395,60 @@ en:{
 }};
 Object.keys(EXTRA_I18N).forEach(l=>{if(I18N[l])Object.assign(I18N[l],EXTRA_I18N[l]);});
 function t(k,p){let s=I18N[STATE.lang][k];if(s===undefined)s=I18N.es[k];if(s===undefined)return k;if(p)Object.keys(p).forEach(x=>{s=s.split("{"+x+"}").join(p[x]);});return s;}
-const SIZE_KEY={Toy:"size_toy","Pequeño":"size_small",Mediano:"size_medium",Grande:"size_large",Gigante:"size_giant"};
+const SIZE_KEY={Toy:"size_toy",Small:"size_small",Medium:"size_medium",Large:"size_large",Giant:"size_giant"};
 function sizeLabel(s){const v=t(SIZE_KEY[s]||"");return (typeof v==="string"?v:s).split(" · ")[0]||s;}
 
 /* ===== DATA ===== */
 const BREEDS=[
- ["Affenpinscher","Pequeño"],["Akita","Grande"],["Alaskan Malamute","Gigante"],["American Bully","Mediano"],
- ["Basset Hound","Mediano"],["Beagle","Pequeño"],["Bichón Frisé","Pequeño"],["Bóxer","Grande"],
- ["Border Collie","Mediano"],["Boston Terrier","Pequeño"],["Boyero de Berna","Gigante"],
- ["Bulldog Francés","Pequeño"],["Bulldog Inglés","Mediano"],["Caniche / Poodle Toy","Toy"],
- ["Caniche / Poodle Estándar","Grande"],["Cavalier King Charles","Pequeño"],
- ["Chihuahua","Toy"],["Chow Chow","Grande"],["Cocker Spaniel","Mediano"],["Collie","Grande"],
- ["Corgi","Pequeño"],["Dálmata","Grande"],["Doberman","Grande"],["Dogo Argentino","Grande"],
- ["Fox Terrier","Pequeño"],["Galgo","Grande"],["Golden Retriever","Grande"],
- ["Gran Danés","Gigante"],["Husky Siberiano","Grande"],["Jack Russell","Pequeño"],["Labrador","Grande"],
- ["Lhasa Apso","Pequeño"],["Maltés","Toy"],["Mastín","Gigante"],["Pastor Alemán","Grande"],
- ["Pastor Australiano","Mediano"],["Pekinés","Pequeño"],["Pinscher Miniatura","Toy"],
- ["Pitbull","Mediano"],["Pomerania","Toy"],["Pug","Pequeño"],["Rottweiler","Grande"],
- ["Salchicha / Dachshund","Pequeño"],["Samoyedo","Grande"],["San Bernardo","Gigante"],["Schnauzer Mini","Pequeño"],
- ["Setter Irlandés","Grande"],["Shar Pei","Mediano"],["Shih Tzu","Pequeño"],
- ["Shiba Inu","Mediano"],["Staffordshire","Mediano"],["Teckel","Pequeño"],
- ["Weimaraner","Grande"],["West Highland / Westie","Pequeño"],["Whippet","Mediano"],
- ["Yorkshire Terrier","Toy"],["Mestizo / Criollo","Mediano"]
+ ["Affenpinscher","Small"],["Airedale Terrier","Large"],["Akita","Large"],["Alaskan Malamute","Giant"],
+ ["American Bully","Medium"],["American Pit Bull Terrier","Medium"],["Australian Cattle Dog","Medium"],
+ ["Australian Shepherd","Medium"],["Basset Hound","Medium"],["Beagle","Small"],["Bernedoodle","Large"],
+ ["Bernese Mountain Dog","Giant"],["Bichon Frise","Small"],["Bloodhound","Large"],["Border Collie","Medium"],
+ ["Boston Terrier","Small"],["Boxer","Large"],["Brittany","Medium"],["Bullmastiff","Giant"],
+ ["Cane Corso","Giant"],["Catahoula Leopard Dog","Large"],["Cavalier King Charles Spaniel","Small"],
+ ["Cavapoo","Small"],["Chihuahua","Toy"],["Chow Chow","Large"],["Cockapoo","Small"],
+ ["Cocker Spaniel","Medium"],["Collie","Large"],["Coonhound","Large"],["Corgi (Pembroke Welsh)","Small"],
+ ["Dachshund","Small"],["Dalmatian","Large"],["Doberman Pinscher","Large"],["Dogo Argentino","Large"],
+ ["English Bulldog","Medium"],["French Bulldog","Small"],["German Shepherd","Large"],
+ ["German Shorthaired Pointer","Large"],["Golden Retriever","Large"],["Goldendoodle","Large"],
+ ["Great Dane","Giant"],["Great Pyrenees","Giant"],["Greyhound","Large"],["Havanese","Small"],
+ ["Jack Russell Terrier","Small"],["Labradoodle","Large"],["Labrador Retriever","Large"],
+ ["Lhasa Apso","Small"],["Maltese","Toy"],["Maltipoo","Toy"],["Mastiff","Giant"],
+ ["Miniature Pinscher","Toy"],["Miniature Schnauzer","Small"],["Newfoundland","Giant"],
+ ["Old English Sheepdog","Large"],["Papillon","Toy"],["Pekingese","Small"],["Pomeranian","Toy"],
+ ["Poodle (Standard)","Large"],["Poodle (Toy)","Toy"],["Portuguese Water Dog","Large"],["Pug","Small"],
+ ["Rat Terrier","Small"],["Rhodesian Ridgeback","Large"],["Rottweiler","Large"],["Saint Bernard","Giant"],
+ ["Samoyed","Large"],["Schnauzer (Standard)","Medium"],["Shar Pei","Medium"],["Sheepadoodle","Large"],
+ ["Shiba Inu","Medium"],["Shih Tzu","Small"],["Siberian Husky","Large"],["Staffordshire Terrier","Medium"],
+ ["Vizsla","Large"],["Weimaraner","Large"],["West Highland White Terrier","Small"],["Whippet","Medium"],
+ ["Yorkshire Terrier","Toy"],["Mixed Breed","Medium"]
 ];
-const SIZE_MULT={Toy:1,"Pequeño":1.15,Mediano:1.45,Grande:1.85,Gigante:2.3};
-const SIZES=["Toy","Pequeño","Mediano","Grande","Gigante"];
+const SIZE_MULT={Toy:1,Small:1.15,Medium:1.45,Large:1.85,Giant:2.3};
+const SIZES=["Toy","Small","Medium","Large","Giant"];
 const PALETTE=["#A8688A","#B5526E","#9B6FB0","#C77B8B","#7E6BA8","#C2A24F"];
 const VAN_COLORS=["#A8688A","#7E6BA8","#4F8A6B","#C2A24F","#C77B8B","#5E83B0"];
 const DOG_EMOJI=["🐶","🐕","🦮","🐩","🐕‍🦺"];
-const ADDR_SAMPLES=["412 Woodland St","1808 21st Ave S","2100 Belcourt Ave","515 Church St, Apt 4B","3000 Hillsboro Pike","920 Main St","1212 4th Ave N","700 12th Ave S, Unit 210","2400 Gallatin Ave","105 Music Sq E"];
+const ADDR_SAMPLES=["412 Woodland St, Nashville, TN 37206","1808 21st Ave S, Nashville, TN 37212","2100 Belcourt Ave, Nashville, TN 37212","515 Church St Apt 4B, Nashville, TN 37219","3000 Hillsboro Pike, Nashville, TN 37215","920 Main St, Nashville, TN 37206","1212 4th Ave N, Nashville, TN 37208","700 12th Ave S Unit 210, Nashville, TN 37203","2400 Gallatin Ave, Nashville, TN 37206","105 Music Sq E, Nashville, TN 37203"];
 let _id=0;const nid=()=>"a"+Date.now().toString(36)+(++_id).toString(36)+Math.random().toString(36).slice(2,6);
 
 const STATE={
-  lang:"es",apptView:"list",
+  lang:(function(){
+    try{const s=localStorage.getItem("mg_lang");if(s==="es"||s==="en")return s;}catch(e){}
+    return /^es/i.test(navigator.language||navigator.userLanguage||"en")?"es":"en";
+  })(),apptView:"list",
   brand:{name:"Bella Paws",tag:"",color:"#A8688A",logo:""},
-  zones:["East Nashville","The Gulch","Germantown","Green Hills","12 South"],
-  categories:[{id:"c1",name:"Baños"},{id:"c2",name:"Grooming"},{id:"c3",name:"Extras"}],
+  zones:["East Nashville","The Gulch","Germantown","Green Hills","12 South","Brentwood","Franklin"],
+  categories:[{id:"c1",name:"Baths"},{id:"c2",name:"Grooming"},{id:"c3",name:"Add-ons"}],
   services:[
-    {id:"bano",name:"Baño & cepillado",desc:"Baño, secado y cepillado",icon:"🛁",base:25,dur:45,cat:"c1",groomers:[],vans:[]},
-    {id:"full",name:"Grooming completo",desc:"Baño + corte + uñas + oídos",icon:"✂️",base:40,dur:90,cat:"c2",groomers:[],vans:[]},
-    {id:"deslan",name:"Deslanado",desc:"Remoción de subpelo",icon:"🌬️",base:30,dur:60,cat:"c1",groomers:[],vans:[]},
-    {id:"unas",name:"Corte de uñas & spa",desc:"Uñas, glándulas, perfume",icon:"💅",base:15,dur:25,cat:"c3",groomers:[],vans:[]},
+    {id:"bano",name:"Bath & Brush",desc:"Bath, blow dry and brush out",icon:"🛁",base:45,dur:45,cat:"c1",groomers:[],vans:[],breedPrices:[]},
+    {id:"full",name:"Full Groom",desc:"Bath, haircut, nails and ears",icon:"✂️",base:75,dur:90,cat:"c2",groomers:[],vans:[],breedPrices:[]},
+    {id:"deslan",name:"De-Shedding Treatment",desc:"Undercoat removal",icon:"🌬️",base:60,dur:60,cat:"c1",groomers:[],vans:[],breedPrices:[]},
+    {id:"unas",name:"Nail Trim & Spa",desc:"Nails, glands, cologne",icon:"💅",base:25,dur:25,cat:"c3",groomers:[],vans:[],breedPrices:[]},
   ],
-  staff:[{name:"Valentina R.",comm:40},{name:"Daniela P.",comm:35}],
+  staff:[{name:"Ashley M.",comm:40},{name:"Jordan T.",comm:35}],
   vans:[
-    {id:"v1",name:"Pink Van",color:"#A8688A",zone:"East Nashville",groomer:"Valentina R."},
-    {id:"v2",name:"Lilac Van",color:"#7E6BA8",zone:"The Gulch",groomer:"Daniela P."},
+    {id:"v1",name:"Van 1",color:"#A8688A",zones:["East Nashville","Germantown","12 South"],groomer:"Ashley M."},
+    {id:"v2",name:"Van 2",color:"#7E6BA8",zones:["The Gulch","Green Hills","Brentwood","Franklin"],groomer:"Jordan T."},
   ],
   hours:[
     {on:true,from:"09:00",to:"17:00"},{on:true,from:"09:00",to:"17:00"},
@@ -1321,7 +1459,7 @@ const STATE={
   settings:{reminders:{email:true,sms:false,whatsapp:true,timing:24},deposit:10,maxDay:8,minWindow:24,repeatCount:4,payLink:"",payNote:""},
   slots:["10:00","12:00","14:00","17:00"],
   appointments:[],
-  expenses:[{name:"Gasolina de la unidad",amt:180},{name:"Shampoo & insumos",amt:140},{name:"Mantenimiento van",amt:90}],
+  expenses:[{name:"Fuel",amt:180},{name:"Shampoo & supplies",amt:140},{name:"Van maintenance",amt:90}],
   reqHistory:[]
 };
 
@@ -1331,25 +1469,60 @@ function loc(){return STATE.lang==="en"?"en-US":"es-ES";}
 function fmtDate(iso){return new Date(iso+"T12:00").toLocaleDateString(loc(),{weekday:"short",day:"numeric",month:"short"});}
 function svcById(id){return STATE.services.find(s=>s.id===id)||{};}
 function vanById(id){return STATE.vans.find(v=>v.id===id)||null;}
-function priceFor(svc,size){if(svc&&svc.prices&&svc.prices[size]!=null)return svc.prices[size];return Math.round(((svc&&svc.base)||0)*(SIZE_MULT[size]||1));}
+function normBreed(s){return String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim();}
+/* Recargo/precio fijo por raza: gana sobre el precio por tamaño. */
+function breedRule(svc,breed){
+  if(!svc||!Array.isArray(svc.breedPrices)||!breed)return null;
+  const b=normBreed(breed);if(!b)return null;
+  let best=null;
+  svc.breedPrices.forEach(r=>{
+    const k=normBreed(r.breed);if(!k)return;
+    if(b===k||b.indexOf(k)>=0||k.indexOf(b)>=0){
+      if(!best||k.length>normBreed(best.breed).length)best=r;   // gana la coincidencia más específica
+    }
+  });
+  return best;
+}
+function priceFor(svc,size,breed){
+  const r=breedRule(svc,breed);
+  if(r){
+    if(r.mode==="add")return Math.round(basePriceFor(svc,size)+(+r.price||0));
+    return Math.round(+r.price||0);
+  }
+  return basePriceFor(svc,size);
+}
+function basePriceFor(svc,size){if(svc&&svc.prices&&svc.prices[size]!=null)return svc.prices[size];return Math.round(((svc&&svc.base)||0)*(SIZE_MULT[size]||1));}
 function migrateServices(){
+  migrateSizes();
   if(!STATE.categories||!STATE.categories.length)STATE.categories=[{id:"c1",name:"General"}];
   STATE.services.forEach(s=>{
     if(!s.cat||!STATE.categories.find(c=>c.id===s.cat))s.cat=STATE.categories[0].id;
     if(!s.prices){s.prices={};SIZES.forEach(sz=>s.prices[sz]=Math.round((s.base||0)*(SIZE_MULT[sz]||1)));}
     if(!Array.isArray(s.groomers))s.groomers=[];
     if(!Array.isArray(s.vans))s.vans=[];
+    if(!Array.isArray(s.breedPrices))s.breedPrices=[];
   });
 }
 function migrateSettings(){
   if(!STATE.settings||typeof STATE.settings!=="object")STATE.settings={};
-  const d={deposit:10,maxDay:8,minWindow:24,repeatCount:4,payLink:"",payNote:""};
+  const d={deposit:10,maxDay:8,minWindow:24,repeatCount:4,payLink:"",payNote:"",mapsKey:""};
   Object.keys(d).forEach(k=>{if(STATE.settings[k]===undefined)STATE.settings[k]=d[k];});
   if(!STATE.settings.reminders)STATE.settings.reminders={email:true,sms:false,whatsapp:true,timing:24};
   if(!Array.isArray(STATE.hours)||STATE.hours.length!==7)STATE.hours=[0,1,2,3,4,5,6].map(i=>({on:i<6,from:"09:00",to:"17:00"}));
   if(!Array.isArray(STATE.slots)||!STATE.slots.length)STATE.slots=["09:00","11:00","13:00","15:00"];
+  (STATE.vans||[]).forEach(v=>{if(!Array.isArray(v.zones)){v.zones=v.zone?[v.zone]:[];delete v.zone;}});
   if(!Array.isArray(STATE.appointments))STATE.appointments=[];
   if(!Array.isArray(STATE.reqHistory))STATE.reqHistory=[];
+}
+/* Compatibilidad: datos viejos guardaban las tallas en español. */
+const LEGACY_SIZE={"Pequeño":"Small","Pequeno":"Small","Mediano":"Medium","Grande":"Large","Gigante":"Giant"};
+function fixSize(s){return LEGACY_SIZE[s]||s;}
+function migrateSizes(){
+  (STATE.services||[]).forEach(sv=>{
+    if(sv.prices){const p={};Object.keys(sv.prices).forEach(k=>{p[fixSize(k)]=sv.prices[k];});sv.prices=p;}
+  });
+  (STATE.appointments||[]).forEach(a=>{if(a.size)a.size=fixSize(a.size);});
+  (STATE.reqHistory||[]).forEach(x=>{if(x.size)x.size=fixSize(x.size);});
 }
 function catById(id){return STATE.categories.find(c=>c.id===id)||{name:"—"};}
 function svcAllowsGroomer(s,name){return !s.groomers||!s.groomers.length||s.groomers.includes(name);}
@@ -1360,11 +1533,16 @@ function svcIds(a){return (a.svcs&&a.svcs.length)?a.svcs:(a.svc?[a.svc]:[]);}
 function apptSvcNames(a){return svcIds(a).map(id=>svcById(id).name||id).join(" + ")||"—";}
 function apptIcon(a){return svcById(svcIds(a)[0]).icon||"🐾";}
 function apptDur(a){return svcIds(a).reduce((s,id)=>s+(svcById(id).dur||0),0);}
-function svcsPrice(ids,size){return ids.reduce((s,id)=>s+priceFor(svcById(id),size),0);}
+function svcsPrice(ids,size,breed){return ids.reduce((s,id)=>s+priceFor(svcById(id),size,breed),0);}
 function initials(n){return n.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase();}
 function phoneGen(r){return "(615) "+(200+Math.floor(r()*699))+"-"+(1000+Math.floor(r()*8999));}
 function toast(m){const el=document.getElementById("toast");el.textContent=m;el.classList.add("show");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),2400);}
-function vanForGroomer(g,r){const m=STATE.vans.filter(v=>v.groomer===g);if(m.length)return m[0].id;return STATE.vans.length?STATE.vans[Math.floor((r?r():Math.random())*STATE.vans.length)].id:null;}
+function vanForGroomer(g,r,zone){
+  let pool=STATE.vans;
+  if(zone){const inZone=pool.filter(v=>{const zs=(Array.isArray(v.zones)?v.zones:(v.zone?[v.zone]:[]));return !zs.length||zs.includes(zone);});if(inZone.length)pool=inZone;}
+  const m=pool.filter(v=>v.groomer===g);if(m.length)return m[0].id;
+  return pool.length?pool[Math.floor((r?r():Math.random())*pool.length)].id:null;
+}
 
 /* ===== AGENDA: disponibilidad real ===== */
 function toMin(hhmm){const p=String(hhmm||"00:00").split(":");return (+p[0]||0)*60+(+p[1]||0);}
@@ -1406,10 +1584,10 @@ function seed(){
   const mkAddr=()=>ADDR_SAMPLES[Math.floor(r()*ADDR_SAMPLES.length)];
   const grm=()=>STATE.staff[Math.floor(r()*STATE.staff.length)].name;
   const up=[
-    ["Coco","Caniche / Poodle Toy","Toy","full",0,"10:00","conf"],
-    ["Rocky","Golden Retriever","Grande","bano",0,"13:30","conf"],
-    ["Nala","Shih Tzu","Pequeño","full",1,"11:00","pend"],
-    ["Max","Labrador","Grande","deslan",2,"09:30","conf"],
+    ["Coco","Poodle (Toy)","Toy","full",0,"10:00","conf"],
+    ["Rocky","Golden Retriever","Large","bano",0,"13:30","conf"],
+    ["Nala","Shih Tzu","Small","full",1,"11:00","pend"],
+    ["Max","Labrador Retriever","Large","deslan",2,"09:30","conf"],
     ["Toby","Yorkshire Terrier","Toy","unas",3,"15:00","pend"],
   ];
   const owners=["Sarah Johnson","Mike Davis","Emily Carter","Jessica Brown","David Wilson"];
@@ -1418,12 +1596,12 @@ function seed(){
     addr:mkAddr(),zone:STATE.zones[Math.floor(r()*STATE.zones.length)],when:addDays(a[4]),time:a[5],
     price:priceFor(sv,a[2]),groomer:g,vanId:vanForGroomer(g,r),status:a[6],paid:false,recurring:null});});
   // Solicitudes de ejemplo (entran por el portal del cliente)
-  STATE.appointments.push({id:nid(),pet:"Bella",breed:"Cavapoo",size:"Pequeño",svcs:["full","deslan"],owner:"Olivia Martin",phone:phoneGen(r),email:"olivia@example.com",
-    addr:"1808 21st Ave S",zone:"Green Hills",when:addDays(2),time:"12:00",price:svcsPrice(["full","deslan"],"Pequeño"),groomer:STATE.staff[0].name,vanId:"v1",status:"requested",paid:false,recurring:null,photo:""});
-  STATE.appointments.push({id:nid(),pet:"Cooper","breed":"Australian Shepherd",size:"Grande",svcs:["bano"],owner:"Noah Clark",phone:phoneGen(r),email:"",
-    addr:"2400 Gallatin Ave",zone:"East Nashville",when:addDays(4),time:"14:00",price:svcsPrice(["bano"],"Grande"),groomer:STATE.staff[0].name,vanId:"v2",status:"requested",paid:false,recurring:4,photo:""});
-  const pets=["Kira","Bruno","Lola","Thor","Maya","Zeus","Canela","Simba","Frida","Duke","Mia","Oso","Chloe","Niko","Pepa","Tobías","Cookie","Balto"];
-  const ow2=["Chris M.","Ashley P.","Brandon H.","Megan C.","Tyler A.","Hannah G.","Justin O.","Lauren V.","Kevin A.","Rachel R."];
+  STATE.appointments.push({id:nid(),pet:"Bella",breed:"Cavapoo",size:"Small",svcs:["full","deslan"],owner:"Olivia Martin",phone:phoneGen(r),email:"olivia@example.com",
+    addr:"1808 21st Ave S, Nashville, TN 37212",zone:"Green Hills",when:addDays(2),time:"12:00",price:svcsPrice(["full","deslan"],"Small"),groomer:STATE.staff[0].name,vanId:"v1",status:"requested",paid:false,recurring:null,photo:""});
+  STATE.appointments.push({id:nid(),pet:"Cooper",breed:"Australian Shepherd",size:"Large",svcs:["bano"],owner:"Noah Clark",phone:phoneGen(r),email:"",
+    addr:"2400 Gallatin Ave, Nashville, TN 37206",zone:"East Nashville",when:addDays(4),time:"14:00",price:svcsPrice(["bano"],"Large"),groomer:STATE.staff[0].name,vanId:"v2",status:"requested",paid:false,recurring:4,photo:""});
+  const pets=["Bailey","Charlie","Daisy","Duke","Ellie","Finn","Gracie","Hank","Ivy","Jax","Lola","Milo","Nala","Otis","Piper","Rocco","Sadie","Winston"];
+  const ow2=["Chris Miller","Ashley Parker","Brandon Hayes","Megan Cole","Tyler Adams","Hannah Gray","Justin Owens","Lauren Vance","Kevin Alvarez","Rachel Reed"];
   for(let i=0;i<30;i++){
     const day=-(1+Math.floor(r()*41));const b=BREEDS[Math.floor(r()*BREEDS.length)];const sv=STATE.services[Math.floor(r()*STATE.services.length)];const g=grm();
     STATE.appointments.push({id:nid(),pet:pets[i%pets.length],breed:b[0],size:b[1],svc:sv.id,
@@ -1435,7 +1613,7 @@ function seed(){
 seed();
 migrateServices();
 
-const SEL={pet:"",breed:"",size:"Mediano",notes:"",svcs:[],zone:null,addr:"",date:null,time:null,recur:null,price:0,photo:""};
+const SEL={pet:"",breed:"",size:"Medium",notes:"",svcs:[],zone:null,addr:"",addrVerified:false,lat:null,lng:null,date:null,time:null,recur:null,price:0,photo:""};
 let _naPhoto="";
 function readImg(input,cb){const f=input.files&&input.files[0];if(!f)return;const rd=new FileReader();rd.onload=e=>cb(e.target.result);rd.readAsDataURL(f);}
 function onPetPhoto(input){readImg(input,url=>{const im=document.getElementById("petPhotoImg");im.src=url;im.style.display="block";document.getElementById("petPhotoIc").style.display="none";SEL.photo=url;checkStep1();uploadPhoto(url,"pets",u=>{SEL.photo=u;});});}
@@ -1451,10 +1629,21 @@ function applyLang(){
   document.getElementById("clientNote").innerHTML=t("client_note");
   renderServices();
   if(document.getElementById("view-biz").classList.contains("on"))refreshBiz();else renderZones();
+  // el idioma no debe dejar nada a medias: se redibuja lo dinámico
+  try{if(document.getElementById("dpStrip"))renderDayPicker();}catch(e){}
+  try{if(document.getElementById("slotList"))buildSlots();}catch(e){}
+  try{if(SEL.addrVerified)setAddrState("okv","✓ "+t("addr_ok"));else if(!SEL.addr)setAddrState("","");}catch(e){}
+  try{refreshSaveBadge();}catch(e){}
   const s4=document.querySelector('#view-client .step[data-step="4"]');
   if(s4&&s4.style.display!=="none")buildSummary();
 }
-function setLang(l){STATE.lang=l;applyLang();}
+function setLang(l){
+  if(l!=="es"&&l!=="en")return;
+  STATE.lang=l;
+  try{localStorage.setItem("mg_lang",l);}catch(e){}
+  closeModal();            // evita quedarse con un modal a medio traducir
+  applyLang();
+}
 function toggleLang(){setLang(STATE.lang==="es"?"en":"es");}
 
 /* ===== login & views ===== */
@@ -1525,30 +1714,196 @@ function renderServices(){
   const html=STATE.categories.map(cat=>{
     const svs=STATE.services.filter(s=>s.cat===cat.id);if(!svs.length)return"";
     const opts=svs.map(s=>{
-      const p=priceFor(s,SEL.size);const on=SEL.svcs.includes(s.id);
+      const p=priceFor(s,SEL.size,SEL.breed);const on=SEL.svcs.includes(s.id);
       return '<button class="opt '+(on?'sel':'')+'" onclick="toggleService(\''+s.id+'\')"><span class="ic">'+(on?'✓':s.icon)+'</span><span><span class="tl">'+s.name+'</span><br><span class="ds">'+s.desc+'</span></span><span><span class="pr">'+money(p)+'</span><span class="dur">'+s.dur+' '+t("m_min")+'</span></span></button>';
     }).join("");
     return '<div class="bk-cat">'+cat.name+'</div>'+opts;
   }).join("");
   document.getElementById("serviceList").innerHTML=html;
-  const tot=svcsPrice(SEL.svcs,SEL.size);const el=document.getElementById("svcTotal");
+  const tot=svcsPrice(SEL.svcs,SEL.size,SEL.breed);const el=document.getElementById("svcTotal");
   if(el)el.innerHTML=SEL.svcs.length?t("svc_total")+": <b>"+money(tot)+"</b> · "+apptDur({svcs:SEL.svcs})+" "+t("m_min"):"";
   const n2=document.getElementById("next2");if(n2)n2.disabled=SEL.svcs.length===0;
 }
 function toggleService(id){const i=SEL.svcs.indexOf(id);if(i>=0)SEL.svcs.splice(i,1);else SEL.svcs.push(id);renderServices();}
 function renderZones(){document.getElementById("zoneSelect").innerHTML=STATE.zones.map(z=>'<option>'+z+'</option>').join("");if(!SEL.zone)SEL.zone=STATE.zones[0];}
 document.getElementById("zoneSelect").addEventListener("change",e=>SEL.zone=e.target.value);
-document.getElementById("bookAddr").addEventListener("input",e=>{SEL.addr=e.target.value.trim();validateStep3();});
-
-function buildDateOptions(){
-  const sel=document.getElementById("dateSelect");const opts=[];const dur=svcsDur(SEL.svcs);
-  const keep=SEL.date;
-  for(let i=0;i<28;i++){const d=new Date();d.setDate(d.getDate()+i);const iso=d.toISOString().slice(0,10);
-    if(dayHasFree(iso,dur))opts.push('<option value="'+iso+'" '+(iso===keep?'selected':'')+'>'+d.toLocaleDateString(loc(),{weekday:"long",day:"numeric",month:"long"})+'</option>');}
-  sel.innerHTML=opts.join("")||'<option value="">'+t("no_days")+'</option>';
-  SEL.date=sel.value||null;buildSlots();
+/* ============================================================
+   DIRECCIONES VERIFICADAS
+   Con clave de Google Maps (Ajustes → Direcciones) usa Google Places.
+   Sin clave, usa OpenStreetMap/Nominatim para que funcione igual.
+   ============================================================ */
+let _gmaps=null,_gsvc=null,_gtoken=null,_addrT=null,_addrSeq=0;
+function mapsKey(){return (STATE.settings&&STATE.settings.mapsKey||"").trim();}
+function loadGoogleMaps(){
+  if(_gmaps)return Promise.resolve(_gmaps);
+  const key=mapsKey();if(!key)return Promise.resolve(null);
+  if(window.google&&window.google.maps&&window.google.maps.places){_gmaps=window.google.maps;return Promise.resolve(_gmaps);}
+  return new Promise(res=>{
+    const s=document.createElement("script");
+    s.src="https://maps.googleapis.com/maps/api/js?key="+encodeURIComponent(key)+"&libraries=places&region=US&language="+(STATE.lang==="en"?"en":"es");
+    s.async=true;
+    s.onload=()=>{try{_gmaps=window.google.maps;res(_gmaps);}catch(e){res(null);}};
+    s.onerror=()=>{console.warn("maps: no cargó");res(null);};
+    document.head.appendChild(s);
+  });
 }
-document.getElementById("dateSelect").addEventListener("change",e=>{SEL.date=e.target.value;buildSlots();});
+async function suggestGoogle(q){
+  const g=await loadGoogleMaps();if(!g)return null;
+  if(!_gsvc)_gsvc=new g.places.AutocompleteService();
+  if(!_gtoken&&g.places.AutocompleteSessionToken)_gtoken=new g.places.AutocompleteSessionToken();
+  return new Promise(res=>{
+    _gsvc.getPlacePredictions({input:q,types:["address"],componentRestrictions:{country:"us"},sessionToken:_gtoken},(pred,st)=>{
+      if(st!==g.places.PlacesServiceStatus.OK||!pred){res([]);return;}
+      res(pred.slice(0,5).map(p=>({
+        id:p.place_id,
+        main:(p.structured_formatting&&p.structured_formatting.main_text)||p.description,
+        sub:(p.structured_formatting&&p.structured_formatting.secondary_text)||"",
+        full:p.description,src:"google"
+      })));
+    });
+  });
+}
+function detailsGoogle(placeId){
+  return new Promise(res=>{
+    const g=_gmaps;if(!g){res(null);return;}
+    const host=document.getElementById("addrSug")||document.body;
+    const svc=new g.places.PlacesService(host);
+    svc.getDetails({placeId:placeId,fields:["formatted_address","geometry"],sessionToken:_gtoken},(pl,st)=>{
+      _gtoken=g.places.AutocompleteSessionToken?new g.places.AutocompleteSessionToken():null;
+      if(st!==g.places.PlacesServiceStatus.OK||!pl){res(null);return;}
+      res({addr:pl.formatted_address,lat:pl.geometry&&pl.geometry.location?pl.geometry.location.lat():null,lng:pl.geometry&&pl.geometry.location?pl.geometry.location.lng():null});
+    });
+  });
+}
+async function suggestOSM(q){
+  try{
+    const url="https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&countrycodes=us&limit=5&q="+encodeURIComponent(q);
+    const r=await fetch(url,{headers:{"Accept":"application/json"}});
+    if(!r.ok)return [];
+    const j=await r.json();
+    return j.map(x=>{
+      const parts=String(x.display_name||"").split(",");
+      const a=x.address||{};
+      const line1=[a.house_number,a.road].filter(Boolean).join(" ")||parts[0];
+      const line2=[a.city||a.town||a.village||a.hamlet,a.state,a.postcode].filter(Boolean).join(", ");
+      const full=(line1&&line2)?(line1+", "+line2):String(x.display_name).replace(/, United States$/,"");
+      return {id:String(x.place_id),main:line1||parts[0],sub:line2||parts.slice(2).join(",").trim(),
+              full:full,lat:+x.lat,lng:+x.lon,src:"osm"};
+    });
+  }catch(e){return [];}
+}
+function setAddrState(kind,msg){
+  const el=document.getElementById("addrState");if(!el)return;
+  el.className="addr-state "+(kind||"");el.textContent=msg||"";
+}
+function hideAddrSug(){const s=document.getElementById("addrSug");if(s){s.classList.remove("show");s.innerHTML="";}}
+let _addrList=[];
+async function onAddrInput(v){
+  SEL.addr=v.trim();SEL.addrVerified=false;SEL.lat=null;SEL.lng=null;
+  validateStep3();
+  clearTimeout(_addrT);
+  if(SEL.addr.length<4){hideAddrSug();setAddrState("",""); return;}
+  setAddrState("",t("addr_searching"));
+  const seq=++_addrSeq;
+  _addrT=setTimeout(async()=>{
+    let list=null;
+    if(mapsKey())list=await suggestGoogle(SEL.addr);
+    if(!list)list=await suggestOSM(SEL.addr);
+    if(seq!==_addrSeq)return;                      // llegó tarde: se descarta
+    _addrList=list||[];
+    renderAddrSug();
+  },420);
+}
+function renderAddrSug(){
+  const box=document.getElementById("addrSug");if(!box)return;
+  if(!_addrList.length){
+    hideAddrSug();
+    setAddrState("warn",t("addr_none"));
+    return;
+  }
+  box.innerHTML=_addrList.map((s,i)=>'<button onclick="pickAddr('+i+')">📍 '+s.main+(s.sub?'<span class="sug-sub">'+s.sub+'</span>':'')+'</button>').join("")+
+    '<div class="addr-attrib">'+(_addrList[0].src==="google"?t("addr_byGoogle"):t("addr_byOSM"))+'</div>';
+  box.classList.add("show");
+  setAddrState("",t("addr_choose"));
+}
+async function pickAddr(i){
+  const s=_addrList[i];if(!s)return;
+  hideAddrSug();
+  let addr=s.full,lat=s.lat,lng=s.lng;
+  if(s.src==="google"){
+    setAddrState("",t("addr_confirming"));
+    const d=await detailsGoogle(s.id);
+    if(d&&d.addr){addr=d.addr;lat=d.lat;lng=d.lng;}
+  }
+  SEL.addr=addr;SEL.addrVerified=true;SEL.lat=lat||null;SEL.lng=lng||null;
+  const inp=document.getElementById("bookAddr");if(inp)inp.value=addr;
+  setAddrState("okv","✓ "+t("addr_ok"));
+  validateStep3();
+}
+function useAddrAsTyped(){
+  SEL.addrVerified=true;hideAddrSug();
+  setAddrState("warn","⚠️ "+t("addr_manual"));
+  validateStep3();
+}
+document.getElementById("bookAddr").addEventListener("input",e=>onAddrInput(e.target.value));
+document.getElementById("bookAddr").addEventListener("blur",()=>setTimeout(hideAddrSug,220));
+
+/* ===== selector de fecha tipo aerolínea (tira de días) ===== */
+const DP_RANGE=60;          // días visibles hacia adelante
+let _dpOffset=0;
+function isoAdd(n){const d=new Date();d.setDate(d.getDate()+n);return d.toISOString().slice(0,10);}
+function buildDateOptions(){
+  const dur=svcsDur(SEL.svcs);
+  // si la fecha elegida ya no sirve, salta al primer día con hueco
+  if(!SEL.date||!dayHasFree(SEL.date,dur)){
+    SEL.date=null;
+    for(let i=0;i<DP_RANGE;i++){const iso=isoAdd(i);if(dayHasFree(iso,dur)){SEL.date=iso;break;}}
+    _dpOffset=0;
+  }
+  renderDayPicker();buildSlots();
+}
+function renderDayPicker(){
+  const strip=document.getElementById("dpStrip");if(!strip)return;
+  const dur=svcsDur(SEL.svcs);
+  let html="",firstFree=null,freeCount=0;
+  for(let i=0;i<DP_RANGE;i++){
+    const d=new Date();d.setDate(d.getDate()+i);
+    const iso=d.toISOString().slice(0,10);
+    const free=slotsForDay(iso).filter(tt=>slotState(iso,tt,dur)==="free").length;
+    const open=dayHours(iso).on;
+    const off=free===0;
+    if(!off){freeCount++;if(!firstFree)firstFree=iso;}
+    const foot=off?(open?t("dp_full"):t("dp_closed")):t("dp_free",{n:free});
+    html+='<button class="dp-day '+(iso===SEL.date?'on':'')+(off?' off':'')+(!off&&free>=3?' cheap':'')+'" '+
+      (off?'disabled':'onclick="pickDay(\''+iso+'\')"')+'>'+
+      '<span class="dw">'+d.toLocaleDateString(loc(),{weekday:"short"}).replace(".","")+'</span>'+
+      '<span class="dd">'+d.getDate()+'</span>'+
+      '<span class="df">'+foot+'</span></button>';
+  }
+  strip.innerHTML=html;
+  const note=document.getElementById("dpNote");
+  if(note)note.textContent=freeCount?(SEL.date?t("dp_picked",{d:new Date(SEL.date+"T12:00").toLocaleDateString(loc(),{weekday:"long",day:"numeric",month:"long"})}):t("dp_pick")):t("no_days");
+  updateDpMonth();
+  // centrar el día elegido
+  requestAnimationFrame(()=>{
+    const on=strip.querySelector(".dp-day.on");
+    if(on&&on.scrollIntoView)on.scrollIntoView({inline:"center",block:"nearest"});
+  });
+}
+function updateDpMonth(){
+  const strip=document.getElementById("dpStrip"),el=document.getElementById("dpMonth");
+  if(!strip||!el)return;
+  const idx=Math.max(0,Math.round(strip.scrollLeft/70));
+  const d=new Date();d.setDate(d.getDate()+idx);
+  el.textContent=d.toLocaleDateString(loc(),{month:"long",year:"numeric"});
+}
+function dpShift(dir){
+  const strip=document.getElementById("dpStrip");if(!strip)return;
+  strip.scrollBy({left:dir*280,behavior:"smooth"});
+  setTimeout(updateDpMonth,320);
+}
+function pickDay(iso){SEL.date=iso;SEL.time=null;renderDayPicker();buildSlots();}
+document.getElementById("dpStrip").addEventListener("scroll",()=>{clearTimeout(window._dpT);window._dpT=setTimeout(updateDpMonth,90);});
 function fmtTime(hhmm){let[h,m]=hhmm.split(":").map(Number);const ap=h<12?"AM":"PM";let h12=h%12;if(h12===0)h12=12;return h12+":"+String(m).padStart(2,"0")+" "+ap;}
 function buildSlots(){
   const dur=svcsDur(SEL.svcs);
@@ -1567,10 +1922,18 @@ function pickSlot(tt){SEL.time=tt;buildSlots();}
 function toggleRecur(){document.getElementById("recurOpts").classList.toggle("show",document.getElementById("recurChk").checked);}
 function toggleCustomRecur(){const c=document.getElementById("recurEvery").value==="custom";document.getElementById("recurCustomWrap").style.display=c?"":"none";}
 function recurWeeks(){const v=document.getElementById("recurEvery").value;return v==="custom"?Math.max(1,+document.getElementById("recurCustom").value||1):+v;}
-function validateStep3(){document.getElementById("next3").disabled=!(SEL.zone&&SEL.addr&&SEL.date&&SEL.time);}
+function validateStep3(){
+  const ok=!!(SEL.zone&&SEL.addr&&SEL.date&&SEL.time&&SEL.addrVerified);
+  document.getElementById("next3").disabled=!ok;
+  const st=document.getElementById("addrState");
+  if(st&&SEL.addr&&!SEL.addrVerified&&SEL.addr.length>=4&&st.textContent.indexOf(t("addr_searching"))<0&&st.textContent.indexOf(t("addr_choose"))<0){
+    st.className="addr-state warn";
+    st.innerHTML=t("addr_needConfirm")+' <button class="btn btn-ghost btn-sm" style="margin-left:6px" onclick="useAddrAsTyped()">'+t("addr_useTyped")+'</button>';
+  }
+}
 
 function buildSummary(){
-  const p=svcsPrice(SEL.svcs,SEL.size);SEL.price=p;
+  const p=svcsPrice(SEL.svcs,SEL.size,SEL.breed);SEL.price=p;
   const dep=STATE.settings.deposit;
   const recurTxt=document.getElementById("recurChk").checked?t("sum_yesEvery",{n:recurWeeks()}):t("sum_no");
   document.getElementById("bookSummary").innerHTML=
@@ -1589,10 +1952,10 @@ function confirmBooking(){
   if(!name||!phone){toast(t("t_needNamePhone"));return;}
   // Revalidar el hueco justo antes de reservar (evita doble reserva).
   if(slotState(SEL.date,SEL.time,svcsDur(SEL.svcs))!=="free"){toast(t("slot_gone"));buildDateOptions();goStep(3);return;}
-  const allowedG=groomersForSvcs(SEL.svcs);const groomer=(allowedG[0]||STATE.staff[0]||{}).name||"—";const vanId=vanForGroomer(groomer);
+  const allowedG=groomersForSvcs(SEL.svcs);const groomer=(allowedG[0]||STATE.staff[0]||{}).name||"—";const vanId=vanForGroomer(groomer,null,SEL.zone);
   const recurOn=document.getElementById("recurChk").checked;const every=recurWeeks();
   const base={pet:SEL.pet,breed:SEL.breed,size:SEL.size,svcs:SEL.svcs.slice(),owner:name,phone:phone,email:email,
-    addr:SEL.addr,zone:SEL.zone,price:SEL.price,groomer:groomer,vanId:vanId,recurring:recurOn?every:null,photo:SEL.photo,notes:document.getElementById("petNotes").value.trim(),when:SEL.date,time:SEL.time};
+    addr:SEL.addr,lat:SEL.lat||null,lng:SEL.lng||null,addrVerified:!!SEL.addrVerified,zone:SEL.zone,price:SEL.price,groomer:groomer,vanId:vanId,recurring:recurOn?every:null,photo:SEL.photo,notes:document.getElementById("petNotes").value.trim(),when:SEL.date,time:SEL.time};
   if(PUBLIC){submitPublicRequest(base);return;}
   // Entra UNA sola solicitud (con su marca de recurrencia). Las repeticiones se generan al aceptar.
   STATE.appointments.push(Object.assign({id:nid(),status:"requested",paid:false},base));
@@ -1601,10 +1964,11 @@ function confirmBooking(){
   goStep("done");document.querySelectorAll('.steps .s').forEach(s=>{s.classList.add('done');s.classList.remove('cur');});
 }
 function resetBooking(){
-  Object.assign(SEL,{pet:"",breed:"",size:"Mediano",notes:"",svcs:[],zone:STATE.zones[0],addr:"",date:null,time:null,recur:null,photo:""});
+  Object.assign(SEL,{pet:"",breed:"",size:"Medium",notes:"",svcs:[],zone:STATE.zones[0],addr:"",addrVerified:false,lat:null,lng:null,date:null,time:null,recur:null,photo:""});
+  hideAddrSug();setAddrState("","");
   ["petName","breedInput","petNotes","bookAddr","ownerName","ownerPhone","ownerEmail"].forEach(id=>document.getElementById(id).value="");
   const im=document.getElementById("petPhotoImg");im.style.display="none";im.src="";document.getElementById("petPhotoIc").style.display="block";
-  document.getElementById("petSize").value="Mediano";document.getElementById("recurChk").checked=false;document.getElementById("recurOpts").classList.remove("show");
+  document.getElementById("petSize").value="Medium";document.getElementById("recurChk").checked=false;document.getElementById("recurOpts").classList.remove("show");
   document.getElementById("next1").disabled=true;document.getElementById("next2").disabled=true;goStep(1);
 }
 
@@ -1890,7 +2254,7 @@ function addExpense(){
 /* ===== modal cita ===== */
 function openAppt(id){
   const a=STATE.appointments.find(x=>x.id===id);if(!a)return;const s=svcById(svcIds(a)[0]);
-  const mapUrl="https://maps.google.com/?q="+encodeURIComponent(a.addr+" "+a.zone);
+  const mapUrl=(a.lat&&a.lng)?("https://maps.google.com/?q="+a.lat+","+a.lng):("https://maps.google.com/?q="+encodeURIComponent(a.addr+" "+a.zone));
   const gopts=STATE.staff.map(g=>'<option '+(g.name===a.groomer?'selected':'')+'>'+g.name+'</option>').join("");
   const vopts='<option value="">'+t("m_unassigned")+'</option>'+STATE.vans.map(v=>'<option value="'+v.id+'" '+(v.id===a.vanId?'selected':'')+'>'+v.name+'</option>').join("");
   const recurTxt=a.recurring?t("every_lbl",{n:a.recurring}):"";
@@ -1936,9 +2300,10 @@ function openApptEdit(id){
 function edSelectedSvcs(){return Array.prototype.slice.call(document.querySelectorAll("#edSvcs input:checked")).map(i=>i.value);}
 function edRecalc(id){
   const ids=edSelectedSvcs();
-  const size=(document.getElementById("ed_size")||{}).value||"Mediano";
+  const size=(document.getElementById("ed_size")||{}).value||"Medium";
   const pi=document.getElementById("ed_price");
-  if(pi&&!pi._touched)pi.value=svcsPrice(ids,size);
+  const a0=STATE.appointments.find(x=>x.id===id);
+  if(pi&&!pi._touched)pi.value=svcsPrice(ids,size,a0?a0.breed:"");
   const w=document.getElementById("ed_warn");if(!w)return;
   const st=slotState((document.getElementById("ed_date")||{}).value,(document.getElementById("ed_time")||{}).value,svcsDur(ids),id);
   if(st==="free"){w.textContent="✓ "+t("sl_ok");w.style.color="#2f6b4a";}
@@ -1953,7 +2318,7 @@ function saveApptEdit(id){
   a.when=document.getElementById("ed_date").value||a.when;
   a.time=document.getElementById("ed_time").value||a.time;
   const p=parseFloat(document.getElementById("ed_price").value);
-  a.price=isNaN(p)?svcsPrice(ids,a.size):p;
+  a.price=isNaN(p)?svcsPrice(ids,a.size,a.breed):p;
   a.notes=document.getElementById("ed_notes").value.trim();
   a.reminded=false;delete a.conflict;
   if(slotState(a.when,a.time,svcsDur(ids),id)!=="free")a.conflict=true;
@@ -2036,8 +2401,8 @@ function closeModal(){document.getElementById("modalBg").classList.remove("show"
 /* ===== nueva cita (admin) ===== */
 function openNewAppt(iso){
   _naPhoto="";
-  const sizes=[["Toy","size_toy"],["Pequeño","size_small"],["Mediano","size_medium"],["Grande","size_large"],["Gigante","size_giant"]];
-  const sizeOpts=sizes.map(s=>'<option value="'+s[0]+'" '+(s[0]==="Mediano"?"selected":"")+'>'+sizeLabel(s[0])+'</option>').join("");
+  const sizes=[["Toy","size_toy"],["Small","size_small"],["Medium","size_medium"],["Large","size_large"],["Giant","size_giant"]];
+  const sizeOpts=sizes.map(s=>'<option value="'+s[0]+'" '+(s[0]==="Medium"?"selected":"")+'>'+sizeLabel(s[0])+'</option>').join("");
   const svcOpts=STATE.services.map(s=>'<option value="'+s.id+'">'+s.name+'</option>').join("");
   const zoneOpts=STATE.zones.map(z=>'<option>'+z+'</option>').join("");
   const grOpts=STATE.staff.map(x=>'<option>'+x.name+'</option>').join("");
@@ -2062,7 +2427,7 @@ function saveNewAppt(){
   STATE.appointments.push({id:nid(),pet:pet,breed:g("na_breed").value.trim()||"—",size:size,svc:svc,
     owner:client,phone:g("na_phone").value.trim(),email:"",addr:g("na_addr").value.trim(),
     zone:g("na_zone").value,when:g("na_date").value,time:g("na_time").value||"10:00",
-    price:priceFor(sv,size),groomer:g("na_groomer").value,vanId:g("na_van").value||null,
+    price:priceFor(sv,size,g("na_breed").value.trim()),groomer:g("na_groomer").value,vanId:g("na_van").value||null,
     status:"conf",paid:false,recurring:null,photo:_naPhoto||""});
   const _last=STATE.appointments[STATE.appointments.length-1];
   if(slotState(_last.when,_last.time,svcsDur([svc]),_last.id)!=="free"){_last.conflict=true;toast("⚠️ "+t("sl_busy"));}
@@ -2099,6 +2464,7 @@ function renderConfig(){
   document.getElementById("rmEmail").classList.toggle("on",STATE.settings.reminders.email);
   document.getElementById("rmSms").classList.toggle("on",STATE.settings.reminders.sms);
   document.getElementById("rmWa").classList.toggle("on",STATE.settings.reminders.whatsapp);
+  const mk=document.getElementById("mapsKey");if(mk)mk.value=STATE.settings.mapsKey||"";
   const rc=document.getElementById("repCount");if(rc)rc.value=STATE.settings.repeatCount||4;
   renderStorageMeter();
   renderReminderPreview();
@@ -2109,7 +2475,12 @@ function renderStorageMeter(){
 }
 function updatePrice(id,v){svcById(id).base=parseFloat(v)||0;toast(t("t_priceUpd"));}
 function updateDur(id,v){svcById(id).dur=parseInt(v)||30;}
-function priceRange(s){const vals=SIZES.map(sz=>priceFor(s,sz));const mn=Math.min(...vals),mx=Math.max(...vals);return mn===mx?money(mn):money(mn)+"–"+money(mx);}
+function priceRange(s){
+  const vals=SIZES.map(sz=>basePriceFor(s,sz));const mn=Math.min(...vals),mx=Math.max(...vals);
+  const base=mn===mx?money(mn):money(mn)+"–"+money(mx);
+  const n=(s.breedPrices||[]).length;
+  return base+(n?' <span class="se-breed">🐕 '+n+'</span>':'');
+}
 function openSvcEdit(id){
   const isNew=!id;const s=id?svcById(id):{id:"s"+Date.now(),name:"",icon:"🐾",desc:"",dur:45,cat:STATE.categories[0].id,prices:{},groomers:[],vans:[]};
   if(isNew)SIZES.forEach(sz=>s.prices[sz]=0);
@@ -2123,17 +2494,41 @@ function openSvcEdit(id){
     '<div class="row"><div class="field"><label>'+t("svc_cat")+'</label><select class="input" id="sv_cat">'+catOpts+'</select></div><div class="field"><label>'+t("svc_dur")+'</label><input class="input" id="sv_dur" type="number" min="5" step="5" value="'+s.dur+'"></div></div>'+
     '<div class="field"><label>'+t("svc_desc")+'</label><input class="input" id="sv_desc" value="'+(s.desc||"").replace(/"/g,"&quot;")+'"></div>'+
     '<label class="lab-strong">'+t("svc_prices")+'</label><div class="price-grid">'+priceInputs+'</div>'+
+    '<label class="lab-strong" style="margin-top:14px">'+t("svc_breedPrices")+'</label><p class="hint" style="margin:0 0 8px">'+t("svc_breedHint")+'</p><div id="bpList"></div>'+
+    '<div class="add-inline" style="margin-top:8px"><input class="input" id="bp_breed" placeholder="'+t("svc_breedPh")+'" list="breedDatalist"><select class="input" id="bp_mode" style="max-width:130px"><option value="fixed">'+t("svc_bpFixed")+'</option><option value="add">'+t("svc_bpAdd")+'</option></select><input class="input" id="bp_price" type="number" min="0" inputmode="decimal" placeholder="$" style="max-width:100px"><button class="btn btn-primary" onclick="addBreedPrice()">'+t("add")+'</button></div>'+
     '<label class="lab-strong" style="margin-top:14px">'+t("svc_availG")+'</label><p class="hint" style="margin:0 0 8px">'+t("svc_availHint")+'</p><div class="chk-row">'+(gChecks||'<span class="hint">—</span>')+'</div>'+
     '<label class="lab-strong" style="margin-top:12px">'+t("svc_availV")+'</label><div class="chk-row">'+(vChecks||'<span class="hint">—</span>')+'</div>'+
     '<div class="modal-actions">'+(isNew?'':'<button class="btn btn-danger" onclick="deleteSvc(\''+s.id+'\')">'+t("svc_del")+'</button>')+'<button class="btn btn-primary'+(isNew?' full':'')+'" onclick="saveSvc(\''+s.id+'\','+isNew+')">'+t("save_btn")+'</button></div>');
+  _bpDraft=(s.breedPrices||[]).map(r=>({breed:r.breed,price:+r.price||0,mode:r.mode||"fixed"}));
+  renderBreedPrices();
 }
+/* ---- reglas de precio por raza ---- */
+let _bpDraft=[];
+function renderBreedPrices(){
+  const el=document.getElementById("bpList");if(!el)return;
+  el.innerHTML=_bpDraft.length?_bpDraft.map((r,i)=>
+    '<div class="bp-row"><span class="bp-b">🐕 '+r.breed+'</span><span class="bp-p">'+(r.mode==="add"?"+"+money(r.price):money(r.price))+'</span>'+
+    '<span class="bp-m">'+t(r.mode==="add"?"svc_bpAdd":"svc_bpFixed")+'</span>'+
+    '<button class="vx" onclick="removeBreedPrice('+i+')">✕</button></div>').join(""):'<div class="hint">'+t("svc_breedNone")+'</div>';
+}
+function addBreedPrice(){
+  const b=document.getElementById("bp_breed").value.trim();
+  const p=parseFloat(document.getElementById("bp_price").value);
+  const m=document.getElementById("bp_mode").value;
+  if(!b||isNaN(p)){toast(t("svc_breedNeed"));return;}
+  _bpDraft=_bpDraft.filter(r=>normBreed(r.breed)!==normBreed(b));
+  _bpDraft.push({breed:b,price:p,mode:m});
+  document.getElementById("bp_breed").value="";document.getElementById("bp_price").value="";
+  renderBreedPrices();
+}
+function removeBreedPrice(i){_bpDraft.splice(i,1);renderBreedPrices();}
 function saveSvc(id,isNew){
   const g=x=>document.getElementById(x);
   const name=g("sv_name").value.trim();if(!name){toast(t("svc_needName"));return;}
   const prices={};SIZES.forEach(sz=>prices[sz]=parseFloat(g("sv_p_"+sz).value)||0);
   const groomers=[...document.querySelectorAll(".sv_g:checked")].map(c=>c.value);
   const vans=[...document.querySelectorAll(".sv_v:checked")].map(c=>c.value);
-  const data={name:name,icon:g("sv_icon").value.trim()||"🐾",desc:g("sv_desc").value.trim(),dur:parseInt(g("sv_dur").value)||30,cat:g("sv_cat").value,base:prices[SIZES[0]],prices:prices,groomers:groomers,vans:vans};
+  const data={name:name,icon:g("sv_icon").value.trim()||"🐾",desc:g("sv_desc").value.trim(),dur:parseInt(g("sv_dur").value)||30,cat:g("sv_cat").value,base:prices[SIZES[0]],prices:prices,groomers:groomers,vans:vans,breedPrices:_bpDraft.slice()};
   if(isNew)STATE.services.push(Object.assign({id:id},data));
   else Object.assign(svcById(id),data);
   closeModal();refreshBiz();persist();toast(t("t_svcSaved"));
@@ -2158,16 +2553,32 @@ function deleteCat(id){
   STATE.categories=STATE.categories.filter(c=>c.id!==id);
   closeModal();refreshBiz();persist();toast(t("t_catDeleted"));
 }
-function renderVanEditor(){
-  const zopts=z=>STATE.zones.map(x=>'<option '+(x===z?'selected':'')+'>'+x+'</option>').join("");
-  const gopts=g=>STATE.staff.map(x=>'<option '+(x.name===g?'selected':'')+'>'+x.name+'</option>').join("");
-  document.getElementById("vanEditor").innerHTML=STATE.vans.map((v,i)=>
-    '<div class="van-row"><label class="vcolor" style="background:'+v.color+'"><input type="color" value="'+v.color+'" onchange="setVanColor('+i+',this.value)"></label>'+
-    '<input class="input vn" value="'+v.name+'" onchange="setVanName('+i+',this.value)">'+
-    '<select class="input vsel" onchange="setVanGroomer('+i+',this.value)">'+gopts(v.groomer)+'</select>'+
-    '<select class="input vsel" onchange="setVanZone('+i+',this.value)">'+zopts(v.zone)+'</select>'+
-    '<button class="vx" onclick="removeVan('+i+')">✕</button></div>').join("");
+function vanZones(v){
+  if(Array.isArray(v.zones))return v.zones;
+  return v.zone?[v.zone]:[];        // formato antiguo: una sola zona
 }
+function renderVanEditor(){
+  const gopts=g=>STATE.staff.map(x=>'<option '+(x.name===g?'selected':'')+'>'+x.name+'</option>').join("");
+  document.getElementById("vanEditor").innerHTML=STATE.vans.map((v,i)=>{
+    const zs=vanZones(v);
+    const chips=STATE.zones.map(z=>'<button class="zchip '+(zs.includes(z)?'on':'')+'" onclick="toggleVanZone('+i+',\''+String(z).replace(/'/g,"\\'")+'\')">'+z+'</button>').join("")||'<span class="hint">'+t("van_noZones")+'</span>';
+    return '<div class="van-row2">'+
+      '<div class="van-top"><label class="vcolor" style="background:'+v.color+'"><input type="color" value="'+v.color+'" onchange="setVanColor('+i+',this.value)"></label>'+
+      '<input class="input vn" value="'+v.name+'" onchange="setVanName('+i+',this.value)">'+
+      '<select class="input vsel" onchange="setVanGroomer('+i+',this.value)">'+gopts(v.groomer)+'</select>'+
+      '<button class="vx" onclick="removeVan('+i+')">✕</button></div>'+
+      '<div class="van-zones"><span class="vz-lbl">'+t("van_zones")+'</span><div class="zchips">'+chips+'</div></div></div>';
+  }).join("");
+}
+function toggleVanZone(i,z){
+  const v=STATE.vans[i];if(!v)return;
+  let zs=vanZones(v).slice();
+  const k=zs.indexOf(z);
+  if(k>=0)zs.splice(k,1);else zs.push(z);
+  v.zones=zs;delete v.zone;
+  renderVanEditor();markDirty();
+}
+function vansForZone(z){return STATE.vans.filter(v=>{const zs=vanZones(v);return !zs.length||zs.includes(z);});}
 function renderZoneChips(){document.getElementById("zoneChips").innerHTML=STATE.zones.map((z,i)=>'<span class="chip">'+z+'<button onclick="removeZone('+i+')">×</button></span>').join("");}
 function addSlot(){const v=document.getElementById("slotInput").value;if(!v||!/^\d\d:\d\d$/.test(v))return;if(!STATE.slots.includes(v)){STATE.slots.push(v);STATE.slots.sort();renderConfig();toast(t("t_slotAdded"));}}
 function removeSlot(s){STATE.slots=STATE.slots.filter(x=>x!==s);renderConfig();}
@@ -2176,12 +2587,12 @@ function removeZone(i){STATE.zones.splice(i,1);renderConfig();renderZones();}
 function addStaff(){const n=document.getElementById("staffName").value.trim();const c=parseFloat(document.getElementById("staffComm").value)||35;if(!n)return;STATE.staff.push({name:n,comm:c});document.getElementById("staffName").value="";document.getElementById("staffComm").value="";renderConfig();toast(t("t_groomerAdded"));}
 function removeStaff(i){STATE.staff.splice(i,1);renderConfig();}
 function updateComm(i,v){STATE.staff[i].comm=parseFloat(v)||0;renderFinance();}
-function addVan(){const n=document.getElementById("vanName").value.trim();if(!n)return;const color=VAN_COLORS[STATE.vans.length%VAN_COLORS.length];STATE.vans.push({id:"v"+Date.now(),name:n,color:color,zone:STATE.zones[0]||"",groomer:(STATE.staff[0]||{}).name||""});document.getElementById("vanName").value="";renderConfig();toast(t("t_vanAdded"));}
+function addVan(){const n=document.getElementById("vanName").value.trim();if(!n)return;const color=VAN_COLORS[STATE.vans.length%VAN_COLORS.length];STATE.vans.push({id:"v"+Date.now(),name:n,color:color,zones:STATE.zones.slice(0,1),groomer:(STATE.staff[0]||{}).name||""});document.getElementById("vanName").value="";renderConfig();markDirty();toast(t("t_vanAdded"));}
 function removeVan(i){STATE.vans.splice(i,1);renderConfig();renderAllAppts();}
 function setVanColor(i,v){STATE.vans[i].color=v;renderConfig();renderAllAppts();}
 function setVanName(i,v){STATE.vans[i].name=v;renderAllAppts();}
 function setVanGroomer(i,v){STATE.vans[i].groomer=v;}
-function setVanZone(i,v){STATE.vans[i].zone=v;}
+
 function toggleReminder(k,el){STATE.settings.reminders[k]=!STATE.settings.reminders[k];el.classList.toggle("on");renderReminderPreview();}
 function renderReminderPreview(){
   STATE.settings.reminders.timing=+document.getElementById("rmTiming").value;
@@ -2251,6 +2662,7 @@ document.addEventListener("visibilitychange",()=>{
 });
 window.addEventListener("online",()=>{if(DIRTY&&SAFE)saveNow({silent:true});});
 setInterval(()=>{if(document.getElementById("remList"))renderReminders();},300000);
+try{document.getElementById("breedDatalist").innerHTML=BREEDS.map(b=>'<option value="'+b[0]+'">').join("");}catch(e){}
 applyLang();applyColor(STATE.brand.color);refreshBiz();setupPWA();applyWordmark();
 if(PUBLIC){enterPublicBooking(PUBLIC);}
 </script>
