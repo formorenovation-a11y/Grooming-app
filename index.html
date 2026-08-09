@@ -385,7 +385,8 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
 @media(max-width:560px){.row{flex-direction:column}.biz-head h1{font-size:25px}.wrap{padding:18px 14px 60px}.modal-actions{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 /* --- guardado / agenda / recordatorios --- */
-.save-dot{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;border:1px solid var(--line);background:#fff;color:var(--muted);white-space:nowrap}
+.save-dot{font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px;border:1px solid var(--line);background:#fff;color:var(--muted);white-space:nowrap;cursor:pointer;font-family:inherit}
+.save-dot:active{transform:scale(.96)}
 .save-dot.sv-w{color:#8a6d1f;border-color:rgba(194,162,79,.6);background:#fdf7e6}
 .save-dot.sv-ok{color:#2f6b4a;border-color:rgba(79,138,107,.5);background:#e9f4ee}
 .save-dot.sv-err{color:#9c2740;border-color:rgba(192,85,107,.5);background:#fbe4e8}
@@ -405,8 +406,8 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
     <div class="login-logo">Mobile <span class="paw">Grooming</span> 🐾</div>
     <div class="login-sub" data-i18n="login_sub"></div>
     <div class="login-box">
-      <div class="field"><label data-i18n="login_email"></label><input id="logEmail" type="email" value="demo@mobilegrooming.app"></div>
-      <div class="field"><label data-i18n="login_pass"></label><input id="logPass" type="password" value="demo1234"></div>
+      <div class="field"><label data-i18n="login_email"></label><input id="logEmail" type="email" autocomplete="username" placeholder="tucorreo@ejemplo.com"></div>
+      <div class="field"><label data-i18n="login_pass"></label><input id="logPass" type="password" autocomplete="current-password"></div>
       <div id="logErr" style="display:none;background:#fbe4e8;border:1px solid rgba(192,85,107,.5);color:#9c2740;font-size:12.5px;padding:9px 12px;border-radius:10px;margin-bottom:12px"></div>
       <button class="login-btn" data-i18n="login_enter" onclick="doLogin()"></button>
       <div class="login-alt" id="signupRow"><span data-i18n="login_noAccount"></span> <button data-i18n="login_signup" onclick="doSignup()"></button></div>
@@ -420,7 +421,7 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
 </div>
 
 <div class="demo-bar">
-  <span class="pl">Mobile Grooming 🐾 <small>demo</small></span>
+  <span class="pl">Mobile Grooming 🐾</span>
   <button class="lang-btn" id="langBtn" onclick="toggleLang()">🌐 EN</button>
   <div class="seg">
     <button id="sw-client" onclick="showView('client')" data-i18n="sw_client"></button>
@@ -494,7 +495,7 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
 <section id="view-biz" class="view on">
   <div class="biz-head">
     <div style="display:flex;align-items:center;gap:14px"><img id="bizLogo" style="display:none;width:54px;height:54px;border-radius:14px;object-fit:cover;border:1px solid var(--line)" alt=""><div><h1 id="bizName">Bella Paws</h1><div class="meta"><span data-i18n="biz_panel"></span> · <span id="todayLabel"></span></div></div></div>
-    <span class="pl-badge">Mobile Grooming 🐾</span><span class="save-dot" id="saveDot" style="display:none"></span>
+    <span class="pl-badge">Mobile Grooming 🐾</span><button class="save-dot" id="saveDot" style="display:none" onclick="saveNowFromBadge()"></button>
   </div>
 
   <div id="loadBanner" style="display:none"></div>
@@ -645,7 +646,7 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
 <div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()"><div class="modal" id="modalBody"></div></div>
 <div class="toast" id="toast"></div>
 
-<!-- Firebase SDK (compat). Si no carga o no hay config, la app corre en modo demo. -->
+<!-- Firebase SDK (compat). Sin config, la app corre en local sin guardar en la nube. -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -666,7 +667,7 @@ const FIREBASE_CONFIG={
   appId:"1:351255112534:web:32d65510846fd9571784f7",
   measurementId:"G-6JCKKEDFHG"
 };
-let FB=false,fbAuth=null,fbDB=null,fbStore=null,fbUser=null,_loading=false,_persistT=null;
+let FB=false,fbAuth=null,fbDB=null,fbStore=null,fbUser=null,_loading=false;
 /* SAFE: solo se escribe en la nube DESPUÉS de haber leído los datos con éxito.
    Sin esto, un fallo de red haría que la app guardara datos vacíos encima de los reales. */
 let SAFE=false,_saveState="idle",_reqUnsub=null;
@@ -676,6 +677,9 @@ function fbInit(){
     if(typeof firebase==="undefined"||!FIREBASE_CONFIG.apiKey)return false;
     firebase.initializeApp(FIREBASE_CONFIG);
     fbAuth=firebase.auth();fbDB=firebase.firestore();
+    // Brave/adblockers y algunos proxies rompen el canal en streaming de Firestore.
+    // Con esto el SDK detecta y usa long-polling: se acaban las desconexiones.
+    try{fbDB.settings({experimentalAutoDetectLongPolling:true,merge:true});}catch(e){console.warn("settings:",e);}
     try{fbDB.enablePersistence({synchronizeTabs:true}).catch(function(){});}catch(e){}
     try{fbAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);}catch(e){}
     try{fbStore=firebase.storage();}catch(e){fbStore=null;}
@@ -688,34 +692,95 @@ function fbInit(){
     return true;
   }catch(e){console.warn("Firebase init:",e);return false;}
 }
-/* El documento del negocio guarda SOLO la configuración (pequeña y acotada).
-   Las citas y el historial viven en subcolecciones: crecen sin límite. */
+/* ============================================================
+   SINCRONIZACIÓN CON LA NUBE
+   - El documento del negocio guarda SOLO la configuración (pequeña).
+   - Citas e historial viven en subcolecciones: crecen sin límite.
+   - Guardado automático silencioso + latido cada 60 s + aviso si queda algo sin guardar.
+   - NUNCA se escribe si la lectura inicial no fue confirmada (SAFE).
+   ============================================================ */
 const CFG_KEYS=["brand","zones","categories","services","staff","vans","hours","settings","slots","expenses"];
 const ALL_KEYS=CFG_KEYS.concat(["appointments","reqHistory"]);
+const AUTOSAVE_MS=60000;   // latido: sube cambios pendientes cada minuto
+const DEBOUNCE_MS=5000;    // tras editar algo, sube a los 5 s
 function withTimeout(p,ms){return Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("timeout")),ms))]);}
 function bizRef(){return fbDB.collection("businesses").doc(fbUser.uid);}
 function apptCol(){return bizRef().collection("appointments");}
 function histCol(){return bizRef().collection("reqHistory");}
-/* Huella de lo último escrito: permite guardar SOLO lo que cambió. */
-let _written={appts:{},hist:{}},_legacy=false;
 
-/* ===== indicador de guardado ===== */
+let DIRTY=false,_saving=false,_queued=false,_autoT=null,_legacy=false;
+let _written={cfg:"",appts:{},hist:{}};
+let SYNC={lastOk:0,lastErr:"",fails:0};
+
+/* ---- Firestore rechaza undefined / NaN / funciones. Se limpia siempre antes de escribir. ---- */
+function clean(v){
+  if(v===null)return null;
+  if(Array.isArray(v))return v.map(clean);
+  if(typeof v==="number")return isFinite(v)?v:0;
+  if(typeof v==="object"){
+    const o={};
+    Object.keys(v).forEach(k=>{
+      const val=v[k];
+      if(val===undefined||typeof val==="function"||typeof val==="symbol")return;
+      if(k.indexOf("__")===0)return;
+      o[k]=clean(val);
+    });
+    return o;
+  }
+  if(typeof v==="undefined"||typeof v==="function")return null;
+  return v;
+}
+function errText(e){
+  if(!e)return "";
+  const c=e.code||"";const m=e.message||String(e);
+  return c?String(c):String(m).slice(0,80);
+}
+function isTransient(e){
+  const c=errText(e).toLowerCase();
+  return /unavailable|deadline|timeout|internal|aborted|cancelled|network/.test(c);
+}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+async function withRetry(fn,tries){
+  tries=tries||3;let last=null;
+  for(let i=0;i<tries;i++){
+    try{return await fn();}
+    catch(e){last=e;if(!isTransient(e)||i===tries-1)throw e;await sleep(600*Math.pow(2,i));}
+  }
+  throw last;
+}
+
+/* ===== indicador de guardado (es un botón: al tocarlo guarda) ===== */
 function setSaveState(s){
   _saveState=s;
   const el=document.getElementById("saveDot");if(!el)return;
-  const map={idle:["",""],saving:["sv-w",t("sv_saving")],ok:["sv-ok",t("sv_ok")],err:["sv-err",t("sv_err")],locked:["sv-err",t("sv_locked")]};
+  const map={
+    idle:["",""],
+    saving:["sv-w",t("sv_saving")],
+    ok:["sv-ok",t("sv_ok")],
+    dirty:["sv-w",t("sv_dirty")],
+    err:["sv-err",t("sv_err")+(SYNC.lastErr?" ("+SYNC.lastErr+")":"")],
+    locked:["sv-err",t("sv_locked")]
+  };
   const m=map[s]||map.idle;
   el.className="save-dot "+m[0];el.textContent=m[1];el.style.display=m[1]?"":"none";
+  el.title=SYNC.lastErr||"";
 }
+function refreshSaveBadge(){
+  if(!FB||!fbUser)return;
+  if(!SAFE){setSaveState("locked");return;}
+  if(_saving){setSaveState("saving");return;}
+  setSaveState(DIRTY?"dirty":(SYNC.lastErr?"err":"ok"));
+}
+
 function serializeCfg(){const o={updatedAt:Date.now()};CFG_KEYS.forEach(k=>o[k]=STATE[k]);return o;}
 function serializeBiz(){const o=serializeCfg();o.appointments=STATE.appointments;o.reqHistory=STATE.reqHistory;return o;}
-function stripPhotos(list){return (list||[]).map(x=>{const c=Object.assign({},x);if(c.photo&&c.photo.indexOf("data:")===0)c.photo="";return c;});}
-/* Copia local de emergencia. Sin fotos pesadas para no llenar el navegador. */
+function stripPhotos(list){return (list||[]).map(x=>{const c=Object.assign({},x);if(c.photo&&String(c.photo).indexOf("data:")===0)c.photo="";return c;});}
+/* Copia local de emergencia (sin fotos pesadas). */
 function backupLocal(){
   try{
     const o=serializeCfg();o.appointments=stripPhotos(STATE.appointments);o.reqHistory=stripPhotos(STATE.reqHistory);
-    localStorage.setItem(LS_PREFIX+(fbUser?fbUser.uid:"demo"),JSON.stringify({at:Date.now(),data:o}));
-  }catch(e){/* cuota llena: la nube sigue siendo la fuente real */}
+    localStorage.setItem(LS_PREFIX+(fbUser?fbUser.uid:"local"),JSON.stringify({at:Date.now(),data:o}));
+  }catch(e){/* cuota llena: la nube es la fuente real */}
 }
 function readBackup(uid){try{const raw=localStorage.getItem(LS_PREFIX+uid);return raw?JSON.parse(raw):null;}catch(e){return null;}}
 function downloadBackup(){
@@ -726,21 +791,107 @@ function downloadBackup(){
     document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
   }catch(e){toast(t("save_err"));}
 }
-function forceSave(){if(!SAFE){toast(t("sv_locked"));return;}flushPersist().then(ok=>{if(ok)toast(t("t_saved"));});}
+
+/* ===== marcar cambios y programar subida ===== */
+let _debT=null;
+function markDirty(){
+  if(PUBLIC||!FB||!fbUser||_loading)return;
+  DIRTY=true;backupLocal();
+  if(!SAFE){setSaveState("locked");return;}
+  refreshSaveBadge();
+  clearTimeout(_debT);_debT=setTimeout(()=>saveNow({silent:true}),DEBOUNCE_MS);
+}
+function persist(){markDirty();}            // compatibilidad con el resto del código
+function flushPersist(){return saveNow({silent:true});}
+function persistNow(){if(!FB||!fbUser||!SAFE)return false;saveNow({silent:true});return true;}
+function forceSave(){
+  if(!FB||!fbUser){toast(t("cloud_off"));return;}
+  if(!SAFE){toast(t("sv_locked"));return;}
+  saveNow({silent:false});
+}
+function saveNowFromBadge(){forceSave();}
+
+/* ===== escritura ===== */
+async function writeCfg(){
+  const cfg=clean(serializeCfg());
+  delete cfg.updatedAt;                       // la marca de tiempo no cuenta como cambio
+  const j=JSON.stringify(cfg);
+  if(j===_written.cfg)return false;
+  cfg.updatedAt=Date.now();
+  await withRetry(()=>bizRef().set(cfg,{merge:true}));
+  _written.cfg=j;return true;
+}
+async function writeCollection(col,items,keyField,store){
+  const now={};
+  items.forEach(x=>{
+    if(!x[keyField])x[keyField]=(keyField==="id")?nid():("h"+Date.now().toString(36)+Math.random().toString(36).slice(2,7));
+    now[x[keyField]]=JSON.stringify(clean(x));
+  });
+  const ops=[];
+  items.forEach(x=>{const k=x[keyField];if(store[k]!==now[k])ops.push({t:"set",k:k,v:clean(x)});});
+  Object.keys(store).forEach(k=>{if(now[k]===undefined)ops.push({t:"del",k:k});});
+  for(let i=0;i<ops.length;i+=200){
+    const chunk=ops.slice(i,i+200);
+    await withRetry(()=>{
+      const bt=fbDB.batch();
+      chunk.forEach(o=>{if(o.t==="set")bt.set(col().doc(o.k),o.v);else bt.delete(col().doc(o.k));});
+      return bt.commit();
+    });
+    // solo se marca como escrito lo que realmente se confirmó
+    chunk.forEach(o=>{if(o.t==="set")store[o.k]=now[o.k];else delete store[o.k];});
+  }
+}
+async function saveNow(opts){
+  opts=opts||{};
+  if(PUBLIC||!FB||!fbUser||!SAFE)return false;
+  if(_saving){_queued=true;return false;}
+  clearTimeout(_debT);
+  _saving=true;setSaveState("saving");
+  try{
+    await writeCfg();
+    await writeCollection(apptCol,STATE.appointments,"id",_written.appts);
+    await writeCollection(histCol,STATE.reqHistory||[],"hid",_written.hist);
+    try{publishPublic();}catch(e){console.warn("publishPublic:",e);} // nunca debe tumbar el guardado
+    _saving=false;DIRTY=false;SYNC.lastOk=Date.now();SYNC.lastErr="";SYNC.fails=0;
+    backupLocal();refreshSaveBadge();
+    if(!opts.silent)toast(t("t_saved"));
+    if(_queued){_queued=false;return saveNow({silent:true});}
+    return true;
+  }catch(e){
+    _saving=false;_queued=false;
+    SYNC.lastErr=errText(e);SYNC.fails++;
+    console.warn("saveNow:",e);
+    setSaveState("err");
+    if(!opts.silent)toast(t("save_err")+" · "+SYNC.lastErr);
+    else if(SYNC.fails===1||SYNC.fails%5===0)toast(t("save_retry")+" ("+SYNC.lastErr+")");
+    return false;
+  }
+}
+/* Latido: cada minuto sube lo que quede pendiente, en silencio. */
+function startAutosave(){
+  clearInterval(_autoT);
+  _autoT=setInterval(()=>{
+    if(DIRTY&&SAFE&&!_saving)saveNow({silent:true});
+    else refreshSaveBadge();
+  },AUTOSAVE_MS);
+}
+
+/* ===== carga ===== */
 function showLoadBanner(msg){
   const el=document.getElementById("loadBanner");if(!el)return;
   if(!msg){el.style.display="none";el.innerHTML="";return;}
   el.style.display="";el.innerHTML='<span>⚠️ '+msg+'</span><button class="btn btn-ghost btn-sm" onclick="retryLoad()">'+t("retry")+'</button>';
 }
 function retryLoad(){if(FB&&fbUser)loadBiz(fbUser.uid);}
-
-async function loadBiz(uid){
-  _loading=true;SAFE=false;_legacy=false;_written={appts:{},hist:{}};
+async function loadBiz(uid,attempt){
+  attempt=attempt||1;
+  _loading=true;SAFE=false;
+  if(attempt===1){_legacy=false;_written={cfg:"",appts:{},hist:{}};}
   document.getElementById("login").classList.add("hide");
   showView("biz");showLoadBanner("");setSaveState("saving");
   try{
     const ref=fbDB.collection("businesses").doc(uid);
-    const snap=await withTimeout(ref.get(),15000);
+    const snap=await withRetry(()=>withTimeout(ref.get(),20000));
     let oldAppts=null,oldHist=null;
     if(snap.exists){
       const d=snap.data();
@@ -749,91 +900,53 @@ async function loadBiz(uid){
       if(Array.isArray(d.reqHistory))oldHist=d.reqHistory;
     }else{
       STATE.appointments=[];STATE.reqHistory=[];
-      await withTimeout(ref.set(serializeCfg()),15000);
+      await withRetry(()=>withTimeout(ref.set(clean(serializeCfg())),20000));
     }
-    // Subcolecciones (sin límite de tamaño)
     const res=await Promise.all([
-      withTimeout(ref.collection("appointments").get(),25000),
-      withTimeout(ref.collection("reqHistory").get(),25000)
+      withRetry(()=>withTimeout(ref.collection("appointments").get(),30000)),
+      withRetry(()=>withTimeout(ref.collection("reqHistory").get(),30000))
     ]);
     const appts=[],hist=[];
     res[0].forEach(d=>appts.push(Object.assign({},d.data(),{id:d.id})));
     res[1].forEach(d=>hist.push(Object.assign({},d.data(),{hid:d.id})));
     if(appts.length||!oldAppts)STATE.appointments=appts;
     if(hist.length||!oldHist)STATE.reqHistory=hist;
-    // Migración automática del formato antiguo (documento único → subcolecciones)
     if(oldAppts&&!appts.length){STATE.appointments=oldAppts.map(a=>Object.assign({},a,{id:a.id||nid()}));_legacy=true;}
-    if(oldHist&&!hist.length){STATE.reqHistory=oldHist.map(x=>Object.assign({},x,{hid:x.hid||("h"+Date.now()+Math.floor(Math.random()*99999))}));_legacy=true;}
-    STATE.reqHistory.sort((a,b)=>(b.at||0)-(a.at||0));
-    if(!_legacy){ // ya estaba migrado: registra la huella para no reescribir de más
-      STATE.appointments.forEach(a=>_written.appts[a.id]=JSON.stringify(a));
-      STATE.reqHistory.forEach(x=>_written.hist[x.hid]=JSON.stringify(x));
+    if(oldHist&&!hist.length){STATE.reqHistory=oldHist.map(x=>Object.assign({},x,{hid:x.hid||("h"+Date.now().toString(36)+Math.random().toString(36).slice(2,7))}));_legacy=true;}
+    (STATE.reqHistory||[]).sort((a,b)=>(b.at||0)-(a.at||0));
+    if(!_legacy){ // huella de lo ya guardado: así solo se escribe lo que cambie
+      const _c0=clean(serializeCfg());delete _c0.updatedAt;_written.cfg=JSON.stringify(_c0);
+      STATE.appointments.forEach(a=>_written.appts[a.id]=JSON.stringify(clean(a)));
+      (STATE.reqHistory||[]).forEach(x=>_written.hist[x.hid]=JSON.stringify(clean(x)));
     }
     migrateSettings();migrateServices();
     mergeRequests(await loadRequests(uid));
-    _loading=false;SAFE=true;            // ← desde aquí ya es seguro escribir
-    backupLocal();watchRequests(uid);
+    _loading=false;SAFE=true;DIRTY=false;SYNC.lastErr="";SYNC.fails=0;
+    backupLocal();watchRequests(uid);startAutosave();
     applyLang();refreshBiz();
-    if(_legacy)await finishMigration(ref);
-    else setSaveState("ok");
+    if(_legacy){const ok=await saveNow({silent:true});if(ok)await finishMigration(ref);}
+    DIRTY=false;refreshSaveBadge();
   }catch(e){
     console.warn("loadBiz:",e);
-    _loading=false;SAFE=false;           // ← NO se escribe nada: protege los datos reales
+    if(attempt<3&&isTransient(e)){await sleep(900*attempt);return loadBiz(uid,attempt+1);}
+    _loading=false;SAFE=false;           // ← no se escribe nada: protege los datos reales
     const bk=readBackup(uid);
     if(bk&&bk.data)ALL_KEYS.forEach(k=>{if(bk.data[k]!==undefined)STATE[k]=bk.data[k];});
     migrateSettings();migrateServices();
     applyLang();refreshBiz();
-    const code=(e&&(e.code||e.message))?String(e.code||e.message):"";
+    const code=errText(e);
     setSaveState("locked");
     showLoadBanner(/permission|insufficient/i.test(code)?t("load_rules"):(t("load_err")+" ("+(code||"?")+")"));
   }
 }
-/* Sube las citas antiguas a la subcolección y limpia el documento viejo. */
 async function finishMigration(ref){
-  const ok=await flushPersist();
-  if(!ok)return;
   try{
     await ref.update({
       appointments:firebase.firestore.FieldValue.delete(),
       reqHistory:firebase.firestore.FieldValue.delete()
     });
-    _legacy=false;toast(t("migrated"));
+    _legacy=false;_written.cfg="";toast(t("migrated"));
   }catch(e){console.warn("migracion:",e);}
-}
-function persist(){
-  if(PUBLIC||!FB||!fbUser||_loading)return;
-  if(!SAFE){setSaveState("locked");return;}
-  clearTimeout(_persistT);setSaveState("saving");
-  _persistT=setTimeout(flushPersist,700);
-}
-/* Escribe la config + solo las citas/historial que cambiaron desde el último guardado. */
-function diffOps(){
-  const ops=[],nowA={},nowH={};
-  STATE.appointments.forEach(a=>{if(!a.id)a.id=nid();nowA[a.id]=JSON.stringify(a);});
-  (STATE.reqHistory||[]).forEach(x=>{if(!x.hid)x.hid="h"+Date.now()+Math.floor(Math.random()*99999);nowH[x.hid]=JSON.stringify(x);});
-  STATE.appointments.forEach(a=>{if(_written.appts[a.id]!==nowA[a.id])ops.push(["set",apptCol().doc(a.id),a]);});
-  Object.keys(_written.appts).forEach(id=>{if(nowA[id]===undefined)ops.push(["del",apptCol().doc(id)]);});
-  (STATE.reqHistory||[]).forEach(x=>{if(_written.hist[x.hid]!==nowH[x.hid])ops.push(["set",histCol().doc(x.hid),x]);});
-  Object.keys(_written.hist).forEach(id=>{if(nowH[id]===undefined)ops.push(["del",histCol().doc(id)]);});
-  return {ops:ops,nowA:nowA,nowH:nowH};
-}
-function flushPersist(){
-  clearTimeout(_persistT);_persistT=null;
-  if(PUBLIC||!FB||!fbUser||!SAFE)return Promise.resolve(false);
-  setSaveState("saving");
-  const d=diffOps();
-  backupLocal();
-  let p=bizRef().set(serializeCfg(),{merge:true});
-  for(let i=0;i<d.ops.length;i+=400){
-    const chunk=d.ops.slice(i,i+400);
-    p=p.then(()=>{
-      const bt=fbDB.batch();
-      chunk.forEach(o=>{if(o[0]==="set")bt.set(o[1],o[2]);else bt.delete(o[1]);});
-      return bt.commit();
-    });
-  }
-  return p.then(()=>{_written={appts:d.nowA,hist:d.nowH};setSaveState("ok");publishPublic();return true;})
-          .catch(e=>{console.warn("persist:",e);setSaveState("err");toast(t("save_err"));return false;});
 }
 function uploadPhoto(dataUrl,folder,cb){
   if(!(FB&&fbStore&&fbUser)){cb(dataUrl);return;}
@@ -848,7 +961,9 @@ const PUBLIC_KEYS=["brand","categories","services","zones","slots","hours","sett
 function serializePublicInfo(){const o={updatedAt:Date.now()};PUBLIC_KEYS.forEach(k=>o[k]=STATE[k]);return o;}
 function publishPublic(){
   if(!FB||!fbUser||!SAFE)return;
-  fbDB.collection("businesses").doc(fbUser.uid).collection("public").doc("info").set(serializePublicInfo()).catch(e=>console.warn("publishPublic:",e));
+  try{
+    bizRef().collection("public").doc("info").set(clean(serializePublicInfo())).catch(e=>console.warn("publishPublic:",e));
+  }catch(e){console.warn("publishPublic:",e);}
 }
 function reqToAppt(doc){const d=doc.data()||{};return Object.assign({id:nid(),_reqId:doc.id,status:d.proposal?"modProposed":"requested",paid:false},d);}
 function mergeRequests(list){
@@ -945,7 +1060,7 @@ function updateAccountUI(){
   const em=document.getElementById("acctEmail"),st=document.getElementById("acctStatus"),lb=document.getElementById("logoutBtn");
   if(!em)return;
   if(FB&&fbUser){em.textContent=fbUser.email;st.textContent=t("cloud_on");lb.style.display="";}
-  else{em.textContent="demo@mobilegrooming.app";st.textContent=t("cloud_off");lb.style.display="none";}
+  else{em.textContent="—";st.textContent=t("cloud_off");lb.style.display="none";}
   const pl=document.getElementById("pubLink"),note=document.getElementById("pubLinkNote");
   if(pl){
     if(FB&&fbUser){pl.value=location.origin+location.pathname+"?biz="+fbUser.uid;note.textContent=t("cfg_portal_ready");}
@@ -960,7 +1075,7 @@ es:{
  login_sub:"El sistema de reservas y gestión para grooming móvil",login_email:"Correo",login_pass:"Contraseña",
  login_enter:"Entrar al panel",login_seeClient:"¿Quieres ver el portal de reservas?",login_viewClient:"Ver vista cliente",
  login_noAccount:"¿Primera vez?",login_signup:"Crear cuenta",err_auth:"Correo o contraseña incorrectos",err_signup:"No se pudo crear la cuenta (¿correo en uso o contraseña corta?)",err_needCreds:"Escribe correo y contraseña",
- cfg_account:"Cuenta",cfg_account_h:"Sesión y datos de tu negocio en la nube.",logout:"Cerrar sesión",cloud_on:"☁️ Conectado a la nube",cloud_off:"Modo demo · sin guardar",
+ cfg_account:"Cuenta",cfg_account_h:"Sesión y datos de tu negocio en la nube.",logout:"Cerrar sesión",cloud_on:"☁️ Conectado a la nube",cloud_off:"Sin conexión con la nube",
  connecting:"Conectando…",cloud_err:"Conectado, pero no se pudo leer la base de datos. Revisa que Firestore esté habilitado.",
  feat_booking:"Reservas 24/7",feat_reminders:"Recordatorios",feat_routes:"Rutas",feat_finances:"Finanzas",
  sw_client:"Cliente",sw_biz:"Negocio",
@@ -1032,7 +1147,7 @@ en:{
  login_sub:"Booking & management system for mobile grooming",login_email:"Email",login_pass:"Password",
  login_enter:"Enter dashboard",login_seeClient:"Want to see the booking portal?",login_viewClient:"View client side",
  login_noAccount:"First time?",login_signup:"Create account",err_auth:"Wrong email or password",err_signup:"Couldn't create account (email in use or password too short?)",err_needCreds:"Enter email and password",
- cfg_account:"Account",cfg_account_h:"Session and your business data in the cloud.",logout:"Sign out",cloud_on:"☁️ Connected to the cloud",cloud_off:"Demo mode · not saved",
+ cfg_account:"Account",cfg_account_h:"Session and your business data in the cloud.",logout:"Sign out",cloud_on:"☁️ Connected to the cloud",cloud_off:"No cloud connection",
  connecting:"Connecting…",cloud_err:"Signed in, but couldn't read the database. Check that Firestore is enabled.",
  feat_booking:"24/7 booking",feat_reminders:"Reminders",feat_routes:"Routes",feat_finances:"Finances",
  sw_client:"Client",sw_biz:"Business",
@@ -1104,6 +1219,8 @@ en:{
 const EXTRA_I18N={
 es:{
  sv_saving:"Guardando…",sv_ok:"Guardado ✓",sv_err:"Error al guardar",sv_locked:"Sin guardar · solo lectura",
+ sv_dirty:"● Cambios sin guardar · toca para guardar",save_retry:"No se pudo guardar; se reintentará solo.",
+ unsaved_warn:"Tienes cambios sin guardar.",
  load_err:"No se pudieron leer tus datos. Para no borrar nada, el guardado está bloqueado. Reintenta.",
  retry:"Reintentar",save_err:"No se pudo guardar. Revisa tu conexión.",
  load_rules:"Firestore rechazó la lectura (permisos). Publica las reglas de FIREBASE-SETUP.md en la consola de Firebase y reintenta. No se ha borrado nada.",
@@ -1125,6 +1242,8 @@ es:{
 },
 en:{
  sv_saving:"Saving…",sv_ok:"Saved ✓",sv_err:"Save failed",sv_locked:"Not saving · read only",
+ sv_dirty:"● Unsaved changes · tap to save",save_retry:"Couldn't save; it will retry automatically.",
+ unsaved_warn:"You have unsaved changes.",
  load_err:"Couldn't read your data. Saving is locked so nothing gets erased. Please retry.",
  retry:"Retry",save_err:"Couldn't save. Check your connection.",
  load_rules:"Firestore denied the read (permissions). Publish the rules from FIREBASE-SETUP.md in the Firebase console and retry. Nothing was deleted.",
@@ -2087,7 +2206,7 @@ function applyWordmark(){
   if(CURVIEW==="client"||PUBLIC){
     pl.innerHTML=(lg?'<img src="'+lg+'" style="width:26px;height:26px;border-radius:7px;object-fit:cover;vertical-align:middle;margin-right:7px">':'')+'<b>'+(STATE.brand.name||"Tu negocio")+'</b>';
   }else{
-    pl.innerHTML='Mobile Grooming 🐾'+((FB&&fbUser)?'':' <small>demo</small>');
+    pl.innerHTML='Mobile Grooming 🐾';
   }
 }
 function applyLogo(){
@@ -2097,10 +2216,16 @@ function applyLogo(){
   const li=document.getElementById("logoImg"),lic=document.getElementById("logoIc"),lr=document.getElementById("logoRemove");
   if(li){if(lg){li.src=lg;li.style.display="block";if(lic)lic.style.display="none";if(lr)lr.style.display="";}else{li.style.display="none";if(lic)lic.style.display="";if(lr)lr.style.display="none";}}
 }
-function onBrandLogo(input){readImg(input,url=>{STATE.brand.logo=url;applyLogo();uploadPhoto(url,"logo",u=>{STATE.brand.logo=u;applyLogo();persist();});persist();});}
-function removeLogo(){STATE.brand.logo="";applyLogo();persist();}
+function onBrandLogo(input){
+  readImg(input,async url=>{
+    const small=await resizeImage(url,420);          // el logo nunca infla el documento
+    STATE.brand.logo=small;applyLogo();setupPWA();markDirty();
+    uploadPhoto(small,"logo",u=>{STATE.brand.logo=u;applyLogo();setupPWA();markDirty();});
+  });
+}
+function removeLogo(){STATE.brand.logo="";applyLogo();setupPWA();markDirty();}
 function persistNow(){if(!FB||!fbUser||!SAFE)return false;flushPersist();return true;}
-function saveSettings(){applyBrand();if(!persistNow()){toast(FB?t("sv_locked"):t("cloud_off"));return;}toast(t("t_saved"));}
+function saveSettings(){applyBrand();forceSave();}
 
 /* init */
 const _now=new Date();STATE.cal={y:_now.getFullYear(),m:_now.getMonth(),sel:addDays(0)};
@@ -2115,9 +2240,16 @@ document.getElementById("clientRow").style.display=FB?"none":"";
 document.getElementById("view-biz").addEventListener("change",persist);
 document.getElementById("view-biz").addEventListener("click",e=>{if(e.target.closest("button,.toggle,.sw"))persist();});
 // Nada se queda sin guardar al cerrar o cambiar de app (clave en iOS).
-window.addEventListener("beforeunload",()=>{if(_persistT)flushPersist();});
-window.addEventListener("pagehide",()=>{if(_persistT)flushPersist();});
-document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&_persistT)flushPersist();});
+// Nada se escapa: se guarda al salir, al cambiar de app y se avisa si queda pendiente.
+window.addEventListener("beforeunload",e=>{
+  if(DIRTY&&SAFE){saveNow({silent:true});e.preventDefault();e.returnValue=t("unsaved_warn");return e.returnValue;}
+});
+window.addEventListener("pagehide",()=>{if(DIRTY&&SAFE)saveNow({silent:true});});
+document.addEventListener("visibilitychange",()=>{
+  if(document.visibilityState==="hidden"){if(DIRTY&&SAFE)saveNow({silent:true});}
+  else refreshSaveBadge();
+});
+window.addEventListener("online",()=>{if(DIRTY&&SAFE)saveNow({silent:true});});
 setInterval(()=>{if(document.getElementById("remList"))renderReminders();},300000);
 applyLang();applyColor(STATE.brand.color);refreshBiz();setupPWA();applyWordmark();
 if(PUBLIC){enterPublicBooking(PUBLIC);}
