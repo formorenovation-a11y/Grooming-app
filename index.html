@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>PerreoLand — Mobile grooming booking & management</title>
+<meta name="theme-color" content="#A8688A" id="themeColorMeta">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PerreoLand" id="appTitleMeta">
+<link rel="apple-touch-icon" id="appleIcon" href="">
+<link rel="manifest" id="manifestLink" href="">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -44,16 +51,16 @@ a{color:var(--mauve-deep)}
 .login-card{width:100%;max-width:380px;text-align:center}
 .login-logo{font-family:'Fraunces';font-size:42px;color:#fff;letter-spacing:-.02em;margin-bottom:4px}
 .login-logo .paw{color:var(--gold)}
-.login-sub{color:#E7C9D4;font-size:13.5px;margin-bottom:30px}
-.login-box{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:var(--r);padding:26px 22px;backdrop-filter:blur(8px)}
+.login-sub{color:#F0D9E1;font-size:13.5px;margin-bottom:30px}
+.login-box{background:var(--cream);border:1px solid rgba(255,255,255,.5);border-radius:var(--r);padding:26px 22px;box-shadow:0 18px 50px rgba(0,0,0,.35)}
 .login-box .field{margin-bottom:14px;text-align:left}
-.login-box label{display:block;font-size:12px;color:#E7C9D4;font-weight:600;margin-bottom:6px}
-.login-box input{width:100%;padding:13px 15px;border:1.5px solid rgba(255,255,255,.18);border-radius:var(--r-sm);background:rgba(255,255,255,.08);color:#fff;outline:none}
-.login-box input::placeholder{color:#c9a9b6}
-.login-box input:focus{border-color:var(--gold)}
+.login-box label{display:block;font-size:12.5px;color:var(--burgundy);font-weight:700;margin-bottom:6px;letter-spacing:.2px}
+.login-box input{width:100%;padding:13px 15px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:#fff;color:var(--ink);outline:none;font-size:15px}
+.login-box input::placeholder{color:#b89aa6}
+.login-box input:focus{border-color:var(--mauve);box-shadow:0 0 0 3px rgba(168,104,138,.15)}
 .login-btn{width:100%;padding:14px;border-radius:var(--r-pill);background:var(--gold);color:#3a2e10;font-weight:700;font-size:15px;margin-top:6px}
-.login-alt{margin-top:18px;font-size:13px;color:#E7C9D4}
-.login-alt button{color:#fff;font-weight:600;text-decoration:underline}
+.login-alt{margin-top:18px;font-size:13px;color:var(--muted)}
+.login-alt button{color:var(--mauve-deep);font-weight:700;text-decoration:underline}
 .login-feat{display:flex;gap:18px;justify-content:center;margin-top:26px;color:#d9b9c6;font-size:11.5px;flex-wrap:wrap}
 .login-feat span{display:flex;align-items:center;gap:5px}
 .login-lang{margin-top:22px}.login-lang button{color:#E7C9D4;font-size:12px;font-weight:600;padding:4px 8px;text-decoration:underline}
@@ -338,6 +345,8 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
 .pay-m{display:flex;flex-direction:column;align-items:center;gap:4px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:11px 6px;font-size:12.5px;font-weight:600;color:var(--burgundy)}
 .pay-m span{font-size:20px}
 .pay-m.on{border-color:var(--mauve);background:var(--blush-soft);box-shadow:0 0 0 1.5px var(--mauve)}
+.install-chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);color:var(--mauve-deep);font-weight:600;font-size:13px;padding:9px 16px;border-radius:var(--r-pill);box-shadow:var(--shadow-sm)}
+.install-chip:active{transform:scale(.97)}
 
 .cal-head{display:flex;align-items:center;gap:10px;margin-bottom:16px}
 .cal-nav{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--mauve-deep);font-size:20px;font-weight:700;flex:none;box-shadow:var(--shadow-sm)}
@@ -386,7 +395,7 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
     <div class="login-box">
       <div class="field"><label data-i18n="login_email"></label><input id="logEmail" type="email" value="demo@perreoland.com"></div>
       <div class="field"><label data-i18n="login_pass"></label><input id="logPass" type="password" value="demo1234"></div>
-      <div id="logErr" style="display:none;background:rgba(192,85,107,.18);border:1px solid rgba(192,85,107,.4);color:#ffd9e0;font-size:12.5px;padding:9px 12px;border-radius:10px;margin-bottom:12px"></div>
+      <div id="logErr" style="display:none;background:#fbe4e8;border:1px solid rgba(192,85,107,.5);color:#9c2740;font-size:12.5px;padding:9px 12px;border-radius:10px;margin-bottom:12px"></div>
       <button class="login-btn" data-i18n="login_enter" onclick="doLogin()"></button>
       <div class="login-alt" id="signupRow"><span data-i18n="login_noAccount"></span> <button data-i18n="login_signup" onclick="doSignup()"></button></div>
       <div class="login-alt" id="clientRow"><span data-i18n="login_seeClient"></span> <button data-i18n="login_viewClient" onclick="doLogin('client')"></button></div>
@@ -467,6 +476,7 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
     </div>
   </div>
   <p class="note" id="clientNote"></p>
+  <div style="text-align:center;margin-top:6px"><button class="install-chip" id="installBtn" onclick="promptInstall()">📲 <span data-i18n="pwa_install"></span></button></div>
 </section>
 
 <section id="view-biz" class="view on">
@@ -664,7 +674,7 @@ async function loadBiz(uid){
     if(snap.exists){const d=snap.data();BIZ_KEYS.forEach(k=>{if(d[k]!==undefined)STATE[k]=d[k];});}
     else{STATE.appointments=[];await withTimeout(fbDB.collection("businesses").doc(uid).set(serializeBiz()),9000);}
     const reqs=await loadRequests(uid);
-    if(reqs.length)STATE.appointments=STATE.appointments.concat(reqs);
+    if(reqs.length){const seen=new Set(STATE.appointments.map(a=>a._reqId).filter(Boolean));STATE.appointments=STATE.appointments.concat(reqs.filter(r=>!seen.has(r._reqId)));}
   }catch(e){console.warn("loadBiz:",e);_loading=false;toast(t("cloud_err"));applyLang();refreshBiz();return;}
   _loading=false;
   applyLang();refreshBiz();
@@ -712,7 +722,32 @@ function setClientHeader(){
   const bn=document.getElementById("brandName"),bt=document.getElementById("brandTag");
   if(bn)bn.textContent=STATE.brand.name||"Tu negocio";
   if(bt)bt.textContent=STATE.brand.tag||t("default_tagline");
-  applyLogo();
+  applyLogo();setupPWA();
+}
+function pawIconDataURL(color){
+  try{const c=document.createElement("canvas");c.width=c.height=512;const x=c.getContext("2d");
+    x.fillStyle=color||"#A8688A";const r=96;x.beginPath();x.moveTo(r,0);x.arcTo(512,0,512,512,r);x.arcTo(512,512,0,512,r);x.arcTo(0,512,0,0,r);x.arcTo(0,0,512,0,r);x.fill();
+    x.font="300px serif";x.textAlign="center";x.textBaseline="middle";x.fillText("🐾",256,280);
+    return c.toDataURL("image/png");
+  }catch(e){return "";}
+}
+function setupPWA(){
+  const name=STATE.brand.name||"PerreoLand";const color=STATE.brand.color||"#A8688A";
+  const icon=(STATE.brand.logo&&STATE.brand.logo.length>20)?STATE.brand.logo:pawIconDataURL(color);
+  const manifest={name:name,short_name:name.slice(0,12),start_url:location.pathname+location.search,scope:location.pathname,display:"standalone",orientation:"portrait",background_color:"#FBF6F2",theme_color:color,
+    icons:[{src:icon,sizes:"192x192",type:"image/png",purpose:"any"},{src:icon,sizes:"512x512",type:"image/png",purpose:"any maskable"}]};
+  const ml=document.getElementById("manifestLink");if(ml)ml.setAttribute("href","data:application/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(manifest)));
+  const ai=document.getElementById("appleIcon");if(ai&&icon)ai.setAttribute("href",icon);
+  const tc=document.getElementById("themeColorMeta");if(tc)tc.setAttribute("content",color);
+  const at=document.getElementById("appTitleMeta");if(at)at.setAttribute("content",name);
+}
+let _deferredPrompt=null;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();_deferredPrompt=e;});
+function isStandalone(){return window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone;}
+function promptInstall(){
+  if(_deferredPrompt){_deferredPrompt.prompt();_deferredPrompt.userChoice.finally(()=>{_deferredPrompt=null;});return;}
+  const iOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  toast(iOS?t("pwa_ios"):t("pwa_android"));
 }
 async function submitPublicRequest(data){
   let photo=data.photo||"";if(photo&&photo.startsWith("data:"))photo=await resizeImage(photo,700);
@@ -722,8 +757,8 @@ async function submitPublicRequest(data){
   document.getElementById("doneMsg").innerHTML=t("done_msg",{date:fmtDate(SEL.date),time:fmtTime(SEL.time),extra:""});
   goStep("done");document.querySelectorAll('.steps .s').forEach(s=>{s.classList.add('done');s.classList.remove('cur');});
 }
-function showLogErr(msg){const e=document.getElementById("logErr");if(!msg){e.style.display="none";return;}e.style.background="rgba(192,85,107,.18)";e.style.borderColor="rgba(192,85,107,.4)";e.style.color="#ffd9e0";e.textContent=msg;e.style.display="block";}
-function showLogInfo(msg){const e=document.getElementById("logErr");e.style.background="rgba(79,138,107,.18)";e.style.borderColor="rgba(79,138,107,.4)";e.style.color="#d6f0e0";e.textContent=msg;e.style.display="block";}
+function showLogErr(msg){const e=document.getElementById("logErr");if(!msg){e.style.display="none";return;}e.style.background="#fbe4e8";e.style.borderColor="rgba(192,85,107,.5)";e.style.color="#9c2740";e.textContent=msg;e.style.display="block";}
+function showLogInfo(msg){const e=document.getElementById("logErr");e.style.background="#e3f1e9";e.style.borderColor="rgba(79,138,107,.5)";e.style.color="#2f6b4a";e.textContent=msg;e.style.display="block";}
 function doLogout(){if(FB&&fbAuth){fbAuth.signOut();}else{location.reload();}}
 function updateAccountUI(){
   const em=document.getElementById("acctEmail"),st=document.getElementById("acctStatus"),lb=document.getElementById("logoutBtn");
@@ -775,6 +810,7 @@ es:{
  cfg_portal:"Portal público de reservas",cfg_portal_h:"Comparte este enlace con tus clientes para que reserven solos. Cada solicitud entra a tu pestaña Solicitudes.",cfg_copy:"Copiar",cfg_portal_ready:"Compártelo por WhatsApp, Instagram o tu bio.",cfg_portal_demo:"(Disponible al conectar tu cuenta)",cfg_portal_note:"El enlace aparece cuando inicias sesión con tu cuenta en la nube.",t_copied:"Enlace copiado ✓",
  cfg_pay:"Pagos",cfg_pay_h:"Configura cómo cobras. El checkout funciona como tu punto de venta en el teléfono.",cfg_payLink:"Link de pago (Stripe / PayPal)",cfg_payNote:"Datos de transferencia / Zelle",cfg_payNotePh:"Ej. Zelle: pagos@bellapaws.com",cfg_payHelp:"Para Stripe: entra a dashboard.stripe.com → Enlaces de pago → crea uno (activa «el cliente elige el monto») y pega aquí la URL. Se enviará al cliente por WhatsApp al cobrar.",
  co_title:"Cobro",co_tip:"Propina",co_noTip:"Sin propina",co_total:"Total a cobrar",co_method:"Método de pago",co_cash:"Efectivo",co_card:"Tarjeta",co_transfer:"Transfer.",co_link:"Link",co_markPaid:"Marcar pagado",co_sendWa:"Enviar link por WhatsApp",co_pickMethod:"Elige un método de pago",co_done:"Cobrado {amt} ✓",co_note:"El cobro con tarjeta real se procesa con tu link de Stripe/PayPal. Aquí registras el pago y lo envías.",co_waMsg:"¡Hola {owner}! Tu servicio de grooming con {brand} suma {amt}.",co_waPay:"Puedes pagar aquí:",co_waOpen:"Abriendo WhatsApp…",fin_tips:"Propinas",
+ pwa_install:"Instalar app",pwa_ios:"En Safari: toca Compartir → «Añadir a inicio» 📲",pwa_android:"Toca el menú ⋮ del navegador → «Instalar app» / «Añadir a pantalla de inicio» 📲",
  svc_add:"+ Servicio",svc_addCat:"+ Categoría",svc_edit:"Editar servicio",svc_editCat:"Editar categoría",svc_icon:"Icono",svc_name:"Nombre",svc_cat:"Categoría",svc_dur:"Duración (min)",svc_desc:"Descripción",svc_prices:"Precio por tamaño",svc_availG:"Groomers que lo realizan",svc_availV:"Vans que lo realizan",svc_availHint:"Vacío = todos. Marca solo si quieres limitarlo.",svc_del:"Eliminar",svc_catName:"Nombre de la categoría",svc_emptyCat:"Sin servicios aún.",svc_needName:"Escribe un nombre",
  t_svcSaved:"Servicio guardado ✓",t_svcDeleted:"Servicio eliminado",t_catSaved:"Categoría guardada ✓",t_catDeleted:"Categoría eliminada",
  cal_today:"Hoy",cal_dow:["L","M","X","J","V","S","D"],cal_dayAppts:"Citas del {d}",cal_noDay:"Sin citas este día.",cal_legendDone:"Completada",cal_legendUp:"Próxima",
@@ -846,6 +882,7 @@ en:{
  cfg_portal:"Public booking portal",cfg_portal_h:"Share this link so clients book on their own. Every request lands in your Requests tab.",cfg_copy:"Copy",cfg_portal_ready:"Share it on WhatsApp, Instagram or your bio.",cfg_portal_demo:"(Available once your account is connected)",cfg_portal_note:"The link appears when you sign in with your cloud account.",t_copied:"Link copied ✓",
  cfg_pay:"Payments",cfg_pay_h:"Set up how you charge. Checkout works as your phone point of sale.",cfg_payLink:"Payment link (Stripe / PayPal)",cfg_payNote:"Transfer / Zelle details",cfg_payNotePh:"e.g. Zelle: pay@bellapaws.com",cfg_payHelp:"For Stripe: go to dashboard.stripe.com → Payment Links → create one (enable “let customer choose amount”) and paste the URL here. It's sent to the client via WhatsApp at checkout.",
  co_title:"Checkout",co_tip:"Tip",co_noTip:"No tip",co_total:"Total to charge",co_method:"Payment method",co_cash:"Cash",co_card:"Card",co_transfer:"Transfer",co_link:"Link",co_markPaid:"Mark paid",co_sendWa:"Send link via WhatsApp",co_pickMethod:"Pick a payment method",co_done:"Charged {amt} ✓",co_note:"Real card charges run through your Stripe/PayPal link. Here you record the payment and send it.",co_waMsg:"Hi {owner}! Your grooming service with {brand} comes to {amt}.",co_waPay:"You can pay here:",co_waOpen:"Opening WhatsApp…",fin_tips:"Tips",
+ pwa_install:"Install app",pwa_ios:"In Safari: tap Share → “Add to Home Screen” 📲",pwa_android:"Tap the browser ⋮ menu → “Install app” / “Add to Home screen” 📲",
  svc_add:"+ Service",svc_addCat:"+ Category",svc_edit:"Edit service",svc_editCat:"Edit category",svc_icon:"Icon",svc_name:"Name",svc_cat:"Category",svc_dur:"Duration (min)",svc_desc:"Description",svc_prices:"Price by size",svc_availG:"Groomers who perform it",svc_availV:"Vans that perform it",svc_availHint:"Empty = everyone. Check only to restrict it.",svc_del:"Delete",svc_catName:"Category name",svc_emptyCat:"No services yet.",svc_needName:"Enter a name",
  t_svcSaved:"Service saved ✓",t_svcDeleted:"Service deleted",t_catSaved:"Category saved ✓",t_catDeleted:"Category deleted",
  cal_today:"Today",cal_dow:["M","T","W","T","F","S","S"],cal_dayAppts:"Appointments on {d}",cal_noDay:"No appointments this day.",cal_legendDone:"Completed",cal_legendUp:"Upcoming",
@@ -1049,11 +1086,14 @@ function doSignup(){
   showLogInfo(t("connecting"));
   fbAuth.createUserWithEmailAndPassword(em,pw).catch(e=>showLogErr(t("err_signup")+" — "+(e.code||e.message)));
 }
+let CURVIEW="biz";
 function showView(v){
+  CURVIEW=v;
   document.getElementById("view-client").classList.toggle("on",v==="client");
   document.getElementById("view-biz").classList.toggle("on",v==="biz");
   document.getElementById("sw-client").classList.toggle("on",v==="client");
   document.getElementById("sw-biz").classList.toggle("on",v==="biz");
+  applyWordmark();
   if(v==="biz")refreshBiz();
   window.scrollTo({top:0,behavior:"smooth"});
 }
@@ -1157,11 +1197,8 @@ function confirmBooking(){
   const base={pet:SEL.pet,breed:SEL.breed,size:SEL.size,svcs:SEL.svcs.slice(),owner:name,phone:phone,email:email,
     addr:SEL.addr,zone:SEL.zone,price:SEL.price,groomer:groomer,vanId:vanId,recurring:recurOn?every:null,photo:SEL.photo,notes:document.getElementById("petNotes").value.trim(),when:SEL.date,time:SEL.time};
   if(PUBLIC){submitPublicRequest(base);return;}
-  // Reservas en sesión del dueño/demo: entran como SOLICITUD en memoria.
+  // Entra UNA sola solicitud (con su marca de recurrencia). Las repeticiones se generan al aceptar.
   STATE.appointments.push(Object.assign({id:nid(),status:"requested",paid:false},base));
-  if(recurOn){const b0=new Date(SEL.date+"T12:00");
-    for(let k=1;k<=3;k++){const d=new Date(b0);d.setDate(d.getDate()+every*7*k);
-      STATE.appointments.push(Object.assign({id:nid(),status:"requested",paid:false},base,{when:d.toISOString().slice(0,10)}));}}
   document.getElementById("doneMsg").innerHTML=t("done_msg",{date:fmtDate(SEL.date),time:fmtTime(SEL.time),extra:recurOn?t("done_extra_recur"):""});
   persist();
   goStep("done");document.querySelectorAll('.steps .s').forEach(s=>{s.classList.add('done');s.classList.remove('cur');});
@@ -1276,7 +1313,12 @@ function renderRequests(){
   cont.innerHTML=html;
 }
 function logReq(a,outcome){STATE.reqHistory.unshift({hid:"h"+Date.now()+Math.floor(Math.random()*999),pet:a.pet,breed:a.breed,size:a.size,svcs:svcIds(a),owner:a.owner,phone:a.phone,email:a.email||"",addr:a.addr,zone:a.zone,when:a.when,time:a.time,price:a.price,photo:a.photo||"",groomer:a.groomer,vanId:a.vanId,recurring:a.recurring||null,outcome:outcome,at:Date.now()});if(STATE.reqHistory.length>100)STATE.reqHistory.length=100;}
-function acceptRequest(id){const a=STATE.appointments.find(x=>x.id===id);if(a){a.status="conf";if(a._reqId){deleteRequestDoc(a._reqId);delete a._reqId;}logReq(a,"accepted");}refreshBiz();toast(t("t_reqAccepted"));}
+function genRepeats(a){
+  if(!a.recurring)return;const every=a.recurring;const b0=new Date(a.when+"T12:00");
+  for(let k=1;k<=3;k++){const d=new Date(b0);d.setDate(d.getDate()+every*7*k);
+    const c=Object.assign({},a,{id:nid(),when:d.toISOString().slice(0,10),status:"conf"});delete c._reqId;delete c.proposal;STATE.appointments.push(c);}
+}
+function acceptRequest(id){const a=STATE.appointments.find(x=>x.id===id);if(a){a.status="conf";if(a._reqId){deleteRequestDoc(a._reqId);delete a._reqId;}genRepeats(a);logReq(a,"accepted");}refreshBiz();toast(t("t_reqAccepted"));}
 function declineRequest(id){const a=STATE.appointments.find(x=>x.id===id);if(a){if(a._reqId)deleteRequestDoc(a._reqId);logReq(a,"declined");}STATE.appointments=STATE.appointments.filter(x=>x.id!==id);refreshBiz();toast(t("t_reqDeclined"));}
 function openPropose(id){
   const a=STATE.appointments.find(x=>x.id===id);if(!a)return;
@@ -1292,7 +1334,7 @@ function sendProposal(id){
   a.proposal={date:document.getElementById("pp_date").value,time:document.getElementById("pp_time").value,note:document.getElementById("pp_note").value.trim()};
   a.status="modProposed";if(a._reqId)updateRequestDoc(a._reqId,{proposal:a.proposal,status:"modProposed"});closeModal();refreshBiz();toast(t("t_reqProposed"));
 }
-function clientAcceptProposal(id){const a=STATE.appointments.find(x=>x.id===id);if(a&&a.proposal){a.when=a.proposal.date;a.time=a.proposal.time;a.status="conf";delete a.proposal;if(a._reqId){deleteRequestDoc(a._reqId);delete a._reqId;}logReq(a,"accepted");}refreshBiz();toast(t("t_reqAccepted"));}
+function clientAcceptProposal(id){const a=STATE.appointments.find(x=>x.id===id);if(a&&a.proposal){a.when=a.proposal.date;a.time=a.proposal.time;a.status="conf";delete a.proposal;if(a._reqId){deleteRequestDoc(a._reqId);delete a._reqId;}genRepeats(a);logReq(a,"accepted");}refreshBiz();toast(t("t_reqAccepted"));}
 function clientRejectProposal(id){const a=STATE.appointments.find(x=>x.id===id);if(a){if(a._reqId)deleteRequestDoc(a._reqId);logReq(a,"declined");}STATE.appointments=STATE.appointments.filter(x=>x.id!==id);refreshBiz();toast(t("t_reqDeclined"));}
 function restoreReq(hid){
   const h=STATE.reqHistory.find(x=>x.hid===hid);if(!h)return;
@@ -1658,7 +1700,17 @@ function shade(hex,amt){let n=parseInt(hex.slice(1),16);let r=(n>>16)+amt,g=((n>
 function applyBrand(){STATE.brand.name=document.getElementById("cfgName").value;STATE.brand.tag=document.getElementById("cfgTag").value;
   document.getElementById("brandName").textContent=STATE.brand.name||"Tu negocio";document.getElementById("brandTag").textContent=STATE.brand.tag||t("default_tagline");
   document.getElementById("brandMark").textContent=(STATE.brand.name[0]||"B").toUpperCase();document.getElementById("bizName").textContent=STATE.brand.name||"Tu negocio";
-  applyLogo();renderReminderPreview();}
+  applyLogo();applyWordmark();setupPWA();renderReminderPreview();}
+function applyWordmark(){
+  // En la vista cliente/portal, la barra superior muestra la marca del negocio (no "PerreoLand")
+  const pl=document.querySelector(".demo-bar .pl");if(!pl)return;
+  const lg=STATE.brand.logo||"";
+  if(CURVIEW==="client"||PUBLIC){
+    pl.innerHTML=(lg?'<img src="'+lg+'" style="width:26px;height:26px;border-radius:7px;object-fit:cover;vertical-align:middle;margin-right:7px">':'')+'<b>'+(STATE.brand.name||"Tu negocio")+'</b>';
+  }else{
+    pl.innerHTML='PerreoLand 🐾 <small>demo</small>';
+  }
+}
 function applyLogo(){
   const lg=STATE.brand.logo||"";
   const bizLogo=document.getElementById("bizLogo");if(bizLogo){bizLogo.style.display=lg?"block":"none";if(lg)bizLogo.src=lg;}
@@ -1680,7 +1732,7 @@ document.getElementById("signupRow").style.display=FB?"":"none";
 document.getElementById("clientRow").style.display=FB?"none":"";
 document.getElementById("view-biz").addEventListener("change",persist);
 document.getElementById("view-biz").addEventListener("click",e=>{if(e.target.closest("button,.toggle,.sw"))persist();});
-applyLang();applyColor(STATE.brand.color);refreshBiz();
+applyLang();applyColor(STATE.brand.color);refreshBiz();setupPWA();applyWordmark();
 if(PUBLIC){enterPublicBooking(PUBLIC);}
 </script>
 </body>
