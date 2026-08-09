@@ -397,24 +397,42 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
 .ed-svc{display:flex;gap:8px;align-items:center;font-size:13.5px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;margin-bottom:6px;background:#fff}
 .ed-svc input{width:18px;height:18px}
 .slot.off{opacity:.45}
-/* --- selector de fecha tipo aerolínea --- */
-.daypick{border:1px solid var(--line);border-radius:14px;background:#fff;padding:10px 8px 8px}
-.dp-head{display:flex;align-items:center;justify-content:space-between;padding:0 4px 8px}
-.dp-month{font-family:'Fraunces';font-size:15px;font-weight:600;color:var(--burgundy);text-transform:capitalize}
-.dp-nav{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--mauve-deep);font-size:19px;line-height:1;cursor:pointer}
-.dp-nav:disabled{opacity:.3;cursor:default}
-.dp-strip{display:flex;gap:8px;overflow-x:auto;padding:2px 4px 8px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
-.dp-strip::-webkit-scrollbar{height:0}
-.dp-day{flex:0 0 62px;scroll-snap-align:center;border:1px solid var(--line);border-radius:14px;background:#fff;padding:9px 4px 8px;text-align:center;cursor:pointer;transition:.15s;font-family:inherit}
-.dp-day .dw{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
-.dp-day .dd{font-family:'Fraunces';font-size:21px;font-weight:600;color:var(--burgundy);line-height:1.15}
-.dp-day .df{font-size:9.5px;color:var(--muted);margin-top:2px;min-height:12px}
-.dp-day.on{background:var(--mauve);border-color:var(--mauve)}
-.dp-day.on .dw,.dp-day.on .dd,.dp-day.on .df{color:#fff}
-.dp-day.off{opacity:.4;cursor:not-allowed;background:var(--blush-soft)}
-.dp-day.off .df{color:#a2727f}
-.dp-day.cheap .df{color:#2f6b4a;font-weight:600}
-.dp-note{font-size:12px;color:var(--muted);padding:2px 6px 2px}
+/* --- calendario de 30 días --- */
+.daypick{border:1px solid var(--line);border-radius:14px;background:#fff;padding:12px 12px 8px}
+.dp-head{display:flex;align-items:center;justify-content:space-between;padding:0 2px 10px}
+.dp-month{font-family:'Fraunces';font-size:15.5px;font-weight:600;color:var(--burgundy);text-transform:capitalize}
+.dp-nav{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--mauve-deep);font-size:19px;line-height:1;cursor:pointer}
+.dp-nav:disabled{opacity:.25;cursor:default}
+.dp-dow{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding-bottom:6px}
+.dp-dow span{text-align:center;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.dp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.dp-cell{aspect-ratio:1/1;border:1px solid var(--line);border-radius:11px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;font-family:inherit;padding:2px;transition:.12s}
+.dp-cell.blank{border:0;background:none;cursor:default}
+.dp-cell .dn{font-family:'Fraunces';font-size:16px;font-weight:600;color:var(--burgundy);line-height:1}
+.dp-cell .dfr{font-size:8.5px;color:#2f6b4a;font-weight:600;line-height:1.1;text-align:center}
+.dp-cell.today{box-shadow:inset 0 0 0 1.5px var(--gold)}
+.dp-cell.off{opacity:.42;background:var(--blush-soft);cursor:not-allowed}
+.dp-cell.off .dfr{color:#a2727f;font-weight:500}
+.dp-cell:not(.off):not(.blank):hover{border-color:var(--mauve)}
+.dp-cell.on{background:var(--mauve);border-color:var(--mauve)}
+.dp-cell.on .dn,.dp-cell.on .dfr{color:#fff}
+.dp-note{font-size:12px;color:var(--muted);padding:9px 2px 2px}
+/* --- marcar completada --- */
+.appt{cursor:pointer}
+.qdone{flex:none;width:38px;height:38px;border-radius:50%;border:1.5px solid var(--ok);background:#fff;color:var(--ok);font-size:17px;line-height:1;cursor:pointer;font-family:inherit;margin-left:2px}
+.qdone:hover{background:var(--ok);color:#fff}
+.qdone:active{transform:scale(.92)}
+.fin-row.overdue{border-left:3px solid var(--bad);padding-left:9px}
+/* --- ajuste de monto --- */
+.ch-line{display:flex;justify-content:space-between;align-items:center;padding:9px 2px;font-size:13.5px;color:var(--muted)}
+.ch-line b{font-family:'Fraunces';font-size:16px;color:var(--burgundy)}
+.ch-line.big{font-size:15px;color:var(--burgundy);font-weight:600}
+.ch-line.big b{font-size:22px;color:var(--mauve-deep)}
+.ch-total{border-top:1px solid var(--line);margin-top:10px;padding-top:6px}
+.ch-quick{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 12px}
+.cs-line{font-size:11.5px;color:var(--muted);margin-top:4px;display:flex;flex-wrap:wrap;gap:4px}
+.cs-line .cs-disc{color:#2f6b4a;font-weight:600}
+.cs-line .cs-bal{color:#9c2740;font-weight:600}
 /* --- direcciones verificadas --- */
 .addr-field{position:relative}
 .addr-sug{position:absolute;left:0;right:0;top:100%;z-index:60;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 30px rgba(67,32,47,.14);overflow:hidden;display:none;margin-top:4px}
@@ -480,7 +498,7 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
 <section id="view-client" class="view">
   <div class="brand">
     <div class="mark" id="brandMark">B</div>
-    <div><div class="name" id="brandName">Bella Paws</div><div class="tag" id="brandTag"></div></div>
+    <div><div class="name" id="brandName">Lubis Mobile Grooming</div><div class="tag" id="brandTag"></div></div>
   </div>
 
   <div class="steps"><div class="s cur" data-s="1"></div><div class="s" data-s="2"></div><div class="s" data-s="3"></div><div class="s" data-s="4"></div></div>
@@ -520,8 +538,9 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
       </div>
       <div class="field"><label data-i18n="date_lbl"></label>
         <div class="daypick">
-          <div class="dp-head"><button class="dp-nav" onclick="dpShift(-1)" aria-label="prev">‹</button><span class="dp-month" id="dpMonth"></span><button class="dp-nav" onclick="dpShift(1)" aria-label="next">›</button></div>
-          <div class="dp-strip" id="dpStrip"></div>
+          <div class="dp-head"><button class="dp-nav" id="dpPrev" onclick="dpShift(-1)" aria-label="prev">‹</button><span class="dp-month" id="dpMonth"></span><button class="dp-nav" id="dpNext" onclick="dpShift(1)" aria-label="next">›</button></div>
+          <div class="dp-dow" id="dpDow"></div>
+          <div class="dp-grid" id="dpGrid"></div>
           <div class="dp-note" id="dpNote"></div>
         </div>
       </div>
@@ -550,7 +569,7 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
 
 <section id="view-biz" class="view on">
   <div class="biz-head">
-    <div style="display:flex;align-items:center;gap:14px"><img id="bizLogo" style="display:none;width:54px;height:54px;border-radius:14px;object-fit:cover;border:1px solid var(--line)" alt=""><div><h1 id="bizName">Bella Paws</h1><div class="meta"><span data-i18n="biz_panel"></span> · <span id="todayLabel"></span></div></div></div>
+    <div style="display:flex;align-items:center;gap:14px"><img id="bizLogo" style="display:none;width:54px;height:54px;border-radius:14px;object-fit:cover;border:1px solid var(--line)" alt=""><div><h1 id="bizName">Lubis Mobile Grooming</h1><div class="meta"><span data-i18n="biz_panel"></span> · <span id="todayLabel"></span></div></div></div>
     <span class="pl-badge">Mobile Grooming 🐾</span><button class="save-dot" id="saveDot" style="display:none" onclick="saveNowFromBadge()"></button>
   </div>
 
@@ -616,6 +635,9 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
       <div class="stat"><div class="k" data-i18n="fin_expenses"></div><div class="v" id="finOut" style="color:var(--bad)">—</div><div class="d" data-i18n="fin_inclComm"></div></div>
       <div class="stat"><div class="k" data-i18n="fin_net"></div><div class="v" id="finNet">—</div><div class="d up" id="finMargin"></div></div>
     </div>
+    <div class="cfg-card"><h3 data-i18n="fin_pipeline"></h3><p class="hint" data-i18n="fin_pipeline_h"></p>
+      <div id="finPipe"></div>
+    </div>
     <div class="cfg-card"><h3 data-i18n="fin_weekly"></h3><p class="hint" data-i18n="fin_last6"></p><div class="chart" id="finChart"></div></div>
     <div class="cfg-card"><h3 data-i18n="fin_byService"></h3><div class="fin-rows" id="svcBreakdown"></div></div>
     <div class="cfg-card"><h3 data-i18n="fin_commissions"></h3><div class="fin-rows" id="commRows"></div></div>
@@ -630,7 +652,7 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
         <div class="photo-up"><label class="pbox" id="logoBox"><img id="logoImg" style="display:none" alt=""><span class="ic" id="logoIc">🏷️</span><input type="file" accept="image/*" onchange="onBrandLogo(this)"></label>
         <button class="btn btn-ghost btn-sm" id="logoRemove" style="display:none" onclick="removeLogo()" data-i18n="req_deleteFwd"></button></div>
       </div>
-      <div class="field"><label data-i18n="cfg_bizName"></label><input class="input" id="cfgName" value="Bella Paws" oninput="applyBrand()"></div>
+      <div class="field"><label data-i18n="cfg_bizName"></label><input class="input" id="cfgName" value="Lubis Mobile Grooming" oninput="applyBrand()"></div>
       <div class="field"><label data-i18n="cfg_tagline"></label><input class="input" id="cfgTag" oninput="applyBrand()"></div>
       <div class="field"><label data-i18n="cfg_color"></label><div class="swatches" id="swatches"></div></div>
     </div>
@@ -1188,7 +1210,7 @@ es:{
  req_history:"Historial",req_hAccepted:"Aceptada",req_hDeclined:"Rechazada",req_restore:"Restaurar",req_deleteFwd:"Eliminar",t_reqRestored:"Solicitud restaurada",t_reqDeleted:"Eliminada del historial",
  cfg_logo:"Logo de la empresa",cfg_logoHint:"Aparecerá en el panel y en el portal de reservas.",cfg_save:"Guardar cambios",t_saved:"Cambios guardados ✓",
  cfg_portal:"Portal público de reservas",cfg_portal_h:"Comparte este enlace con tus clientes para que reserven solos. Cada solicitud entra a tu pestaña Solicitudes.",cfg_copy:"Copiar",cfg_portal_ready:"Compártelo por WhatsApp, Instagram o tu bio.",cfg_portal_demo:"(Disponible al conectar tu cuenta)",cfg_portal_note:"El enlace aparece cuando inicias sesión con tu cuenta en la nube.",t_copied:"Enlace copiado ✓",
- cfg_pay:"Pagos",cfg_pay_h:"Configura cómo cobras. El checkout funciona como tu punto de venta en el teléfono.",cfg_payLink:"Link de pago (Stripe / PayPal)",cfg_payNote:"Datos de transferencia / Zelle",cfg_payNotePh:"Ej. Zelle: pagos@bellapaws.com",cfg_payHelp:"Para Stripe: entra a dashboard.stripe.com → Enlaces de pago → crea uno (activa «el cliente elige el monto») y pega aquí la URL. Se enviará al cliente por WhatsApp al cobrar.",
+ cfg_pay:"Pagos",cfg_pay_h:"Configura cómo cobras. El checkout funciona como tu punto de venta en el teléfono.",cfg_payLink:"Link de pago (Stripe / PayPal)",cfg_payNote:"Datos de transferencia / Zelle",cfg_payNotePh:"Ej. Zelle: pagos@lubismobilegrooming.com",cfg_payHelp:"Para Stripe: entra a dashboard.stripe.com → Enlaces de pago → crea uno (activa «el cliente elige el monto») y pega aquí la URL. Se enviará al cliente por WhatsApp al cobrar.",
  co_title:"Cobro",co_tip:"Propina",co_noTip:"Sin propina",co_total:"Total a cobrar",co_method:"Método de pago",co_cash:"Efectivo",co_card:"Tarjeta",co_transfer:"Transfer.",co_link:"Link",co_markPaid:"Marcar pagado",co_sendWa:"Enviar link por WhatsApp",co_pickMethod:"Elige un método de pago",co_done:"Cobrado {amt} ✓",co_note:"El cobro con tarjeta real se procesa con tu link de Stripe/PayPal. Aquí registras el pago y lo envías.",co_waMsg:"¡Hola {owner}! Tu servicio de grooming con {brand} suma {amt}.",co_waPay:"Puedes pagar aquí:",co_waOpen:"Abriendo WhatsApp…",fin_tips:"Propinas",
  pwa_install:"Instalar app",pwa_ios:"Toca Compartir → «Añadir a pantalla de inicio» 📲",pwa_android:"Menú ⋮ del navegador → «Instalar app» 📲",
  pwa_already:"Ya la tienes instalada ✓",ok_btn:"Entendido",
@@ -1267,7 +1289,7 @@ en:{
  req_history:"History",req_hAccepted:"Accepted",req_hDeclined:"Declined",req_restore:"Restore",req_deleteFwd:"Delete",t_reqRestored:"Request restored",t_reqDeleted:"Removed from history",
  cfg_logo:"Company logo",cfg_logoHint:"Shown in the dashboard and the booking portal.",cfg_save:"Save changes",t_saved:"Changes saved ✓",
  cfg_portal:"Public booking portal",cfg_portal_h:"Share this link so clients book on their own. Every request lands in your Requests tab.",cfg_copy:"Copy",cfg_portal_ready:"Share it on WhatsApp, Instagram or your bio.",cfg_portal_demo:"(Available once your account is connected)",cfg_portal_note:"The link appears when you sign in with your cloud account.",t_copied:"Link copied ✓",
- cfg_pay:"Payments",cfg_pay_h:"Set up how you charge. Checkout works as your phone point of sale.",cfg_payLink:"Payment link (Stripe / PayPal)",cfg_payNote:"Transfer / Zelle details",cfg_payNotePh:"e.g. Zelle: pay@bellapaws.com",cfg_payHelp:"For Stripe: go to dashboard.stripe.com → Payment Links → create one (enable “let customer choose amount”) and paste the URL here. It's sent to the client via WhatsApp at checkout.",
+ cfg_pay:"Payments",cfg_pay_h:"Set up how you charge. Checkout works as your phone point of sale.",cfg_payLink:"Payment link (Stripe / PayPal)",cfg_payNote:"Transfer / Zelle details",cfg_payNotePh:"e.g. Zelle: pay@lubismobilegrooming.com",cfg_payHelp:"For Stripe: go to dashboard.stripe.com → Payment Links → create one (enable “let customer choose amount”) and paste the URL here. It's sent to the client via WhatsApp at checkout.",
  co_title:"Checkout",co_tip:"Tip",co_noTip:"No tip",co_total:"Total to charge",co_method:"Payment method",co_cash:"Cash",co_card:"Card",co_transfer:"Transfer",co_link:"Link",co_markPaid:"Mark paid",co_sendWa:"Send link via WhatsApp",co_pickMethod:"Pick a payment method",co_done:"Charged {amt} ✓",co_note:"Real card charges run through your Stripe/PayPal link. Here you record the payment and send it.",co_waMsg:"Hi {owner}! Your grooming service with {brand} comes to {amt}.",co_waPay:"You can pay here:",co_waOpen:"Opening WhatsApp…",fin_tips:"Tips",
  pwa_install:"Install app",pwa_ios:"Tap Share → “Add to Home Screen” 📲",pwa_android:"Browser ⋮ menu → “Install app” 📲",
  pwa_already:"It's already installed ✓",ok_btn:"Got it",
@@ -1323,12 +1345,24 @@ es:{
  retry:"Reintentar",save_err:"No se pudo guardar. Revisa tu conexión.",
  load_rules:"Firestore rechazó la lectura (permisos). Publica las reglas de FIREBASE-SETUP.md en la consola de Firebase y reintenta. No se ha borrado nada.",
  migrated:"Datos actualizados al nuevo formato sin límite ✓",
+ fin_pipeline:"Flujo de citas",fin_pipeline_h:"Los ingresos solo cuentan citas completadas. Lo agendado es previsión.",
+ fin_completed:"Completadas (30 días)",fin_unpaid:"Completadas sin cobrar",fin_booked:"Agendado por venir",
+ fin_overdue:"Citas pasadas sin cerrar",fin_overdue_h:"{n} ya pasaron y no cuentan como ingreso.",
+ fin_closeAll:"Marcar completadas",
+ m_reopen:"Reabrir",t_apptReopen:"Cita reabierta",t_closedN:"{n} citas marcadas como completadas",
+ m_adjust:"Ajustar monto",
+ ch_title:"Monto final de la cita",ch_subtotal:"Subtotal de servicios",ch_discount:"Descuento",
+ ch_final:"Total servicios",ch_tip:"Propina",ch_paidAmt:"Abonado",ch_total:"Total a cobrar",
+ ch_balance:"Saldo pendiente",ch_settled:"Sin saldo ✓",ch_change:"cambio {amt}",
+ ch_reset:"Sin descuento",ch_settle:"Marcar pagado",
+ ch_note:"Nota del cobro",ch_notePh:"Ej. descuento por cliente frecuente / queda a deber",
+ b_balance:"Debe {amt}",t_chargeSaved:"Monto actualizado · {amt}",
  van_zones:"Zonas",van_noZones:"Añade zonas de servicio primero",
  svc_breedPrices:"Precio especial por raza",
  svc_breedHint:"Ej. Husky a $230. Gana sobre el precio por tamaño. Se busca por coincidencia, no hace falta escribir la raza exacta.",
  svc_breedPh:"Raza (ej. Husky)",svc_bpFixed:"Precio fijo",svc_bpAdd:"Recargo",
  svc_breedNone:"Sin reglas por raza.",svc_breedNeed:"Escribe la raza y el monto.",
- dp_free:"{n} libres",dp_full:"lleno",dp_closed:"cerrado",dp_pick:"Elige un día disponible.",
+ dp_open:"libres",dp_full:"lleno",dp_closed:"cerrado",dp_pick:"Elige un día disponible.",
  dp_picked:"Elegiste el {d}.",
  addr_searching:"Buscando direcciones…",addr_choose:"Elige tu dirección de la lista para confirmarla.",
  addr_none:"No encontramos esa dirección. Revisa que esté completa.",
@@ -1362,12 +1396,24 @@ en:{
  retry:"Retry",save_err:"Couldn't save. Check your connection.",
  load_rules:"Firestore denied the read (permissions). Publish the rules from FIREBASE-SETUP.md in the Firebase console and retry. Nothing was deleted.",
  migrated:"Data upgraded to the new unlimited format ✓",
+ fin_pipeline:"Appointment flow",fin_pipeline_h:"Revenue counts completed appointments only. Booked work is a forecast.",
+ fin_completed:"Completed (30 days)",fin_unpaid:"Completed, unpaid",fin_booked:"Booked ahead",
+ fin_overdue:"Past appointments not closed",fin_overdue_h:"{n} already happened and don't count as revenue.",
+ fin_closeAll:"Mark completed",
+ m_reopen:"Reopen",t_apptReopen:"Appointment reopened",t_closedN:"{n} appointments marked completed",
+ m_adjust:"Adjust amount",
+ ch_title:"Final appointment amount",ch_subtotal:"Services subtotal",ch_discount:"Discount",
+ ch_final:"Services total",ch_tip:"Tip",ch_paidAmt:"Amount paid",ch_total:"Total to charge",
+ ch_balance:"Balance due",ch_settled:"Settled ✓",ch_change:"change {amt}",
+ ch_reset:"No discount",ch_settle:"Mark as paid",
+ ch_note:"Charge note",ch_notePh:"e.g. loyal client discount / owes balance",
+ b_balance:"Owes {amt}",t_chargeSaved:"Amount updated · {amt}",
  van_zones:"Zones",van_noZones:"Add service zones first",
  svc_breedPrices:"Breed-specific price",
  svc_breedHint:"E.g. Husky at $230. Overrides the size price. Matching is fuzzy, no need for the exact breed name.",
  svc_breedPh:"Breed (e.g. Husky)",svc_bpFixed:"Flat price",svc_bpAdd:"Surcharge",
  svc_breedNone:"No breed rules yet.",svc_breedNeed:"Enter the breed and the amount.",
- dp_free:"{n} open",dp_full:"full",dp_closed:"closed",dp_pick:"Pick an available day.",
+ dp_open:"open",dp_full:"full",dp_closed:"closed",dp_pick:"Pick an available day.",
  dp_picked:"You picked {d}.",
  addr_searching:"Searching addresses…",addr_choose:"Pick your address from the list to confirm it.",
  addr_none:"We couldn't find that address. Check that it's complete.",
@@ -1436,7 +1482,7 @@ const STATE={
     try{const s=localStorage.getItem("mg_lang");if(s==="es"||s==="en")return s;}catch(e){}
     return /^es/i.test(navigator.language||navigator.userLanguage||"en")?"es":"en";
   })(),apptView:"list",
-  brand:{name:"Bella Paws",tag:"",color:"#A8688A",logo:""},
+  brand:{name:"Lubis Mobile Grooming",tag:"",color:"#A8688A",logo:""},
   zones:["East Nashville","The Gulch","Germantown","Green Hills","12 South","Brentwood","Franklin"],
   categories:[{id:"c1",name:"Baths"},{id:"c2",name:"Grooming"},{id:"c3",name:"Add-ons"}],
   services:[
@@ -1630,7 +1676,7 @@ function applyLang(){
   renderServices();
   if(document.getElementById("view-biz").classList.contains("on"))refreshBiz();else renderZones();
   // el idioma no debe dejar nada a medias: se redibuja lo dinámico
-  try{if(document.getElementById("dpStrip"))renderDayPicker();}catch(e){}
+  try{if(document.getElementById("dpGrid"))renderDayPicker();}catch(e){}
   try{if(document.getElementById("slotList"))buildSlots();}catch(e){}
   try{if(SEL.addrVerified)setAddrState("okv","✓ "+t("addr_ok"));else if(!SEL.addr)setAddrState("","");}catch(e){}
   try{refreshSaveBadge();}catch(e){}
@@ -1848,62 +1894,72 @@ function useAddrAsTyped(){
 document.getElementById("bookAddr").addEventListener("input",e=>onAddrInput(e.target.value));
 document.getElementById("bookAddr").addEventListener("blur",()=>setTimeout(hideAddrSug,220));
 
-/* ===== selector de fecha tipo aerolínea (tira de días) ===== */
-const DP_RANGE=60;          // días visibles hacia adelante
-let _dpOffset=0;
-function isoAdd(n){const d=new Date();d.setDate(d.getDate()+n);return d.toISOString().slice(0,10);}
+/* ===== calendario de 30 días (cuadrícula mensual) ===== */
+const DP_RANGE=30;          // días reservables desde hoy
+let _dpView=null;           // "YYYY-MM" del mes visible
+function isoAdd(n){const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+n);return d.toISOString().slice(0,10);}
+function monthKey(y,m){return y+"-"+String(m).padStart(2,"0");}
+function dpBounds(){return {min:isoAdd(0),max:isoAdd(DP_RANGE-1)};}
 function buildDateOptions(){
   const dur=svcsDur(SEL.svcs);
-  // si la fecha elegida ya no sirve, salta al primer día con hueco
   if(!SEL.date||!dayHasFree(SEL.date,dur)){
     SEL.date=null;
     for(let i=0;i<DP_RANGE;i++){const iso=isoAdd(i);if(dayHasFree(iso,dur)){SEL.date=iso;break;}}
-    _dpOffset=0;
+    _dpView=null;
+  }
+  if(!_dpView){
+    const d=SEL.date?new Date(SEL.date+"T12:00"):new Date();
+    _dpView=monthKey(d.getFullYear(),d.getMonth()+1);
   }
   renderDayPicker();buildSlots();
 }
 function renderDayPicker(){
-  const strip=document.getElementById("dpStrip");if(!strip)return;
+  const grid=document.getElementById("dpGrid");if(!grid)return;
   const dur=svcsDur(SEL.svcs);
-  let html="",firstFree=null,freeCount=0;
-  for(let i=0;i<DP_RANGE;i++){
-    const d=new Date();d.setDate(d.getDate()+i);
-    const iso=d.toISOString().slice(0,10);
-    const free=slotsForDay(iso).filter(tt=>slotState(iso,tt,dur)==="free").length;
-    const open=dayHours(iso).on;
-    const off=free===0;
-    if(!off){freeCount++;if(!firstFree)firstFree=iso;}
-    const foot=off?(open?t("dp_full"):t("dp_closed")):t("dp_free",{n:free});
-    html+='<button class="dp-day '+(iso===SEL.date?'on':'')+(off?' off':'')+(!off&&free>=3?' cheap':'')+'" '+
+  const B=dpBounds();
+  if(!_dpView){const d=SEL.date?new Date(SEL.date+"T12:00"):new Date();_dpView=monthKey(d.getFullYear(),d.getMonth()+1);}
+  const yy=+_dpView.split("-")[0],mm=+_dpView.split("-")[1];
+  const ws=(STATE.lang==="en")?0:1;                       // EE. UU. empieza en domingo
+  const dow=document.getElementById("dpDow");
+  if(dow){let hd="";for(let i=0;i<7;i++){const d=new Date(2024,0,7+((ws+i)%7));hd+='<span>'+d.toLocaleDateString(loc(),{weekday:"short"}).replace(".","").slice(0,3)+'</span>';}dow.innerHTML=hd;}
+  const first=new Date(yy,mm-1,1,12);
+  const lead=(first.getDay()-ws+7)%7;
+  const dim=new Date(yy,mm,0).getDate();
+  let html="",freeCount=0;
+  for(let i=0;i<lead;i++)html+='<span class="dp-cell blank"></span>';
+  for(let d=1;d<=dim;d++){
+    const dt=new Date(yy,mm-1,d,12);
+    const iso=dt.toISOString().slice(0,10);
+    const inRange=iso>=B.min&&iso<=B.max;
+    const free=inRange?slotsForDay(iso).filter(tt=>slotState(iso,tt,dur)==="free").length:0;
+    const off=!inRange||free===0;
+    if(!off)freeCount++;
+    let foot="";
+    if(!inRange)foot="";
+    else if(free>0)foot=free+" "+t("dp_open");
+    else foot=dayHours(iso).on?t("dp_full"):t("dp_closed");
+    html+='<button class="dp-cell'+(iso===SEL.date?' on':'')+(off?' off':'')+(iso===B.min?' today':'')+'" '+
       (off?'disabled':'onclick="pickDay(\''+iso+'\')"')+'>'+
-      '<span class="dw">'+d.toLocaleDateString(loc(),{weekday:"short"}).replace(".","")+'</span>'+
-      '<span class="dd">'+d.getDate()+'</span>'+
-      '<span class="df">'+foot+'</span></button>';
+      '<span class="dn">'+d+'</span><span class="dfr">'+foot+'</span></button>';
   }
-  strip.innerHTML=html;
+  grid.innerHTML=html;
+  document.getElementById("dpMonth").textContent=first.toLocaleDateString(loc(),{month:"long",year:"numeric"});
+  const pv=document.getElementById("dpPrev"),nx=document.getElementById("dpNext");
+  if(pv)pv.disabled=monthKey(yy,mm)<=B.min.slice(0,7);
+  if(nx)nx.disabled=monthKey(yy,mm)>=B.max.slice(0,7);
   const note=document.getElementById("dpNote");
-  if(note)note.textContent=freeCount?(SEL.date?t("dp_picked",{d:new Date(SEL.date+"T12:00").toLocaleDateString(loc(),{weekday:"long",day:"numeric",month:"long"})}):t("dp_pick")):t("no_days");
-  updateDpMonth();
-  // centrar el día elegido
-  requestAnimationFrame(()=>{
-    const on=strip.querySelector(".dp-day.on");
-    if(on&&on.scrollIntoView)on.scrollIntoView({inline:"center",block:"nearest"});
-  });
-}
-function updateDpMonth(){
-  const strip=document.getElementById("dpStrip"),el=document.getElementById("dpMonth");
-  if(!strip||!el)return;
-  const idx=Math.max(0,Math.round(strip.scrollLeft/70));
-  const d=new Date();d.setDate(d.getDate()+idx);
-  el.textContent=d.toLocaleDateString(loc(),{month:"long",year:"numeric"});
+  if(note)note.textContent=SEL.date?t("dp_picked",{d:new Date(SEL.date+"T12:00").toLocaleDateString(loc(),{weekday:"long",day:"numeric",month:"long"})}):(freeCount?t("dp_pick"):t("no_days"));
 }
 function dpShift(dir){
-  const strip=document.getElementById("dpStrip");if(!strip)return;
-  strip.scrollBy({left:dir*280,behavior:"smooth"});
-  setTimeout(updateDpMonth,320);
+  const B=dpBounds();
+  let yy=+_dpView.split("-")[0],mm=+_dpView.split("-")[1]+dir;
+  if(mm<1){mm=12;yy--;}else if(mm>12){mm=1;yy++;}
+  const k=monthKey(yy,mm);
+  if(k<B.min.slice(0,7)||k>B.max.slice(0,7))return;
+  _dpView=k;renderDayPicker();
 }
 function pickDay(iso){SEL.date=iso;SEL.time=null;renderDayPicker();buildSlots();}
-document.getElementById("dpStrip").addEventListener("scroll",()=>{clearTimeout(window._dpT);window._dpT=setTimeout(updateDpMonth,90);});
+
 function fmtTime(hhmm){let[h,m]=hhmm.split(":").map(Number);const ap=h<12?"AM":"PM";let h12=h%12;if(h12===0)h12=12;return h12+":"+String(m).padStart(2,"0")+" "+ap;}
 function buildSlots(){
   const dur=svcsDur(SEL.svcs);
@@ -1996,7 +2052,7 @@ function renderDash(){
   const live=STATE.appointments.filter(isLive);
   const todays=live.filter(a=>a.when===today);
   const week=live.filter(a=>[...Array(7)].map((_,i)=>addDays(i)).includes(a.when));
-  const monthRev=live.filter(a=>a.when<=today&&a.when>=addDays(-30)).reduce((s,a)=>s+a.price,0);
+  const monthRev=STATE.appointments.filter(a=>a.status==="done"&&a.when<=today&&a.when>=addDays(-30)).reduce((s,a)=>s+(+a.price||0),0);
   document.getElementById("stToday").textContent=todays.length;
   document.getElementById("stTodayD").textContent=todays.length?("▲ "+money(todays.reduce((s,a)=>s+a.price,0))+" "+t("st_booked")):t("st_noAppts");
   document.getElementById("stWeek").textContent=week.length;
@@ -2037,7 +2093,13 @@ function badges(a){
   const map={conf:["b-conf","b_confirmed"],done:["b-done","b_completed"],pend:["b-pend","b_pending"],requested:["b-pend","b_requested"],modProposed:["b-pend","b_modProposed"],declined:["b-unpaid","b_declined"]};
   const m=map[a.status]||["b-pend","b_pending"];
   let html='<span class="badge '+m[0]+'">'+t(m[1])+'</span>';
-  if(isLive(a))html+=a.paid?'<span class="badge b-paid">'+t("b_paid")+'</span>':'<span class="badge b-unpaid">'+t("b_unpaid")+'</span>';
+  if(isLive(a)){
+    const bal=apptBalance(a);
+    if(bal<=0.009)html+='<span class="badge b-paid">'+t("b_paid")+'</span>';
+    else if(apptPaidAmt(a)>0)html+='<span class="badge b-unpaid">'+t("b_balance",{amt:money(bal)})+'</span>';
+    else html+='<span class="badge b-unpaid">'+t("b_unpaid")+'</span>';
+  }
+  if(+a.discount>0)html+='<span class="badge b-conf">−'+money(a.discount)+'</span>';
   if(a.conflict)html+='<span class="badge b-unpaid">'+t("conflict_badge")+'</span>';
   return html;
 }
@@ -2046,9 +2108,11 @@ function apptRow(a){
   const vc=v?v.color:"#ddd";
   const vtag=v?'<span class="vantag"><span class="vd" style="background:'+v.color+'"></span>'+v.name+'</span>':'';
   const pic=a.photo?'<img class="pic" src="'+a.photo+'" alt="">':'';
-  return '<button class="appt" onclick="openAppt(\''+a.id+'\')"><span class="vanstrip" style="background:'+vc+'"></span><div class="when"><div class="d">'+d.getDate()+'</div><div class="m">'+d.toLocaleDateString(loc(),{month:"short"})+'</div><div class="h">'+a.time+'</div></div>'+pic+
+  const canDone=isLive(a)&&a.status!=="done";
+  const done=canDone?'<button class="qdone" title="'+t("m_done")+'" onclick="event.stopPropagation();markDone(\''+a.id+'\')">✓</button>':'';
+  return '<div class="appt" role="button" tabindex="0" onclick="openAppt(\''+a.id+'\')"><span class="vanstrip" style="background:'+vc+'"></span><div class="when"><div class="d">'+d.getDate()+'</div><div class="m">'+d.toLocaleDateString(loc(),{month:"short"})+'</div><div class="h">'+a.time+'</div></div>'+pic+
     '<div class="info"><div class="pet">'+a.pet+' <span style="color:var(--muted);font-weight:400">· '+a.breed+'</span></div><div class="det">'+apptIcon(a)+' '+apptSvcNames(a)+' · '+a.owner+' · '+(a.zone||'')+'</div>'+vtag+'</div>'+
-    '<div class="rgt">'+badges(a)+'<span class="price">'+money(a.price)+'</span></div></button>';
+    '<div class="rgt">'+badges(a)+'<span class="price">'+money(a.price)+'</span></div>'+done+'</div>';
 }
 function setApptView(v){STATE.apptView=v;document.getElementById("vtList").classList.toggle("on",v==="list");document.getElementById("vtVan").classList.toggle("on",v==="van");renderAllAppts();}
 function renderAllAppts(){
@@ -2203,21 +2267,41 @@ function calShift(delta){
 }
 function calGoToday(){const today=addDays(0);const d=new Date(today+"T12:00");STATE.cal.y=d.getFullYear();STATE.cal.m=d.getMonth();STATE.cal.sel=today;renderCalendar();}
 
+/* Las finanzas se calculan SOLO con citas completadas (status "done").
+   Lo agendado se muestra aparte como previsión, nunca como ingreso. */
+function isDone(a){return a.status==="done";}
+/* ---- Cobro: subtotal de servicios, descuento, propina, abonado y saldo ---- */
+function apptSubtotal(a){const s=svcsPrice(svcIds(a),a.size,a.breed);return s||(+a.price||0);}
+function apptTotal(a){return (+a.price||0)+(+a.tip||0);}
+function apptPaidAmt(a){
+  if(a.paidAmt!==undefined&&a.paidAmt!==null)return +a.paidAmt||0;
+  if(a.paidTotal!==undefined&&a.paidTotal!==null)return +a.paidTotal||0;
+  return a.paid?apptTotal(a):0;
+}
+function apptBalance(a){return Math.round((apptTotal(a)-apptPaidAmt(a))*100)/100;}
+function isSettled(a){return apptBalance(a)<=0.009;}
+/* El ingreso se imputa al día en que se completó; si no se registró, al día de la cita. */
+function apptRevDate(a){
+  if(a.doneAt){try{return new Date(a.doneAt).toISOString().slice(0,10);}catch(e){}}
+  return a.when;
+}
+function completedBetween(from,to){return STATE.appointments.filter(a=>isDone(a)&&apptRevDate(a)>=from&&apptRevDate(a)<=to);}
 function renderFinance(){
   const today=addDays(0);
-  const month=STATE.appointments.filter(a=>isLive(a)&&a.when<=today&&a.when>=addDays(-30));
-  const tipsTotal=month.reduce((s,a)=>s+(a.tip||0),0);
-  const income=month.reduce((s,a)=>s+a.price,0)+tipsTotal;
+  const month=completedBetween(addDays(-30),today);
+  const tipsTotal=month.reduce((s,a)=>s+(+a.tip||0),0);
+  const income=month.reduce((s,a)=>s+(+a.price||0),0)+tipsTotal;
   const comm={};let commTotal=0;
-  month.filter(a=>a.status==="done").forEach(a=>{const g=STATE.staff.find(x=>x.name===a.groomer);if(g){const c=a.price*g.comm/100;comm[g.name]=(comm[g.name]||0)+c;commTotal+=c;}});
+  month.forEach(a=>{const g=STATE.staff.find(x=>x.name===a.groomer);if(g){const c=(+a.price||0)*g.comm/100;comm[g.name]=(comm[g.name]||0)+c;commTotal+=c;}});
   const exp=STATE.expenses.reduce((s,e)=>s+e.amt,0);
   const out=exp+commTotal;const net=income-out;const margin=income?Math.round(net/income*100):0;
   document.getElementById("finIn").textContent=money(income);
   document.getElementById("finOut").textContent=money(out);
   document.getElementById("finNet").textContent=money(net);
   const mEl=document.getElementById("finMargin");mEl.textContent=(net>=0?"▲ ":"▼ ")+margin+"% "+t("fin_margin");mEl.style.color=net>=0?"var(--ok)":"var(--bad)";
+  renderPipeline(today,month);
   const weeks=[0,0,0,0,0,0];
-  STATE.appointments.filter(isLive).forEach(a=>{const diff=Math.floor((new Date(today)-new Date(a.when))/86400000);if(diff>=0&&diff<42)weeks[5-Math.floor(diff/7)]+=a.price;});
+  STATE.appointments.filter(isDone).forEach(a=>{const diff=Math.floor((new Date(today)-new Date(apptRevDate(a)))/86400000);if(diff>=0&&diff<42)weeks[5-Math.floor(diff/7)]+=(+a.price||0);});
   const max=Math.max(...weeks,1);
   document.getElementById("finChart").innerHTML=weeks.map((v,i)=>'<div class="bar"><span class="val">'+money(v)+'</span><div class="fill" style="height:'+Math.round(v/max*100)+'%"></div><span class="lab">S'+(i+1)+'</span></div>').join("");
   const by={},cnt={};month.forEach(a=>{const ids=svcIds(a);const per=ids.length?a.price/ids.length:0;ids.forEach(id=>{by[id]=(by[id]||0)+per;cnt[id]=(cnt[id]||0)+1;});});
@@ -2229,6 +2313,33 @@ function renderFinance(){
   if(tipsTotal>0)document.getElementById("svcBreakdown").innerHTML+='<div class="fin-row"><div class="lft"><span class="dot" style="background:var(--gold)"></span><div><div class="nm">'+t("fin_tips")+'</div></div></div><span class="amt in">'+money(tipsTotal)+'</span></div>';
   document.getElementById("commRows").innerHTML=Object.entries(comm).map(([n,v])=>{const g=STATE.staff.find(x=>x.name===n);
     return '<div class="fin-row"><div class="lft"><span class="dot" style="background:var(--mauve)"></span><div><div class="nm">'+n+'</div><div class="sub">'+(g?g.comm:0)+'% '+t("commission")+'</div></div></div><span class="amt out">−'+money(v)+'</span></div>';}).join("")||'<p class="hint">'+t("fin_noComm")+'</p>';
+  renderExpenseRows();
+}
+function renderPipeline(today,doneMonth){
+  const el=document.getElementById("finPipe");if(!el)return;
+  const pend=STATE.appointments.filter(a=>isLive(a)&&!isDone(a));
+  const overdue=pend.filter(a=>a.when<today);                     // ya pasó y nadie la cerró
+  const upcoming=pend.filter(a=>a.when>=today);
+  const unpaid=doneMonth.filter(a=>!isSettled(a));
+  const sum=l=>l.reduce((s,a)=>s+(+a.price||0),0);
+  const nAppt=n=>n+" "+t(n===1?"fin_apptOne":"fin_apptMany");
+  const row=(icon,color,label,sub,amt,cls)=>'<div class="fin-row"><div class="lft"><span class="dot" style="background:'+color+'"></span><div><div class="nm">'+icon+' '+label+'</div><div class="sub">'+sub+'</div></div></div><span class="amt '+cls+'">'+money(amt)+'</span></div>';
+  let html="";
+  html+=row("✅","var(--ok)",t("fin_completed"),nAppt(doneMonth.length),sum(doneMonth),"in");
+  if(unpaid.length)html+=row("💳","var(--gold)",t("fin_unpaid"),nAppt(unpaid.length),unpaid.reduce((s,a)=>s+apptBalance(a),0),"in");
+  html+=row("📅","var(--mauve)",t("fin_booked"),nAppt(upcoming.length),sum(upcoming),"in");
+  if(overdue.length)html+='<div class="fin-row overdue"><div class="lft"><span class="dot" style="background:var(--bad)"></span><div><div class="nm">⏰ '+t("fin_overdue")+'</div><div class="sub">'+t("fin_overdue_h",{n:overdue.length})+'</div></div></div><button class="btn btn-primary btn-sm" onclick="closeOverdue()">'+t("fin_closeAll")+'</button></div>';
+  el.innerHTML=html;
+}
+/* Cierra de golpe las citas pasadas que quedaron sin marcar. */
+function closeOverdue(){
+  const today=addDays(0);
+  const list=STATE.appointments.filter(a=>isLive(a)&&!isDone(a)&&a.when<today);
+  if(!list.length)return;
+  list.forEach(a=>{a.status="done";});
+  refreshBiz();flushPersist();toast(t("t_closedN",{n:list.length}));
+}
+function renderExpenseRows(){
   document.getElementById("expenseRows").innerHTML=STATE.expenses.map((e,i)=>'<div class="fin-row"><div class="lft"><span class="dot" style="background:var(--bad)"></span><div class="nm">'+e.name+'</div></div><div style="display:flex;align-items:center;gap:8px"><span class="amt out">−'+money(e.amt)+'</span><button onclick="editExpense('+i+')" style="color:var(--mauve);font-size:14px;padding:2px 4px">✎</button><button onclick="deleteExpense('+i+')" style="color:var(--bad);font-size:14px;padding:2px 4px">✕</button></div></div>').join("")||'<p class="hint">'+t("fin_noExp")+'</p>';
 }
 function editExpense(i){
@@ -2262,7 +2373,7 @@ function openAppt(id){
   openModal(
     '<div class="modal-head">'+headAv+'<div><h2>'+a.pet+'</h2><div class="mh-sub">'+a.breed+' · '+sizeLabel(a.size)+'</div></div><button class="x" onclick="closeModal()">×</button></div>'+
     '<div class="mrow"><div class="mi">📅</div><div><div class="mk">'+t("m_dateTime")+'</div><div class="mv">'+fmtDate(a.when)+' · '+a.time+'</div></div><div class="mr">'+badges(a)+'</div></div>'+
-    '<div class="mrow"><div class="mi">✂️</div><div><div class="mk">'+t("m_service")+'</div><div class="mv">'+apptSvcNames(a)+' · '+apptDur(a)+' '+t("m_min")+'</div></div><div class="mr"><span style="font-family:Fraunces;color:var(--mauve-deep);font-weight:600">'+money(a.price)+'</span></div></div>'+
+    '<div class="mrow"><div class="mi">✂️</div><div><div class="mk">'+t("m_service")+'</div><div class="mv">'+apptSvcNames(a)+' · '+apptDur(a)+' '+t("m_min")+'</div>'+chargeSummary(a)+'</div><div class="mr"><span style="font-family:Fraunces;color:var(--mauve-deep);font-weight:600">'+money(apptTotal(a))+'</span></div></div>'+
     '<div class="mrow"><div class="mi">👤</div><div><div class="mk">'+t("m_client")+'</div><div class="mv">'+a.owner+'</div></div><div class="mr"><a class="mv" href="tel:'+a.phone+'">'+a.phone+'</a></div></div>'+
     '<div class="mrow"><div class="mi">📍</div><div><div class="mk">'+t("m_address")+' · '+a.zone+'</div><a class="mv" href="'+mapUrl+'" target="_blank">'+a.addr+' ↗</a></div></div>'+
     (a.recurring?'<div class="mrow"><div class="mi">🔁</div><div><div class="mk">'+t("m_recurrence")+'</div><div class="mv">'+recurTxt+'</div></div></div>':'')+
@@ -2270,6 +2381,8 @@ function openAppt(id){
     '<div class="mrow"><div class="mi">🧑‍🔧</div><div style="flex:1"><div class="mk">'+t("m_groomer")+'</div><select class="input" style="margin-top:4px" onchange="setGroomer(\''+a.id+'\',this.value)">'+gopts+'</select></div></div>'+
     '<div class="modal-actions">'+
       '<button class="btn btn-ghost btn-sm" onclick="openApptEdit(\''+a.id+'\')">🗓️ '+t("m_edit")+'</button>'+
+      (a.status==="done"?'<button class="btn btn-ghost btn-sm" onclick="undoDone(\''+a.id+'\')">↩︎ '+t("m_reopen")+'</button>':'')+
+      '<button class="btn btn-ghost btn-sm" onclick="openCharge(\''+a.id+'\')">💵 '+t("m_adjust")+'</button>'+
       (a.status!=="conf"&&a.status!=="done"?'<button class="btn btn-ghost btn-sm" onclick="setStatus(\''+a.id+'\',\'conf\')">'+t("m_confirm")+'</button>':'')+
       (a.status!=="done"?'<button class="btn btn-ghost btn-sm" onclick="setStatus(\''+a.id+'\',\'done\')">'+t("m_markDone")+'</button>':'')+
       (!a.paid?'<button class="btn btn-gold btn-sm" onclick="openCheckout(\''+a.id+'\')">'+t("m_charge",{amt:money(a.price)})+'</button>':'<button class="btn btn-ghost btn-sm" disabled>'+t("m_paid")+'</button>')+
@@ -2277,6 +2390,75 @@ function openAppt(id){
     '</div>');
 }
 /* ===== editar / reprogramar una cita ya creada ===== */
+/* ===== Ajustar el monto final de una cita (solo panel del negocio) ===== */
+function openCharge(id){
+  const a=STATE.appointments.find(x=>x.id===id);if(!a)return;
+  const sub=apptSubtotal(a);
+  openModal(
+    '<div class="modal-head"><div class="av">💵</div><div><h2>'+t("ch_title")+'</h2><div class="mh-sub">'+a.pet+' · '+a.owner+'</div></div><button class="x" onclick="closeModal()">×</button></div>'+
+    '<div class="ch-line"><span>'+t("ch_subtotal")+'</span><b id="ch_sub">'+money(sub)+'</b></div>'+
+    '<div class="row"><div class="field"><label>'+t("ch_discount")+'</label><input class="input" id="ch_disc" type="number" min="0" step="0.01" inputmode="decimal" value="'+(+a.discount||0)+'" oninput="chargeRecalc(\''+id+'\',\'disc\')"></div>'+
+    '<div class="field"><label>'+t("ch_final")+'</label><input class="input" id="ch_price" type="number" min="0" step="0.01" inputmode="decimal" value="'+(+a.price||0)+'" oninput="chargeRecalc(\''+id+'\',\'price\')"></div></div>'+
+    '<div class="row"><div class="field"><label>'+t("ch_tip")+'</label><input class="input" id="ch_tip" type="number" min="0" step="0.01" inputmode="decimal" value="'+(+a.tip||0)+'" oninput="chargeRecalc(\''+id+'\',\'tip\')"></div>'+
+    '<div class="field"><label>'+t("ch_paidAmt")+'</label><input class="input" id="ch_paid" type="number" min="0" step="0.01" inputmode="decimal" value="'+apptPaidAmt(a)+'" oninput="chargeRecalc(\''+id+'\',\'paid\')"></div></div>'+
+    '<div class="ch-quick"><button class="btn btn-ghost btn-sm" onclick="chargeQuick(\''+id+'\',10)">−10%</button><button class="btn btn-ghost btn-sm" onclick="chargeQuick(\''+id+'\',15)">−15%</button><button class="btn btn-ghost btn-sm" onclick="chargeQuick(\''+id+'\',20)">−20%</button><button class="btn btn-ghost btn-sm" onclick="chargeQuick(\''+id+'\',0)">'+t("ch_reset")+'</button><button class="btn btn-ghost btn-sm" onclick="chargeSettle(\''+id+'\')">'+t("ch_settle")+'</button></div>'+
+    '<div class="field"><label>'+t("ch_note")+'</label><input class="input" id="ch_note" placeholder="'+t("ch_notePh")+'" value="'+String(a.chargeNote||"").replace(/"/g,"&quot;")+'"></div>'+
+    '<div class="ch-total"><div class="ch-line big"><span>'+t("ch_total")+'</span><b id="ch_totalV">—</b></div>'+
+    '<div class="ch-line" id="ch_balRow"><span>'+t("ch_balance")+'</span><b id="ch_balV">—</b></div></div>'+
+    '<div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="openAppt(\''+id+'\')">'+t("back")+'</button><button class="btn btn-primary btn-sm" onclick="saveCharge(\''+id+'\')">'+t("save_btn")+'</button></div>');
+  chargeRecalc(id);
+}
+function chargeSummary(a){
+  const bits=[];
+  if(+a.discount>0)bits.push('<span class="cs-disc">'+t("ch_discount")+' −'+money(a.discount)+'</span>');
+  if(+a.tip>0)bits.push('<span>'+t("ch_tip")+' '+money(a.tip)+'</span>');
+  const bal=apptBalance(a);
+  if(bal>0.009)bits.push('<span class="cs-bal">'+t("ch_balance")+' '+money(bal)+'</span>');
+  if(a.chargeNote)bits.push('<span>📝 '+a.chargeNote+'</span>');
+  return bits.length?'<div class="cs-line">'+bits.join(' · ')+'</div>':'';
+}
+function chNum(id){const el=document.getElementById(id);return el?(parseFloat(el.value)||0):0;}
+function chargeRecalc(id,src){
+  const a=STATE.appointments.find(x=>x.id===id);if(!a)return;
+  const sub=apptSubtotal(a);
+  let disc=Math.max(0,chNum("ch_disc")),price=Math.max(0,chNum("ch_price"));
+  if(src==="disc"){price=Math.max(0,Math.round((sub-disc)*100)/100);document.getElementById("ch_price").value=price;}
+  else if(src==="price"){disc=Math.max(0,Math.round((sub-price)*100)/100);document.getElementById("ch_disc").value=disc;}
+  const tip=Math.max(0,chNum("ch_tip")),paid=Math.max(0,chNum("ch_paid"));
+  const total=Math.round((price+tip)*100)/100;
+  const bal=Math.round((total-paid)*100)/100;
+  document.getElementById("ch_totalV").textContent=money(total);
+  const bv=document.getElementById("ch_balV");
+  bv.textContent=bal<=0.009?(t("ch_settled")+(bal<-0.009?" · "+t("ch_change",{amt:money(-bal)}):"")):money(bal);
+  bv.style.color=bal<=0.009?"#2f6b4a":"#9c2740";
+}
+function chargeQuick(id,pct){
+  const a=STATE.appointments.find(x=>x.id===id);if(!a)return;
+  const sub=apptSubtotal(a);
+  document.getElementById("ch_disc").value=Math.round(sub*pct)/100;
+  chargeRecalc(id,"disc");
+}
+function chargeSettle(id){
+  const price=Math.max(0,chNum("ch_price")),tip=Math.max(0,chNum("ch_tip"));
+  document.getElementById("ch_paid").value=Math.round((price+tip)*100)/100;
+  chargeRecalc(id,"paid");
+}
+function saveCharge(id){
+  const a=STATE.appointments.find(x=>x.id===id);if(!a)return;
+  const price=Math.max(0,chNum("ch_price")),tip=Math.max(0,chNum("ch_tip")),paid=Math.max(0,chNum("ch_paid"));
+  const disc=Math.max(0,chNum("ch_disc"));
+  a.price=Math.round(price*100)/100;
+  a.tip=Math.round(tip*100)/100;
+  a.discount=Math.round(disc*100)/100;
+  a.paidAmt=Math.round(paid*100)/100;
+  a.paid=isSettled(a);
+  if(a.paid&&!a.paidAt)a.paidAt=Date.now();
+  a.chargeNote=document.getElementById("ch_note").value.trim();
+  a.priceAdjusted=true;
+  refreshBiz();flushPersist();closeModal();
+  const bal=apptBalance(a);
+  toast(t("t_chargeSaved",{amt:money(apptTotal(a))})+(bal>0.009?" · "+t("ch_balance")+" "+money(bal):""));
+}
 function openApptEdit(id){
   const a=STATE.appointments.find(x=>x.id===id);if(!a)return;
   const cur=svcIds(a);
@@ -2331,7 +2513,20 @@ function edNotify(id){
   const ph=cleanPhone(a.phone);if(!ph){toast(t("rm_nophone"));return;}
   window.open("https://wa.me/"+ph+"?text="+encodeURIComponent(t("rm_msg2",{pet:a.pet,date:fmtDate(d),time:fmtTime(tt),svc:apptSvcNames(a),biz:STATE.brand.name||""})),"_blank");
 }
-function setStatus(id,st){const a=STATE.appointments.find(x=>x.id===id);if(a){a.status=st;if(st==="done")a.paid=true;}refreshBiz();openAppt(id);toast(st==="conf"?t("t_apptConf"):t("t_apptDone"));}
+function setStatus(id,st){const a=STATE.appointments.find(x=>x.id===id);if(a){a.status=st;if(st==="done"){a.doneAt=Date.now();a.paid=true;}}refreshBiz();flushPersist();openAppt(id);toast(st==="conf"?t("t_apptConf"):t("t_apptDone"));}
+/* Marcar completada desde la lista, sin abrir la cita. */
+function markDone(id){
+  const a=STATE.appointments.find(x=>x.id===id);if(!a)return;
+  a.status="done";a.doneAt=Date.now();
+  if(a.paid===undefined)a.paid=false;
+  refreshBiz();flushPersist();
+  toast(t("t_apptDone")+" · "+money(a.price)+(a.paid?"":" · "+t("b_unpaid")));
+}
+function undoDone(id){
+  const a=STATE.appointments.find(x=>x.id===id);if(!a)return;
+  a.status="conf";delete a.doneAt;
+  refreshBiz();flushPersist();closeModal();toast(t("t_apptReopen"));
+}
 function markPaid(id){const a=STATE.appointments.find(x=>x.id===id);if(a)a.paid=true;refreshBiz();openAppt(id);toast(t("t_payReg"));}
 /* ===== checkout / punto de venta ===== */
 let CO={id:null,tip:0,tipPct:0,method:null};
@@ -2359,7 +2554,7 @@ function renderCheckoutTotalsOnly(){const a=STATE.appointments.find(x=>x.id===CO
 function coFinish(){
   const a=STATE.appointments.find(x=>x.id===CO.id);if(!a)return;
   if(!CO.method){toast(t("co_pickMethod"));return;}
-  a.paid=true;a.payMethod=CO.method;a.tip=CO.tip;a.paidTotal=a.price+CO.tip;a.paidAt=Date.now();
+  a.tip=CO.tip;a.payMethod=CO.method;a.paidAmt=Math.round((a.price+CO.tip)*100)/100;a.paidTotal=a.paidAmt;a.paid=true;a.paidAt=Date.now();
   if(a.status!=="done"&&a.status!=="conf")a.status="conf";
   closeModal();refreshBiz();toast(t("co_done",{amt:money(a.paidTotal)}));
 }
