@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>PerreoLand — Mobile grooming booking & management</title>
+<title>Mobile Grooming — Reservas y gestión de grooming a domicilio</title>
 <meta name="theme-color" content="#A8688A" id="themeColorMeta">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="PerreoLand" id="appTitleMeta">
+<meta name="apple-mobile-web-app-title" content="Mobile Grooming" id="appTitleMeta">
 <link rel="apple-touch-icon" id="appleIcon" href="">
 <link rel="manifest" id="manifestLink" href="">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -384,16 +384,31 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
 
 @media(max-width:560px){.row{flex-direction:column}.biz-head h1{font-size:25px}.wrap{padding:18px 14px 60px}.modal-actions{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* --- guardado / agenda / recordatorios --- */
+.save-dot{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;border:1px solid var(--line);background:#fff;color:var(--muted);white-space:nowrap}
+.save-dot.sv-w{color:#8a6d1f;border-color:rgba(194,162,79,.6);background:#fdf7e6}
+.save-dot.sv-ok{color:#2f6b4a;border-color:rgba(79,138,107,.5);background:#e9f4ee}
+.save-dot.sv-err{color:#9c2740;border-color:rgba(192,85,107,.5);background:#fbe4e8}
+#loadBanner{display:flex;gap:10px;align-items:center;justify-content:space-between;background:#fbe4e8;border:1px solid rgba(192,85,107,.5);color:#9c2740;font-size:13px;padding:10px 14px;border-radius:12px;margin-bottom:14px}
+.rem-row{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:11px 13px;border:1px solid var(--line);border-radius:12px;background:#fff;margin-bottom:8px}
+.rem-row .rs{font-size:12px;color:var(--muted);margin-top:2px}
+.rem-row .ra{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.ed-svc{display:flex;gap:8px;align-items:center;font-size:13.5px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;margin-bottom:6px;background:#fff}
+.ed-svc input{width:18px;height:18px}
+.meter{height:8px;border-radius:6px;background:var(--blush-soft);overflow:hidden;margin-top:8px}
+.meter i{display:block;height:100%;background:var(--mauve)}
+.meter i.hot{background:#c0556b}
+.slot.off{opacity:.45}
 </style>
 </head>
 <body>
 
 <div id="login">
   <div class="login-card">
-    <div class="login-logo">Perreo<span class="paw">land</span> 🐾</div>
+    <div class="login-logo">Mobile <span class="paw">Grooming</span> 🐾</div>
     <div class="login-sub" data-i18n="login_sub"></div>
     <div class="login-box">
-      <div class="field"><label data-i18n="login_email"></label><input id="logEmail" type="email" value="demo@perreoland.com"></div>
+      <div class="field"><label data-i18n="login_email"></label><input id="logEmail" type="email" value="demo@mobilegrooming.app"></div>
       <div class="field"><label data-i18n="login_pass"></label><input id="logPass" type="password" value="demo1234"></div>
       <div id="logErr" style="display:none;background:#fbe4e8;border:1px solid rgba(192,85,107,.5);color:#9c2740;font-size:12.5px;padding:9px 12px;border-radius:10px;margin-bottom:12px"></div>
       <button class="login-btn" data-i18n="login_enter" onclick="doLogin()"></button>
@@ -408,7 +423,7 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
 </div>
 
 <div class="demo-bar">
-  <span class="pl">PerreoLand 🐾 <small>demo</small></span>
+  <span class="pl">Mobile Grooming 🐾 <small>demo</small></span>
   <button class="lang-btn" id="langBtn" onclick="toggleLang()">🌐 EN</button>
   <div class="seg">
     <button id="sw-client" onclick="showView('client')" data-i18n="sw_client"></button>
@@ -482,8 +497,10 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
 <section id="view-biz" class="view on">
   <div class="biz-head">
     <div style="display:flex;align-items:center;gap:14px"><img id="bizLogo" style="display:none;width:54px;height:54px;border-radius:14px;object-fit:cover;border:1px solid var(--line)" alt=""><div><h1 id="bizName">Bella Paws</h1><div class="meta"><span data-i18n="biz_panel"></span> · <span id="todayLabel"></span></div></div></div>
-    <span class="pl-badge">PerreoLand 🐾</span>
+    <span class="pl-badge">Mobile Grooming 🐾</span><span class="save-dot" id="saveDot" style="display:none"></span>
   </div>
+
+  <div id="loadBanner" style="display:none"></div>
 
   <div class="tabs">
     <button class="on" onclick="showTab('dash',this)" data-i18n="tab_home"></button>
@@ -502,6 +519,8 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
       <div class="stat"><div class="k" data-i18n="st_revenue"></div><div class="v" id="stRev">—</div><div class="d up" data-i18n="st_active"></div></div>
       <div class="stat"><div class="k" data-i18n="st_clients"></div><div class="v" id="stClients">—</div><div class="d gold" data-i18n="st_registered"></div></div>
     </div>
+    <div class="sec-title"><span data-i18n="rem_title"></span> <span id="remCount" class="tab-badge"></span></div>
+    <div id="remList"></div>
     <div class="sec-title" data-i18n="upcoming"></div>
     <div id="upcomingList"></div>
   </div>
@@ -593,6 +612,7 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
       <div class="setting-row"><div class="sl"><div class="st" data-i18n="cfg_deposit"></div><div class="ss" data-i18n="cfg_depositSub"></div></div><div class="row" style="flex:none;align-items:center;gap:8px"><span style="color:var(--muted)">$</span><input class="input num" id="depAmt" type="number" value="10" min="0" onchange="updateRules()"></div></div>
       <div class="setting-row"><div class="sl"><div class="st" data-i18n="cfg_maxDay"></div><div class="ss" data-i18n="cfg_maxDaySub"></div></div><input class="input num" id="maxDay" type="number" value="8" min="1" onchange="updateRules()"></div>
       <div class="setting-row"><div class="sl"><div class="st" data-i18n="cfg_minWindow"></div><div class="ss" data-i18n="cfg_minWindowSub"></div></div><select class="input" id="minWindow" style="width:150px" onchange="updateRules()"><option value="2" data-i18n="hours2"></option><option value="12" data-i18n="hours12"></option><option value="24" selected data-i18n="hours24"></option></select></div>
+      <div class="setting-row"><div class="sl"><div class="st" data-i18n="cfg_repeats"></div><div class="ss" data-i18n="cfg_repeatsSub"></div></div><input class="input num" id="repCount" type="number" value="4" min="1" max="12" onchange="updateRules()"></div>
     </div>
 
     <div class="cfg-card"><h3 data-i18n="cfg_pay"></h3><p class="hint" data-i18n="cfg_pay_h"></p>
@@ -610,6 +630,8 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
 
     <div class="cfg-card"><h3 data-i18n="cfg_account"></h3><p class="hint" data-i18n="cfg_account_h"></p>
       <div class="setting-row"><div class="sl"><div class="st" id="acctEmail">—</div><div class="ss" id="acctStatus"></div></div><button class="btn btn-danger btn-sm" id="logoutBtn" onclick="doLogout()" data-i18n="logout"></button></div>
+      <div class="field" style="margin-top:6px"><label data-i18n="cfg_storage"></label><div class="meter"><i id="szBar" style="width:0%"></i></div><p class="hint" id="szNote" style="margin-top:6px"></p></div>
+      <div class="add-inline" style="margin-top:6px"><button class="btn btn-ghost btn-sm" onclick="downloadBackup()" data-i18n="cfg_backup"></button><button class="btn btn-ghost btn-sm" onclick="forceSave()" data-i18n="cfg_forceSave"></button></div>
     </div>
 
     <div class="cfg-card"><h3 data-i18n="cfg_portal"></h3><p class="hint" data-i18n="cfg_portal_h"></p>
@@ -648,42 +670,115 @@ const FIREBASE_CONFIG={
   measurementId:"G-6JCKKEDFHG"
 };
 let FB=false,fbAuth=null,fbDB=null,fbStore=null,fbUser=null,_loading=false,_persistT=null;
+/* SAFE: solo se escribe en la nube DESPUÉS de haber leído los datos con éxito.
+   Sin esto, un fallo de red haría que la app guardara datos vacíos encima de los reales. */
+let SAFE=false,_saveState="idle",_reqUnsub=null;
+const LS_PREFIX="mg_backup_";
 function fbInit(){
   try{
     if(typeof firebase==="undefined"||!FIREBASE_CONFIG.apiKey)return false;
     firebase.initializeApp(FIREBASE_CONFIG);
     fbAuth=firebase.auth();fbDB=firebase.firestore();
+    try{fbDB.enablePersistence({synchronizeTabs:true}).catch(function(){});}catch(e){}
+    try{fbAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);}catch(e){}
     try{fbStore=firebase.storage();}catch(e){fbStore=null;}
     fbAuth.onAuthStateChanged(u=>{
       fbUser=u||null;
-      if(PUBLIC)return; // un enlace ?biz= siempre muestra el portal de reservas, sin importar la sesión
-      if(u){loadBiz(u.uid);}else{document.getElementById("login").classList.remove("hide");}
+      if(PUBLIC)return; // un enlace ?biz= siempre muestra el portal de reservas
+      if(u){loadBiz(u.uid);}
+      else{SAFE=false;stopWatchRequests();setSaveState("idle");document.getElementById("login").classList.remove("hide");}
     });
     return true;
   }catch(e){console.warn("Firebase init:",e);return false;}
 }
 const BIZ_KEYS=["brand","zones","categories","services","staff","vans","hours","settings","slots","expenses","appointments","reqHistory"];
 function withTimeout(p,ms){return Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("timeout")),ms))]);}
-async function loadBiz(uid){
-  _loading=true;
-  // Entrar al panel de inmediato; los datos de la nube llegan después.
-  document.getElementById("login").classList.add("hide");
-  showView("biz");
+
+/* ===== indicador de guardado ===== */
+function setSaveState(s){
+  _saveState=s;
+  const el=document.getElementById("saveDot");if(!el)return;
+  const map={idle:["",""],saving:["sv-w",t("sv_saving")],ok:["sv-ok",t("sv_ok")],err:["sv-err",t("sv_err")],locked:["sv-err",t("sv_locked")]};
+  const m=map[s]||map.idle;
+  el.className="save-dot "+m[0];el.textContent=m[1];el.style.display=m[1]?"":"none";
+}
+function byteSize(o){try{return new Blob([JSON.stringify(o)]).size;}catch(e){return JSON.stringify(o).length;}}
+function bizSize(){return byteSize(serializeBiz());}
+function backupLocal(data){try{localStorage.setItem(LS_PREFIX+(fbUser?fbUser.uid:"demo"),JSON.stringify({at:Date.now(),data:data}));}catch(e){}}
+function readBackup(uid){try{const raw=localStorage.getItem(LS_PREFIX+uid);return raw?JSON.parse(raw):null;}catch(e){return null;}}
+function downloadBackup(){
   try{
-    const snap=await withTimeout(fbDB.collection("businesses").doc(uid).get(),9000);
+    const blob=new Blob([JSON.stringify(serializeBiz(),null,2)],{type:"application/json"});
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+    a.download=(STATE.brand.name||"backup").replace(/\s+/g,"-").toLowerCase()+"-"+addDays(0)+".json";
+    document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+  }catch(e){toast(t("save_err"));}
+}
+function forceSave(){if(!SAFE){toast(t("sv_locked"));return;}flushPersist().then(ok=>{if(ok)toast(t("t_saved"));});}
+function showLoadBanner(msg){
+  const el=document.getElementById("loadBanner");if(!el)return;
+  if(!msg){el.style.display="none";el.innerHTML="";return;}
+  el.style.display="";el.innerHTML='<span>⚠️ '+msg+'</span><button class="btn btn-ghost btn-sm" onclick="retryLoad()">'+t("retry")+'</button>';
+}
+function retryLoad(){if(FB&&fbUser)loadBiz(fbUser.uid);}
+
+async function loadBiz(uid){
+  _loading=true;SAFE=false;
+  document.getElementById("login").classList.add("hide");
+  showView("biz");showLoadBanner("");setSaveState("saving");
+  try{
+    const snap=await withTimeout(fbDB.collection("businesses").doc(uid).get(),12000);
     if(snap.exists){const d=snap.data();BIZ_KEYS.forEach(k=>{if(d[k]!==undefined)STATE[k]=d[k];});}
-    else{STATE.appointments=[];await withTimeout(fbDB.collection("businesses").doc(uid).set(serializeBiz()),9000);}
-    const reqs=await loadRequests(uid);
-    if(reqs.length){const seen=new Set(STATE.appointments.map(a=>a._reqId).filter(Boolean));STATE.appointments=STATE.appointments.concat(reqs.filter(r=>!seen.has(r._reqId)));}
-  }catch(e){console.warn("loadBiz:",e);_loading=false;toast(t("cloud_err"));applyLang();refreshBiz();return;}
-  _loading=false;
-  applyLang();refreshBiz();
+    else{
+      // Cuenta nueva: arranca limpia, nunca con los datos de demostración.
+      STATE.appointments=[];STATE.reqHistory=[];
+      await withTimeout(fbDB.collection("businesses").doc(uid).set(serializeBiz()),12000);
+    }
+    migrateSettings();migrateServices();
+    mergeRequests(await loadRequests(uid));
+    _loading=false;SAFE=true;            // ← desde aquí ya es seguro escribir
+    backupLocal(serializeBiz());
+    watchRequests(uid);
+    applyLang();refreshBiz();setSaveState("ok");
+  }catch(e){
+    console.warn("loadBiz:",e);
+    _loading=false;SAFE=false;           // ← NO se escribe nada: protege los datos reales
+    const bk=readBackup(uid);
+    if(bk&&bk.data)BIZ_KEYS.forEach(k=>{if(bk.data[k]!==undefined)STATE[k]=bk.data[k];});
+    migrateSettings();migrateServices();
+    applyLang();refreshBiz();
+    setSaveState("locked");showLoadBanner(t("load_err"));
+  }
 }
 function serializeBiz(){const o={updatedAt:Date.now()};BIZ_KEYS.forEach(k=>o[k]=STATE[k]);return o;}
 function persist(){
   if(PUBLIC||!FB||!fbUser||_loading)return;
-  clearTimeout(_persistT);
-  _persistT=setTimeout(()=>{fbDB.collection("businesses").doc(fbUser.uid).set(serializeBiz()).then(publishPublic).catch(e=>console.warn("persist:",e));},800);
+  if(!SAFE){setSaveState("locked");return;}
+  clearTimeout(_persistT);setSaveState("saving");
+  _persistT=setTimeout(flushPersist,700);
+}
+function flushPersist(){
+  clearTimeout(_persistT);_persistT=null;
+  if(PUBLIC||!FB||!fbUser||!SAFE)return Promise.resolve(false);
+  if(bizSize()>800000)trimHeavy();
+  const data=serializeBiz();const size=byteSize(data);
+  backupLocal(data);
+  if(size>1000000){setSaveState("err");toast(t("too_big"));return Promise.resolve(false);}
+  setSaveState("saving");
+  return fbDB.collection("businesses").doc(fbUser.uid).set(data,{merge:true})
+    .then(()=>{setSaveState("ok");publishPublic();return true;})
+    .catch(e=>{console.warn("persist:",e);setSaveState("err");toast(t("save_err"));return false;});
+}
+/* Aligera el documento si se acerca al límite de 1 MB de Firestore. */
+function trimHeavy(){
+  (STATE.reqHistory||[]).forEach(hh=>{if(hh.photo&&hh.photo.indexOf("data:")===0)hh.photo="";});
+  if(STATE.reqHistory&&STATE.reqHistory.length>40)STATE.reqHistory.length=40;
+  if(bizSize()<=800000)return;
+  STATE.appointments.slice().sort((a,b)=>(a.when||"").localeCompare(b.when||"")).forEach(a=>{
+    if(bizSize()<=800000)return;
+    if(a.status==="done"&&a.photo&&a.photo.indexOf("data:")===0)a.photo="";
+  });
+  toast(t("trimmed"));
 }
 function uploadPhoto(dataUrl,folder,cb){
   if(!(FB&&fbStore&&fbUser)){cb(dataUrl);return;}
@@ -696,14 +791,38 @@ function uploadPhoto(dataUrl,folder,cb){
 let PUBLIC=null;
 const PUBLIC_KEYS=["brand","categories","services","zones","slots","hours","settings"];
 function serializePublicInfo(){const o={updatedAt:Date.now()};PUBLIC_KEYS.forEach(k=>o[k]=STATE[k]);return o;}
-function publishPublic(){if(!FB||!fbUser)return;fbDB.collection("businesses").doc(fbUser.uid).collection("public").doc("info").set(serializePublicInfo()).catch(e=>console.warn("publishPublic:",e));}
+function publishPublic(){
+  if(!FB||!fbUser||!SAFE)return;
+  fbDB.collection("businesses").doc(fbUser.uid).collection("public").doc("info").set(serializePublicInfo()).catch(e=>console.warn("publishPublic:",e));
+}
+function reqToAppt(doc){const d=doc.data()||{};return Object.assign({id:nid(),_reqId:doc.id,status:d.proposal?"modProposed":"requested",paid:false},d);}
+function mergeRequests(list){
+  const seen=new Set(STATE.appointments.map(a=>a._reqId).filter(Boolean));
+  const hist=new Set((STATE.reqHistory||[]).map(x=>x.rid).filter(Boolean));
+  let added=0;
+  (list||[]).forEach(r=>{if(r._reqId&&!seen.has(r._reqId)&&!hist.has(r._reqId)){STATE.appointments.push(r);seen.add(r._reqId);added++;}});
+  return added;
+}
 async function loadRequests(uid){
   try{
-    const qs=await withTimeout(fbDB.collection("businesses").doc(uid).collection("requests").get(),9000);
-    const out=[];qs.forEach(doc=>{const d=doc.data();out.push(Object.assign({id:nid(),_reqId:doc.id,status:d.proposal?"modProposed":"requested",paid:false},d));});
+    const qs=await withTimeout(fbDB.collection("businesses").doc(uid).collection("requests").get(),12000);
+    const out=[];qs.forEach(doc=>out.push(reqToAppt(doc)));
     return out;
   }catch(e){console.warn("loadRequests:",e);return [];}
 }
+/* Las solicitudes nuevas entran en vivo, sin recargar. */
+function watchRequests(uid){
+  stopWatchRequests();
+  try{
+    _reqUnsub=fbDB.collection("businesses").doc(uid).collection("requests").onSnapshot(qs=>{
+      if(!SAFE)return;
+      let added=0;
+      qs.docChanges().forEach(ch=>{if(ch.type==="added")added+=mergeRequests([reqToAppt(ch.doc)]);});
+      if(added){refreshBiz();toast(t("new_request",{n:added}));}
+    },e=>console.warn("watchReq:",e));
+  }catch(e){console.warn("watchReq:",e);}
+}
+function stopWatchRequests(){if(_reqUnsub){try{_reqUnsub();}catch(e){}_reqUnsub=null;}}
 function deleteRequestDoc(rid){if(FB&&fbUser&&rid)fbDB.collection("businesses").doc(fbUser.uid).collection("requests").doc(rid).delete().catch(e=>console.warn("delReq:",e));}
 function updateRequestDoc(rid,data){if(FB&&fbUser&&rid)fbDB.collection("businesses").doc(fbUser.uid).collection("requests").doc(rid).update(data).catch(e=>console.warn("updReq:",e));}
 function resizeImage(dataUrl,maxW){return new Promise(res=>{try{const img=new Image();img.onload=()=>{const sc=Math.min(1,maxW/img.width);const c=document.createElement("canvas");c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);c.getContext("2d").drawImage(img,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",0.7));};img.onerror=()=>res(dataUrl);img.src=dataUrl;}catch(e){res(dataUrl);}});}
@@ -732,7 +851,7 @@ function pawIconDataURL(color){
   }catch(e){return "";}
 }
 function setupPWA(){
-  const name=STATE.brand.name||"PerreoLand";const color=STATE.brand.color||"#A8688A";
+  const name=STATE.brand.name||"Mobile Grooming";const color=STATE.brand.color||"#A8688A";
   const icon=(STATE.brand.logo&&STATE.brand.logo.length>20)?STATE.brand.logo:pawIconDataURL(color);
   const manifest={name:name,short_name:name.slice(0,12),start_url:location.pathname+location.search,scope:location.pathname,display:"standalone",orientation:"portrait",background_color:"#FBF6F2",theme_color:color,
     icons:[{src:icon,sizes:"192x192",type:"image/png",purpose:"any"},{src:icon,sizes:"512x512",type:"image/png",purpose:"any maskable"}]};
@@ -752,8 +871,15 @@ function promptInstall(){
 async function submitPublicRequest(data){
   let photo=data.photo||"";if(photo&&photo.startsWith("data:"))photo=await resizeImage(photo,700);
   const rec=Object.assign({},data,{photo:photo,status:"requested",createdAt:Date.now()});
-  try{if(FB&&PUBLIC)await withTimeout(fbDB.collection("businesses").doc(PUBLIC).collection("requests").add(rec),9000);}
-  catch(e){console.warn("submitReq:",e);}
+  if(FB&&PUBLIC){
+    try{await withTimeout(fbDB.collection("businesses").doc(PUBLIC).collection("requests").add(rec),15000);}
+    catch(e){
+      // No mostramos "listo" si la reserva no llegó: el cliente puede reintentar.
+      console.warn("submitReq:",e);toast(t("req_sendErr"));
+      const b=document.getElementById("confirmBtn");if(b)b.disabled=false;
+      return;
+    }
+  }
   document.getElementById("doneMsg").innerHTML=t("done_msg",{date:fmtDate(SEL.date),time:fmtTime(SEL.time),extra:""});
   goStep("done");document.querySelectorAll('.steps .s').forEach(s=>{s.classList.add('done');s.classList.remove('cur');});
 }
@@ -764,7 +890,7 @@ function updateAccountUI(){
   const em=document.getElementById("acctEmail"),st=document.getElementById("acctStatus"),lb=document.getElementById("logoutBtn");
   if(!em)return;
   if(FB&&fbUser){em.textContent=fbUser.email;st.textContent=t("cloud_on");lb.style.display="";}
-  else{em.textContent="demo@perreoland.com";st.textContent=t("cloud_off");lb.style.display="none";}
+  else{em.textContent="demo@mobilegrooming.app";st.textContent=t("cloud_off");lb.style.display="none";}
   const pl=document.getElementById("pubLink"),note=document.getElementById("pubLinkNote");
   if(pl){
     if(FB&&fbUser){pl.value=location.origin+location.pathname+"?biz="+fbUser.uid;note.textContent=t("cfg_portal_ready");}
@@ -919,6 +1045,51 @@ en:{
  t_needNamePhone:"Enter name and phone",t_apptConf:"Appointment confirmed",t_apptDone:"Appointment completed",t_payReg:"Payment recorded",t_groomerSet:"Groomer: {n}",t_vanSet:"Van: {n}",t_apptCancel:"Appointment cancelled",
  t_msgSent:"Message sent to {n} 💌",t_expAdded:"Expense recorded",t_needExp:"Enter concept and amount",t_zoneAdded:"Area added",t_priceUpd:"Price updated",t_groomerAdded:"Groomer added",t_vanAdded:"Van added",t_rulesUpd:"Rules updated",save_btn:"Save"
 }};
+/* ===== textos añadidos (guardado + agenda + recordatorios) ===== */
+const EXTRA_I18N={
+es:{
+ sv_saving:"Guardando…",sv_ok:"Guardado ✓",sv_err:"Error al guardar",sv_locked:"Sin guardar · solo lectura",
+ load_err:"No se pudieron leer tus datos. Para no borrar nada, el guardado está bloqueado. Reintenta.",
+ retry:"Reintentar",save_err:"No se pudo guardar. Revisa tu conexión.",
+ too_big:"Tus datos superan el límite de 1 MB. Descarga un respaldo y borra fotos antiguas.",
+ trimmed:"Se liberaron fotos antiguas para poder seguir guardando.",
+ new_request:"🔔 {n} solicitud(es) nueva(s)",
+ sl_past:"pasó",sl_busy:"ocupado",sl_full:"día lleno",sl_closed:"cerrado",sl_ok:"Horario disponible",
+ no_days:"Sin días disponibles",slot_gone:"Ese horario ya no está libre. Elige otro.",
+ t_apptUpdated:"Cita actualizada",m_edit:"Reprogramar",
+ ed_title:"Editar cita",ed_svcs:"Servicios",ed_price:"Precio",ed_notes:"Notas",ed_notify:"Avisar por WhatsApp",
+ ed_date:"Fecha",ed_time:"Hora",ed_size:"Tamaño",ed_save:"Guardar cambios",
+ rem_title:"Recordatorios por enviar",rm_send:"Enviar",rm_sent:"Enviado",
+ rm_empty:"Nada por recordar en este momento.",rm_nophone:"Ese cliente no tiene teléfono.",
+ rm_msg2:"Hola 👋 Te recordamos la cita de {pet}: {date} a las {time} ({svc}). — {biz}",
+ req_sendErr:"No se pudo enviar tu reserva. Revisa tu conexión e inténtalo de nuevo.",
+ cfg_storage:"Espacio usado",cfg_storageSub:"Límite de 1 MB por negocio",
+ cfg_backup:"Descargar respaldo",cfg_forceSave:"Guardar ahora",
+ cfg_repeats:"Citas por recurrencia",cfg_repeatsSub:"Cuántas repeticiones se crean al aceptar",
+ conflict_badge:"⚠️ Solapada"
+},
+en:{
+ sv_saving:"Saving…",sv_ok:"Saved ✓",sv_err:"Save failed",sv_locked:"Not saving · read only",
+ load_err:"Couldn't read your data. Saving is locked so nothing gets erased. Please retry.",
+ retry:"Retry",save_err:"Couldn't save. Check your connection.",
+ too_big:"Your data is over the 1 MB limit. Download a backup and clear old photos.",
+ trimmed:"Old photos were cleared so saving can continue.",
+ new_request:"🔔 {n} new request(s)",
+ sl_past:"past",sl_busy:"booked",sl_full:"day full",sl_closed:"closed",sl_ok:"Slot available",
+ no_days:"No days available",slot_gone:"That slot is no longer free. Pick another one.",
+ t_apptUpdated:"Appointment updated",m_edit:"Reschedule",
+ ed_title:"Edit appointment",ed_svcs:"Services",ed_price:"Price",ed_notes:"Notes",ed_notify:"Notify on WhatsApp",
+ ed_date:"Date",ed_time:"Time",ed_size:"Size",ed_save:"Save changes",
+ rem_title:"Reminders to send",rm_send:"Send",rm_sent:"Sent",
+ rm_empty:"Nothing to remind right now.",rm_nophone:"That client has no phone number.",
+ rm_msg2:"Hi 👋 Reminder for {pet}'s appointment: {date} at {time} ({svc}). — {biz}",
+ req_sendErr:"We couldn't send your booking. Check your connection and try again.",
+ cfg_storage:"Storage used",cfg_storageSub:"1 MB limit per business",
+ cfg_backup:"Download backup",cfg_forceSave:"Save now",
+ cfg_repeats:"Recurring appointments",cfg_repeatsSub:"How many repeats are created on accept",
+ conflict_badge:"⚠️ Overlapping"
+}};
+Object.keys(EXTRA_I18N).forEach(l=>{if(I18N[l])Object.assign(I18N[l],EXTRA_I18N[l]);});
 function t(k,p){let s=I18N[STATE.lang][k];if(s===undefined)s=I18N.es[k];if(s===undefined)return k;if(p)Object.keys(p).forEach(x=>{s=s.split("{"+x+"}").join(p[x]);});return s;}
 const SIZE_KEY={Toy:"size_toy","Pequeño":"size_small",Mediano:"size_medium",Grande:"size_large",Gigante:"size_giant"};
 function sizeLabel(s){const v=t(SIZE_KEY[s]||"");return (typeof v==="string"?v:s).split(" · ")[0]||s;}
@@ -973,7 +1144,7 @@ const STATE={
     {on:true,from:"09:00",to:"18:00"},{on:true,from:"08:00",to:"14:00"},
     {on:false,from:"09:00",to:"13:00"},
   ],
-  settings:{reminders:{email:true,sms:false,whatsapp:true,timing:24},deposit:10,maxDay:8,minWindow:24,payLink:"",payNote:""},
+  settings:{reminders:{email:true,sms:false,whatsapp:true,timing:24},deposit:10,maxDay:8,minWindow:24,repeatCount:4,payLink:"",payNote:""},
   slots:["10:00","12:00","14:00","17:00"],
   appointments:[],
   expenses:[{name:"Gasolina de la unidad",amt:180},{name:"Shampoo & insumos",amt:140},{name:"Mantenimiento van",amt:90}],
@@ -996,6 +1167,16 @@ function migrateServices(){
     if(!Array.isArray(s.vans))s.vans=[];
   });
 }
+function migrateSettings(){
+  if(!STATE.settings||typeof STATE.settings!=="object")STATE.settings={};
+  const d={deposit:10,maxDay:8,minWindow:24,repeatCount:4,payLink:"",payNote:""};
+  Object.keys(d).forEach(k=>{if(STATE.settings[k]===undefined)STATE.settings[k]=d[k];});
+  if(!STATE.settings.reminders)STATE.settings.reminders={email:true,sms:false,whatsapp:true,timing:24};
+  if(!Array.isArray(STATE.hours)||STATE.hours.length!==7)STATE.hours=[0,1,2,3,4,5,6].map(i=>({on:i<6,from:"09:00",to:"17:00"}));
+  if(!Array.isArray(STATE.slots)||!STATE.slots.length)STATE.slots=["09:00","11:00","13:00","15:00"];
+  if(!Array.isArray(STATE.appointments))STATE.appointments=[];
+  if(!Array.isArray(STATE.reqHistory))STATE.reqHistory=[];
+}
 function catById(id){return STATE.categories.find(c=>c.id===id)||{name:"—"};}
 function svcAllowsGroomer(s,name){return !s.groomers||!s.groomers.length||s.groomers.includes(name);}
 function svcAllowsVan(s,vanId){return !s.vans||!s.vans.length||s.vans.includes(vanId);}
@@ -1010,6 +1191,41 @@ function initials(n){return n.split(" ").map(w=>w[0]).slice(0,2).join("").toUppe
 function phoneGen(r){return "(615) "+(200+Math.floor(r()*699))+"-"+(1000+Math.floor(r()*8999));}
 function toast(m){const el=document.getElementById("toast");el.textContent=m;el.classList.add("show");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),2400);}
 function vanForGroomer(g,r){const m=STATE.vans.filter(v=>v.groomer===g);if(m.length)return m[0].id;return STATE.vans.length?STATE.vans[Math.floor((r?r():Math.random())*STATE.vans.length)].id:null;}
+
+/* ===== AGENDA: disponibilidad real ===== */
+function toMin(hhmm){const p=String(hhmm||"00:00").split(":");return (+p[0]||0)*60+(+p[1]||0);}
+function dowOf(iso){return (new Date(iso+"T12:00").getDay()+6)%7;}
+function dayHours(iso){return (STATE.hours&&STATE.hours[dowOf(iso)])||{on:false,from:"09:00",to:"17:00"};}
+function liveOn(iso){return STATE.appointments.filter(a=>a.when===iso&&a.status!=="declined");}
+function capacity(){return Math.max(1,(STATE.vans&&STATE.vans.length)||(STATE.staff&&STATE.staff.length)||1);}
+function svcsDur(ids){return (ids||[]).reduce((s,id)=>s+(svcById(id).dur||0),0)||60;}
+function slotsForDay(iso){
+  if(!iso)return [];
+  const hh=dayHours(iso);if(!hh.on)return [];
+  return STATE.slots.slice().sort().filter(s=>toMin(s)>=toMin(hh.from)&&toMin(s)<=toMin(hh.to));
+}
+function slotPassed(iso,tt){
+  const min=(+STATE.settings.minWindow||0)*3600000;
+  const ts=new Date(iso+"T"+(tt||"00:00")+":00").getTime();
+  return isNaN(ts)?false:(ts<Date.now()+min);
+}
+function dayFull(iso){return liveOn(iso).length>=(+STATE.settings.maxDay||8);}
+function concurrentAt(iso,tt,dur,excludeId){
+  const s=toMin(tt),e=s+(dur||60);
+  return liveOn(iso).filter(a=>a.id!==excludeId).filter(a=>{const as=toMin(a.time),ae=as+(apptDur(a)||60);return as<e&&s<ae;}).length;
+}
+/* free | past | full | busy | closed */
+function slotState(iso,tt,dur,excludeId){
+  if(!iso||!tt)return "closed";
+  const hh=dayHours(iso);
+  // El dueño puede poner horas libres; solo se exige que caigan dentro del horario del día.
+  if(!hh.on||toMin(tt)<toMin(hh.from)||toMin(tt)>toMin(hh.to))return "closed";
+  if(slotPassed(iso,tt))return "past";
+  if(dayFull(iso))return "full";
+  if(concurrentAt(iso,tt,dur,excludeId)>=capacity())return "busy";
+  return "free";
+}
+function dayHasFree(iso,dur){return slotsForDay(iso).some(tt=>slotState(iso,tt,dur)==="free");}
 
 function seed(){
   let s=7;const r=()=>{s=(s*9301+49297)%233280;return s/233280;};
@@ -1151,20 +1367,25 @@ document.getElementById("zoneSelect").addEventListener("change",e=>SEL.zone=e.ta
 document.getElementById("bookAddr").addEventListener("input",e=>{SEL.addr=e.target.value.trim();validateStep3();});
 
 function buildDateOptions(){
-  const sel=document.getElementById("dateSelect");const opts=[];
-  for(let i=0;i<14;i++){const d=new Date();d.setDate(d.getDate()+i);const dow=(d.getDay()+6)%7;
-    if(STATE.hours[dow].on){const iso=d.toISOString().slice(0,10);opts.push('<option value="'+iso+'">'+d.toLocaleDateString(loc(),{weekday:"long",day:"numeric",month:"long"})+'</option>');}}
-  sel.innerHTML=opts.join("");SEL.date=sel.value;buildSlots();
+  const sel=document.getElementById("dateSelect");const opts=[];const dur=svcsDur(SEL.svcs);
+  const keep=SEL.date;
+  for(let i=0;i<28;i++){const d=new Date();d.setDate(d.getDate()+i);const iso=d.toISOString().slice(0,10);
+    if(dayHasFree(iso,dur))opts.push('<option value="'+iso+'" '+(iso===keep?'selected':'')+'>'+d.toLocaleDateString(loc(),{weekday:"long",day:"numeric",month:"long"})+'</option>');}
+  sel.innerHTML=opts.join("")||'<option value="">'+t("no_days")+'</option>';
+  SEL.date=sel.value||null;buildSlots();
 }
 document.getElementById("dateSelect").addEventListener("change",e=>{SEL.date=e.target.value;buildSlots();});
 function fmtTime(hhmm){let[h,m]=hhmm.split(":").map(Number);const ap=h<12?"AM":"PM";let h12=h%12;if(h12===0)h12=12;return h12+":"+String(m).padStart(2,"0")+" "+ap;}
 function buildSlots(){
-  const taken=STATE.appointments.filter(a=>a.when===SEL.date).map(a=>a.time);
-  const slots=STATE.slots.slice().sort();
-  if(SEL.time&&!slots.includes(SEL.time))SEL.time=null;
+  const dur=svcsDur(SEL.svcs);
+  const list=SEL.date?slotsForDay(SEL.date):[];
+  if(SEL.time&&!list.includes(SEL.time))SEL.time=null;
   let html="";
-  slots.forEach(tt=>{const off=taken.includes(tt);
-    html+='<button class="slot '+(off?'off':'')+' '+(SEL.time===tt?'sel':'')+'" '+(off?'disabled':'onclick="pickSlot(\''+tt+'\')"')+'>'+fmtTime(tt)+'</button>';});
+  list.forEach(tt=>{
+    const st=slotState(SEL.date,tt,dur);const off=st!=="free";
+    if(off&&SEL.time===tt)SEL.time=null;
+    const tag=off?' · '+t(st==="past"?"sl_past":st==="busy"?"sl_busy":st==="full"?"sl_full":"sl_closed"):'';
+    html+='<button class="slot '+(off?'off':'')+' '+(SEL.time===tt?'sel':'')+'" '+(off?'disabled':'onclick="pickSlot(\''+tt+'\')"')+'>'+fmtTime(tt)+tag+'</button>';});
   document.getElementById("slotList").innerHTML=html||'<div class="empty" style="padding:14px">'+t("no_slots")+'</div>';
   validateStep3();
 }
@@ -1192,6 +1413,8 @@ function confirmBooking(){
   const phone=document.getElementById("ownerPhone").value.trim();
   const email=document.getElementById("ownerEmail").value.trim();
   if(!name||!phone){toast(t("t_needNamePhone"));return;}
+  // Revalidar el hueco justo antes de reservar (evita doble reserva).
+  if(slotState(SEL.date,SEL.time,svcsDur(SEL.svcs))!=="free"){toast(t("slot_gone"));buildDateOptions();goStep(3);return;}
   const allowedG=groomersForSvcs(SEL.svcs);const groomer=(allowedG[0]||STATE.staff[0]||{}).name||"—";const vanId=vanForGroomer(groomer);
   const recurOn=document.getElementById("recurChk").checked;const every=recurWeeks();
   const base={pet:SEL.pet,breed:SEL.breed,size:SEL.size,svcs:SEL.svcs.slice(),owner:name,phone:phone,email:email,
@@ -1243,13 +1466,41 @@ function renderDash(){
   document.getElementById("stClients").textContent=clientsFromAppts().length;
   const up=live.filter(a=>a.when>=today).sort((a,b)=>(a.when+a.time).localeCompare(b.when+b.time)).slice(0,6);
   document.getElementById("upcomingList").innerHTML=up.length?up.map(apptRow).join(""):'<div class="empty">'+t("no_upcoming")+'</div>';
-  renderRequests();
+  renderReminders();renderRequests();
+}
+/* ===== recordatorios (se envían por WhatsApp con un toque) ===== */
+function dueReminders(){
+  const hrs=+((STATE.settings.reminders||{}).timing||24);const now=Date.now();
+  return STATE.appointments.filter(a=>a.status==="conf"||a.status==="pend").filter(a=>{
+    const ts=new Date(a.when+"T"+(a.time||"09:00")+":00").getTime();
+    return !isNaN(ts)&&ts>now&&(ts-now)<=hrs*3600000;
+  }).sort((a,b)=>((a.when||"")+(a.time||"")).localeCompare((b.when||"")+(b.time||"")));
+}
+function reminderText(a){return t("rm_msg2",{pet:a.pet,date:fmtDate(a.when),time:fmtTime(a.time),svc:apptSvcNames(a),biz:STATE.brand.name||""});}
+function renderReminders(){
+  const el=document.getElementById("remList");if(!el)return;
+  const due=dueReminders();
+  const c=document.getElementById("remCount");
+  if(c){c.textContent=due.length||"";c.style.display=due.length?"":"none";}
+  el.innerHTML=due.length?due.map(a=>{
+    const sent=a.reminded?'<span class="badge b-done">'+t("rm_sent")+'</span>':'';
+    return '<div class="rem-row"><div class="ri"><b>'+a.pet+'</b> · '+a.owner+'<div class="rs">'+fmtDate(a.when)+' · '+fmtTime(a.time)+' · '+apptSvcNames(a)+'</div></div>'+
+      '<div class="ra">'+sent+'<button class="btn btn-primary btn-sm" onclick="sendReminder(\''+a.id+'\')">📲 '+t("rm_send")+'</button></div></div>';
+  }).join(""):'<div class="empty">'+t("rm_empty")+'</div>';
+}
+function sendReminder(id){
+  const a=STATE.appointments.find(x=>x.id===id);if(!a)return;
+  const ph=cleanPhone(a.phone);
+  if(!ph){toast(t("rm_nophone"));return;}
+  window.open("https://wa.me/"+ph+"?text="+encodeURIComponent(reminderText(a)),"_blank");
+  a.reminded=true;a.remindedAt=Date.now();renderReminders();persist();
 }
 function badges(a){
   const map={conf:["b-conf","b_confirmed"],done:["b-done","b_completed"],pend:["b-pend","b_pending"],requested:["b-pend","b_requested"],modProposed:["b-pend","b_modProposed"],declined:["b-unpaid","b_declined"]};
   const m=map[a.status]||["b-pend","b_pending"];
   let html='<span class="badge '+m[0]+'">'+t(m[1])+'</span>';
   if(isLive(a))html+=a.paid?'<span class="badge b-paid">'+t("b_paid")+'</span>':'<span class="badge b-unpaid">'+t("b_unpaid")+'</span>';
+  if(a.conflict)html+='<span class="badge b-unpaid">'+t("conflict_badge")+'</span>';
   return html;
 }
 function apptRow(a){
@@ -1312,11 +1563,21 @@ function renderRequests(){
   }
   cont.innerHTML=html;
 }
-function logReq(a,outcome){STATE.reqHistory.unshift({hid:"h"+Date.now()+Math.floor(Math.random()*999),pet:a.pet,breed:a.breed,size:a.size,svcs:svcIds(a),owner:a.owner,phone:a.phone,email:a.email||"",addr:a.addr,zone:a.zone,when:a.when,time:a.time,price:a.price,photo:a.photo||"",groomer:a.groomer,vanId:a.vanId,recurring:a.recurring||null,outcome:outcome,at:Date.now()});if(STATE.reqHistory.length>100)STATE.reqHistory.length=100;}
+function logReq(a,outcome){STATE.reqHistory.unshift({hid:"h"+Date.now()+Math.floor(Math.random()*999),rid:a._reqId||"",pet:a.pet,breed:a.breed,size:a.size,svcs:svcIds(a),owner:a.owner,phone:a.phone,email:a.email||"",addr:a.addr,zone:a.zone,when:a.when,time:a.time,price:a.price,photo:a.photo||"",groomer:a.groomer,vanId:a.vanId,recurring:a.recurring||null,outcome:outcome,at:Date.now()});if(STATE.reqHistory.length>100)STATE.reqHistory.length=100;}
 function genRepeats(a){
-  if(!a.recurring)return;const every=a.recurring;const b0=new Date(a.when+"T12:00");
-  for(let k=1;k<=3;k++){const d=new Date(b0);d.setDate(d.getDate()+every*7*k);
-    const c=Object.assign({},a,{id:nid(),when:d.toISOString().slice(0,10),status:"conf"});delete c._reqId;delete c.proposal;STATE.appointments.push(c);}
+  if(!a.recurring)return;
+  const every=Math.max(1,+a.recurring||4);const b0=new Date(a.when+"T12:00");
+  const n=Math.max(1,Math.min(12,+(STATE.settings.repeatCount||4)));
+  const dur=apptDur(a)||60;
+  for(let k=1;k<=n;k++){
+    const d=new Date(b0);d.setDate(d.getDate()+every*7*k);
+    const iso=d.toISOString().slice(0,10);
+    const c=Object.assign({},a,{id:nid(),when:iso,status:"conf"});
+    delete c._reqId;delete c.proposal;delete c.reminded;
+    const st=slotState(iso,a.time,dur);
+    if(st!=="free")c.conflict=true; // se crea igual, pero marcada para revisar
+    STATE.appointments.push(c);
+  }
 }
 function acceptRequest(id){const a=STATE.appointments.find(x=>x.id===id);if(a){a.status="conf";if(a._reqId){deleteRequestDoc(a._reqId);delete a._reqId;}genRepeats(a);logReq(a,"accepted");}refreshBiz();toast(t("t_reqAccepted"));}
 function declineRequest(id){const a=STATE.appointments.find(x=>x.id===id);if(a){if(a._reqId)deleteRequestDoc(a._reqId);logReq(a,"declined");}STATE.appointments=STATE.appointments.filter(x=>x.id!==id);refreshBiz();toast(t("t_reqDeclined"));}
@@ -1454,7 +1715,7 @@ function addExpense(){
 
 /* ===== modal cita ===== */
 function openAppt(id){
-  const a=STATE.appointments.find(x=>x.id===id);if(!a)return;const s=svcById(a.svc);
+  const a=STATE.appointments.find(x=>x.id===id);if(!a)return;const s=svcById(svcIds(a)[0]);
   const mapUrl="https://maps.google.com/?q="+encodeURIComponent(a.addr+" "+a.zone);
   const gopts=STATE.staff.map(g=>'<option '+(g.name===a.groomer?'selected':'')+'>'+g.name+'</option>').join("");
   const vopts='<option value="">'+t("m_unassigned")+'</option>'+STATE.vans.map(v=>'<option value="'+v.id+'" '+(v.id===a.vanId?'selected':'')+'>'+v.name+'</option>').join("");
@@ -1463,18 +1724,73 @@ function openAppt(id){
   openModal(
     '<div class="modal-head">'+headAv+'<div><h2>'+a.pet+'</h2><div class="mh-sub">'+a.breed+' · '+sizeLabel(a.size)+'</div></div><button class="x" onclick="closeModal()">×</button></div>'+
     '<div class="mrow"><div class="mi">📅</div><div><div class="mk">'+t("m_dateTime")+'</div><div class="mv">'+fmtDate(a.when)+' · '+a.time+'</div></div><div class="mr">'+badges(a)+'</div></div>'+
-    '<div class="mrow"><div class="mi">✂️</div><div><div class="mk">'+t("m_service")+'</div><div class="mv">'+(s.name||a.svc)+' · '+(s.dur||"")+' '+t("m_min")+'</div></div><div class="mr"><span style="font-family:Fraunces;color:var(--mauve-deep);font-weight:600">'+money(a.price)+'</span></div></div>'+
+    '<div class="mrow"><div class="mi">✂️</div><div><div class="mk">'+t("m_service")+'</div><div class="mv">'+apptSvcNames(a)+' · '+apptDur(a)+' '+t("m_min")+'</div></div><div class="mr"><span style="font-family:Fraunces;color:var(--mauve-deep);font-weight:600">'+money(a.price)+'</span></div></div>'+
     '<div class="mrow"><div class="mi">👤</div><div><div class="mk">'+t("m_client")+'</div><div class="mv">'+a.owner+'</div></div><div class="mr"><a class="mv" href="tel:'+a.phone+'">'+a.phone+'</a></div></div>'+
     '<div class="mrow"><div class="mi">📍</div><div><div class="mk">'+t("m_address")+' · '+a.zone+'</div><a class="mv" href="'+mapUrl+'" target="_blank">'+a.addr+' ↗</a></div></div>'+
     (a.recurring?'<div class="mrow"><div class="mi">🔁</div><div><div class="mk">'+t("m_recurrence")+'</div><div class="mv">'+recurTxt+'</div></div></div>':'')+
     '<div class="mrow"><div class="mi">🚐</div><div style="flex:1"><div class="mk">'+t("m_van")+'</div><select class="input" style="margin-top:4px" onchange="setVan(\''+a.id+'\',this.value)">'+vopts+'</select></div></div>'+
     '<div class="mrow"><div class="mi">🧑‍🔧</div><div style="flex:1"><div class="mk">'+t("m_groomer")+'</div><select class="input" style="margin-top:4px" onchange="setGroomer(\''+a.id+'\',this.value)">'+gopts+'</select></div></div>'+
     '<div class="modal-actions">'+
+      '<button class="btn btn-ghost btn-sm" onclick="openApptEdit(\''+a.id+'\')">🗓️ '+t("m_edit")+'</button>'+
       (a.status!=="conf"&&a.status!=="done"?'<button class="btn btn-ghost btn-sm" onclick="setStatus(\''+a.id+'\',\'conf\')">'+t("m_confirm")+'</button>':'')+
       (a.status!=="done"?'<button class="btn btn-ghost btn-sm" onclick="setStatus(\''+a.id+'\',\'done\')">'+t("m_markDone")+'</button>':'')+
       (!a.paid?'<button class="btn btn-gold btn-sm" onclick="openCheckout(\''+a.id+'\')">'+t("m_charge",{amt:money(a.price)})+'</button>':'<button class="btn btn-ghost btn-sm" disabled>'+t("m_paid")+'</button>')+
       '<button class="btn btn-danger btn-sm" onclick="cancelAppt(\''+a.id+'\')">'+t("m_cancel")+'</button>'+
     '</div>');
+}
+/* ===== editar / reprogramar una cita ya creada ===== */
+function openApptEdit(id){
+  const a=STATE.appointments.find(x=>x.id===id);if(!a)return;
+  const cur=svcIds(a);
+  const svcs=STATE.services.map(s=>'<label class="ed-svc"><input type="checkbox" value="'+s.id+'" '+(cur.indexOf(s.id)>=0?'checked':'')+' onchange="edRecalc(\''+id+'\')"><span>'+s.icon+' '+s.name+'</span></label>').join("");
+  const sizeOpts=SIZES.map(sz=>'<option value="'+sz+'" '+(sz===a.size?'selected':'')+'>'+sizeLabel(sz)+'</option>').join("");
+  const slotOpts=STATE.slots.slice().sort().map(s=>'<option value="'+s+'" '+(s===a.time?'selected':'')+'>'+fmtTime(s)+'</option>').join("")+
+                 (STATE.slots.indexOf(a.time)<0?'<option value="'+a.time+'" selected>'+fmtTime(a.time)+'</option>':'');
+  openModal(
+    '<div class="modal-head"><div class="av">🗓️</div><div><h2>'+t("ed_title")+'</h2><div class="mh-sub">'+a.pet+' · '+a.owner+'</div></div><button class="x" onclick="closeModal()">×</button></div>'+
+    '<div class="field"><label>'+t("ed_svcs")+'</label><div id="edSvcs">'+svcs+'</div></div>'+
+    '<div class="row"><div class="field"><label>'+t("ed_size")+'</label><select class="input" id="ed_size" onchange="edRecalc(\''+id+'\')">'+sizeOpts+'</select></div>'+
+    '<div class="field"><label>'+t("ed_price")+'</label><input class="input" id="ed_price" type="number" inputmode="decimal" value="'+(a.price||0)+'" oninput="this._touched=true"></div></div>'+
+    '<div class="row"><div class="field"><label>'+t("ed_date")+'</label><input class="input" id="ed_date" type="date" value="'+a.when+'" onchange="edRecalc(\''+id+'\')"></div>'+
+    '<div class="field"><label>'+t("ed_time")+'</label><select class="input" id="ed_time" onchange="edRecalc(\''+id+'\')">'+slotOpts+'</select></div></div>'+
+    '<div class="field"><label>'+t("ed_notes")+'</label><input class="input" id="ed_notes" value="'+String(a.notes||"").replace(/"/g,"&quot;")+'"></div>'+
+    '<div id="ed_warn" style="font-size:12.5px;font-weight:600;margin:2px 0 10px"></div>'+
+    '<div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="edNotify(\''+id+'\')">📲 '+t("ed_notify")+'</button>'+
+    '<button class="btn btn-primary btn-sm" onclick="saveApptEdit(\''+id+'\')">'+t("ed_save")+'</button></div>');
+  edRecalc(id);
+}
+function edSelectedSvcs(){return Array.prototype.slice.call(document.querySelectorAll("#edSvcs input:checked")).map(i=>i.value);}
+function edRecalc(id){
+  const ids=edSelectedSvcs();
+  const size=(document.getElementById("ed_size")||{}).value||"Mediano";
+  const pi=document.getElementById("ed_price");
+  if(pi&&!pi._touched)pi.value=svcsPrice(ids,size);
+  const w=document.getElementById("ed_warn");if(!w)return;
+  const st=slotState((document.getElementById("ed_date")||{}).value,(document.getElementById("ed_time")||{}).value,svcsDur(ids),id);
+  if(st==="free"){w.textContent="✓ "+t("sl_ok");w.style.color="#2f6b4a";}
+  else{w.textContent="⚠️ "+t(st==="past"?"sl_past":st==="busy"?"sl_busy":st==="full"?"sl_full":"sl_closed");w.style.color="#9c2740";}
+}
+function saveApptEdit(id){
+  const a=STATE.appointments.find(x=>x.id===id);if(!a)return;
+  const ids=edSelectedSvcs();
+  if(!ids.length){toast(t("na_needFields"));return;}
+  a.svcs=ids;delete a.svc;
+  a.size=document.getElementById("ed_size").value;
+  a.when=document.getElementById("ed_date").value||a.when;
+  a.time=document.getElementById("ed_time").value||a.time;
+  const p=parseFloat(document.getElementById("ed_price").value);
+  a.price=isNaN(p)?svcsPrice(ids,a.size):p;
+  a.notes=document.getElementById("ed_notes").value.trim();
+  a.reminded=false;delete a.conflict;
+  if(slotState(a.when,a.time,svcsDur(ids),id)!=="free")a.conflict=true;
+  closeModal();refreshBiz();flushPersist();toast(t("t_apptUpdated"));
+}
+function edNotify(id){
+  const a=STATE.appointments.find(x=>x.id===id);if(!a)return;
+  const d=(document.getElementById("ed_date")||{}).value||a.when;
+  const tt=(document.getElementById("ed_time")||{}).value||a.time;
+  const ph=cleanPhone(a.phone);if(!ph){toast(t("rm_nophone"));return;}
+  window.open("https://wa.me/"+ph+"?text="+encodeURIComponent(t("rm_msg2",{pet:a.pet,date:fmtDate(d),time:fmtTime(tt),svc:apptSvcNames(a),biz:STATE.brand.name||""})),"_blank");
 }
 function setStatus(id,st){const a=STATE.appointments.find(x=>x.id===id);if(a){a.status=st;if(st==="done")a.paid=true;}refreshBiz();openAppt(id);toast(st==="conf"?t("t_apptConf"):t("t_apptDone"));}
 function markPaid(id){const a=STATE.appointments.find(x=>x.id===id);if(a)a.paid=true;refreshBiz();openAppt(id);toast(t("t_payReg"));}
@@ -1574,8 +1890,10 @@ function saveNewAppt(){
     zone:g("na_zone").value,when:g("na_date").value,time:g("na_time").value||"10:00",
     price:priceFor(sv,size),groomer:g("na_groomer").value,vanId:g("na_van").value||null,
     status:"conf",paid:false,recurring:null,photo:_naPhoto||""});
+  const _last=STATE.appointments[STATE.appointments.length-1];
+  if(slotState(_last.when,_last.time,svcsDur([svc]),_last.id)!=="free"){_last.conflict=true;toast("⚠️ "+t("sl_busy"));}
   STATE.cal.sel=g("na_date").value;_naPhoto="";
-  closeModal();refreshBiz();toast(t("t_apptCreated"));
+  closeModal();refreshBiz();flushPersist();toast(t("t_apptCreated"));
 }
 
 /* ===== Ajustes ===== */
@@ -1607,7 +1925,16 @@ function renderConfig(){
   document.getElementById("rmEmail").classList.toggle("on",STATE.settings.reminders.email);
   document.getElementById("rmSms").classList.toggle("on",STATE.settings.reminders.sms);
   document.getElementById("rmWa").classList.toggle("on",STATE.settings.reminders.whatsapp);
+  const rc=document.getElementById("repCount");if(rc)rc.value=STATE.settings.repeatCount||4;
+  renderStorageMeter();
   renderReminderPreview();
+}
+function renderStorageMeter(){
+  const bar=document.getElementById("szBar"),note=document.getElementById("szNote");
+  if(!bar||!note)return;
+  const sz=bizSize();const pct=Math.min(100,Math.round(sz/1048576*100));
+  bar.style.width=pct+"%";bar.className=pct>75?"hot":"";
+  note.textContent=(sz/1024).toFixed(0)+" KB / 1024 KB ("+pct+"%) · "+t("cfg_storageSub");
 }
 function updatePrice(id,v){svcById(id).base=parseFloat(v)||0;toast(t("t_priceUpd"));}
 function updateDur(id,v){svcById(id).dur=parseInt(v)||30;}
@@ -1691,7 +2018,7 @@ function renderReminderPreview(){
   const via=ch.length?ch.join(" + "):t("rm_none");
   document.getElementById("rmPreview").innerHTML='<div class="lbl">'+t("rm_lbl")+' · '+via+'</div>'+t("rm_msg",{pet:"Luna",time:"10:00",biz:STATE.brand.name});
 }
-function updateRules(){STATE.settings.deposit=parseFloat(document.getElementById("depAmt").value)||0;STATE.settings.maxDay=parseInt(document.getElementById("maxDay").value)||8;STATE.settings.minWindow=+document.getElementById("minWindow").value;toast(t("t_rulesUpd"));}
+function updateRules(){STATE.settings.deposit=parseFloat(document.getElementById("depAmt").value)||0;STATE.settings.maxDay=parseInt(document.getElementById("maxDay").value)||8;STATE.settings.minWindow=+document.getElementById("minWindow").value;STATE.settings.repeatCount=Math.max(1,Math.min(12,parseInt((document.getElementById("repCount")||{}).value)||4));persist();toast(t("t_rulesUpd"));}
 function toggleDay(i){STATE.hours[i].on=!STATE.hours[i].on;renderConfig();}
 function setHour(i,k,v){STATE.hours[i][k]=v;}
 function pickColor(c){STATE.brand.color=c;applyColor(c);renderConfig();}
@@ -1702,13 +2029,13 @@ function applyBrand(){STATE.brand.name=document.getElementById("cfgName").value;
   document.getElementById("brandMark").textContent=(STATE.brand.name[0]||"B").toUpperCase();document.getElementById("bizName").textContent=STATE.brand.name||"Tu negocio";
   applyLogo();applyWordmark();setupPWA();renderReminderPreview();}
 function applyWordmark(){
-  // En la vista cliente/portal, la barra superior muestra la marca del negocio (no "PerreoLand")
+  // En la vista cliente/portal, la barra superior muestra la marca del negocio (no "Mobile Grooming")
   const pl=document.querySelector(".demo-bar .pl");if(!pl)return;
   const lg=STATE.brand.logo||"";
   if(CURVIEW==="client"||PUBLIC){
     pl.innerHTML=(lg?'<img src="'+lg+'" style="width:26px;height:26px;border-radius:7px;object-fit:cover;vertical-align:middle;margin-right:7px">':'')+'<b>'+(STATE.brand.name||"Tu negocio")+'</b>';
   }else{
-    pl.innerHTML='PerreoLand 🐾 <small>demo</small>';
+    pl.innerHTML='Mobile Grooming 🐾 <small>demo</small>';
   }
 }
 function applyLogo(){
@@ -1720,18 +2047,26 @@ function applyLogo(){
 }
 function onBrandLogo(input){readImg(input,url=>{STATE.brand.logo=url;applyLogo();uploadPhoto(url,"logo",u=>{STATE.brand.logo=u;applyLogo();persist();});persist();});}
 function removeLogo(){STATE.brand.logo="";applyLogo();persist();}
-function persistNow(){if(!FB||!fbUser){return false;}clearTimeout(_persistT);fbDB.collection("businesses").doc(fbUser.uid).set(serializeBiz()).catch(e=>console.warn("persistNow:",e));return true;}
-function saveSettings(){applyBrand();persistNow();toast(t("t_saved"));}
+function persistNow(){if(!FB||!fbUser||!SAFE)return false;flushPersist();return true;}
+function saveSettings(){applyBrand();if(!persistNow()){toast(FB?t("sv_locked"):t("cloud_off"));return;}toast(t("t_saved"));}
 
 /* init */
 const _now=new Date();STATE.cal={y:_now.getFullYear(),m:_now.getMonth(),sel:addDays(0)};
 const _bizParam=new URLSearchParams(location.search).get("biz");
 if(_bizParam)PUBLIC=_bizParam; // marcar modo público ANTES de Firebase
 FB=fbInit();
+// Con la nube activa nunca se muestran ni se guardan los datos de demostración.
+if(FB&&!PUBLIC){STATE.appointments=[];STATE.reqHistory=[];}
+migrateSettings();
 document.getElementById("signupRow").style.display=FB?"":"none";
 document.getElementById("clientRow").style.display=FB?"none":"";
 document.getElementById("view-biz").addEventListener("change",persist);
 document.getElementById("view-biz").addEventListener("click",e=>{if(e.target.closest("button,.toggle,.sw"))persist();});
+// Nada se queda sin guardar al cerrar o cambiar de app (clave en iOS).
+window.addEventListener("beforeunload",()=>{if(_persistT)flushPersist();});
+window.addEventListener("pagehide",()=>{if(_persistT)flushPersist();});
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&_persistT)flushPersist();});
+setInterval(()=>{if(document.getElementById("remList"))renderReminders();},300000);
 applyLang();applyColor(STATE.brand.color);refreshBiz();setupPWA();applyWordmark();
 if(PUBLIC){enterPublicBooking(PUBLIC);}
 </script>
