@@ -783,7 +783,9 @@ async function loadBiz(uid){
     if(bk&&bk.data)ALL_KEYS.forEach(k=>{if(bk.data[k]!==undefined)STATE[k]=bk.data[k];});
     migrateSettings();migrateServices();
     applyLang();refreshBiz();
-    setSaveState("locked");showLoadBanner(t("load_err"));
+    const code=(e&&(e.code||e.message))?String(e.code||e.message):"";
+    setSaveState("locked");
+    showLoadBanner(/permission|insufficient/i.test(code)?t("load_rules"):(t("load_err")+" ("+(code||"?")+")"));
   }
 }
 /* Sube las citas antiguas a la subcolección y limpia el documento viejo. */
@@ -1104,6 +1106,7 @@ es:{
  sv_saving:"Guardando…",sv_ok:"Guardado ✓",sv_err:"Error al guardar",sv_locked:"Sin guardar · solo lectura",
  load_err:"No se pudieron leer tus datos. Para no borrar nada, el guardado está bloqueado. Reintenta.",
  retry:"Reintentar",save_err:"No se pudo guardar. Revisa tu conexión.",
+ load_rules:"Firestore rechazó la lectura (permisos). Publica las reglas de FIREBASE-SETUP.md en la consola de Firebase y reintenta. No se ha borrado nada.",
  migrated:"Datos actualizados al nuevo formato sin límite ✓",
  new_request:"🔔 {n} solicitud(es) nueva(s)",
  sl_past:"pasó",sl_busy:"ocupado",sl_full:"día lleno",sl_closed:"cerrado",sl_ok:"Horario disponible",
@@ -1124,6 +1127,7 @@ en:{
  sv_saving:"Saving…",sv_ok:"Saved ✓",sv_err:"Save failed",sv_locked:"Not saving · read only",
  load_err:"Couldn't read your data. Saving is locked so nothing gets erased. Please retry.",
  retry:"Retry",save_err:"Couldn't save. Check your connection.",
+ load_rules:"Firestore denied the read (permissions). Publish the rules from FIREBASE-SETUP.md in the Firebase console and retry. Nothing was deleted.",
  migrated:"Data upgraded to the new unlimited format ✓",
  new_request:"🔔 {n} new request(s)",
  sl_past:"past",sl_busy:"booked",sl_full:"day full",sl_closed:"closed",sl_ok:"Slot available",
@@ -1495,7 +1499,7 @@ function refreshBiz(){
   document.getElementById("bizName").textContent=STATE.brand.name;
   document.getElementById("todayLabel").textContent=new Date().toLocaleDateString(loc(),{weekday:"long",day:"numeric",month:"long"});
   renderDash();renderAllAppts();renderCalendar();renderClients();renderFinance();renderConfig();
-  updateAccountUI();persist();
+  updateAccountUI();applyWordmark();persist();
 }
 function clientsFromAppts(){
   const m={};
@@ -2083,7 +2087,7 @@ function applyWordmark(){
   if(CURVIEW==="client"||PUBLIC){
     pl.innerHTML=(lg?'<img src="'+lg+'" style="width:26px;height:26px;border-radius:7px;object-fit:cover;vertical-align:middle;margin-right:7px">':'')+'<b>'+(STATE.brand.name||"Tu negocio")+'</b>';
   }else{
-    pl.innerHTML='Mobile Grooming 🐾 <small>demo</small>';
+    pl.innerHTML='Mobile Grooming 🐾'+((FB&&fbUser)?'':' <small>demo</small>');
   }
 }
 function applyLogo(){
