@@ -395,9 +395,6 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
 .rem-row .ra{display:flex;gap:6px;align-items:center;flex-shrink:0}
 .ed-svc{display:flex;gap:8px;align-items:center;font-size:13.5px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;margin-bottom:6px;background:#fff}
 .ed-svc input{width:18px;height:18px}
-.meter{height:8px;border-radius:6px;background:var(--blush-soft);overflow:hidden;margin-top:8px}
-.meter i{display:block;height:100%;background:var(--mauve)}
-.meter i.hot{background:#c0556b}
 .slot.off{opacity:.45}
 </style>
 </head>
@@ -630,7 +627,7 @@ body.public-mode .demo-bar .seg,body.public-mode .demo-bar .pl small{display:non
 
     <div class="cfg-card"><h3 data-i18n="cfg_account"></h3><p class="hint" data-i18n="cfg_account_h"></p>
       <div class="setting-row"><div class="sl"><div class="st" id="acctEmail">—</div><div class="ss" id="acctStatus"></div></div><button class="btn btn-danger btn-sm" id="logoutBtn" onclick="doLogout()" data-i18n="logout"></button></div>
-      <div class="field" style="margin-top:6px"><label data-i18n="cfg_storage"></label><div class="meter"><i id="szBar" style="width:0%"></i></div><p class="hint" id="szNote" style="margin-top:6px"></p></div>
+      <p class="hint" id="szNote" style="margin-top:10px"></p>
       <div class="add-inline" style="margin-top:6px"><button class="btn btn-ghost btn-sm" onclick="downloadBackup()" data-i18n="cfg_backup"></button><button class="btn btn-ghost btn-sm" onclick="forceSave()" data-i18n="cfg_forceSave"></button></div>
     </div>
 
@@ -691,8 +688,16 @@ function fbInit(){
     return true;
   }catch(e){console.warn("Firebase init:",e);return false;}
 }
-const BIZ_KEYS=["brand","zones","categories","services","staff","vans","hours","settings","slots","expenses","appointments","reqHistory"];
+/* El documento del negocio guarda SOLO la configuración (pequeña y acotada).
+   Las citas y el historial viven en subcolecciones: crecen sin límite. */
+const CFG_KEYS=["brand","zones","categories","services","staff","vans","hours","settings","slots","expenses"];
+const ALL_KEYS=CFG_KEYS.concat(["appointments","reqHistory"]);
 function withTimeout(p,ms){return Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("timeout")),ms))]);}
+function bizRef(){return fbDB.collection("businesses").doc(fbUser.uid);}
+function apptCol(){return bizRef().collection("appointments");}
+function histCol(){return bizRef().collection("reqHistory");}
+/* Huella de lo último escrito: permite guardar SOLO lo que cambió. */
+let _written={appts:{},hist:{}},_legacy=false;
 
 /* ===== indicador de guardado ===== */
 function setSaveState(s){
@@ -702,9 +707,16 @@ function setSaveState(s){
   const m=map[s]||map.idle;
   el.className="save-dot "+m[0];el.textContent=m[1];el.style.display=m[1]?"":"none";
 }
-function byteSize(o){try{return new Blob([JSON.stringify(o)]).size;}catch(e){return JSON.stringify(o).length;}}
-function bizSize(){return byteSize(serializeBiz());}
-function backupLocal(data){try{localStorage.setItem(LS_PREFIX+(fbUser?fbUser.uid:"demo"),JSON.stringify({at:Date.now(),data:data}));}catch(e){}}
+function serializeCfg(){const o={updatedAt:Date.now()};CFG_KEYS.forEach(k=>o[k]=STATE[k]);return o;}
+function serializeBiz(){const o=serializeCfg();o.appointments=STATE.appointments;o.reqHistory=STATE.reqHistory;return o;}
+function stripPhotos(list){return (list||[]).map(x=>{const c=Object.assign({},x);if(c.photo&&c.photo.indexOf("data:")===0)c.photo="";return c;});}
+/* Copia local de emergencia. Sin fotos pesadas para no llenar el navegador. */
+function backupLocal(){
+  try{
+    const o=serializeCfg();o.appointments=stripPhotos(STATE.appointments);o.reqHistory=stripPhotos(STATE.reqHistory);
+    localStorage.setItem(LS_PREFIX+(fbUser?fbUser.uid:"demo"),JSON.stringify({at:Date.now(),data:o}));
+  }catch(e){/* cuota llena: la nube sigue siendo la fuente real */}
+}
 function readBackup(uid){try{const raw=localStorage.getItem(LS_PREFIX+uid);return raw?JSON.parse(raw):null;}catch(e){return null;}}
 function downloadBackup(){
   try{
@@ -723,62 +735,103 @@ function showLoadBanner(msg){
 function retryLoad(){if(FB&&fbUser)loadBiz(fbUser.uid);}
 
 async function loadBiz(uid){
-  _loading=true;SAFE=false;
+  _loading=true;SAFE=false;_legacy=false;_written={appts:{},hist:{}};
   document.getElementById("login").classList.add("hide");
   showView("biz");showLoadBanner("");setSaveState("saving");
   try{
-    const snap=await withTimeout(fbDB.collection("businesses").doc(uid).get(),12000);
-    if(snap.exists){const d=snap.data();BIZ_KEYS.forEach(k=>{if(d[k]!==undefined)STATE[k]=d[k];});}
-    else{
-      // Cuenta nueva: arranca limpia, nunca con los datos de demostración.
+    const ref=fbDB.collection("businesses").doc(uid);
+    const snap=await withTimeout(ref.get(),15000);
+    let oldAppts=null,oldHist=null;
+    if(snap.exists){
+      const d=snap.data();
+      CFG_KEYS.forEach(k=>{if(d[k]!==undefined)STATE[k]=d[k];});
+      if(Array.isArray(d.appointments))oldAppts=d.appointments;   // formato antiguo
+      if(Array.isArray(d.reqHistory))oldHist=d.reqHistory;
+    }else{
       STATE.appointments=[];STATE.reqHistory=[];
-      await withTimeout(fbDB.collection("businesses").doc(uid).set(serializeBiz()),12000);
+      await withTimeout(ref.set(serializeCfg()),15000);
+    }
+    // Subcolecciones (sin límite de tamaño)
+    const res=await Promise.all([
+      withTimeout(ref.collection("appointments").get(),25000),
+      withTimeout(ref.collection("reqHistory").get(),25000)
+    ]);
+    const appts=[],hist=[];
+    res[0].forEach(d=>appts.push(Object.assign({},d.data(),{id:d.id})));
+    res[1].forEach(d=>hist.push(Object.assign({},d.data(),{hid:d.id})));
+    if(appts.length||!oldAppts)STATE.appointments=appts;
+    if(hist.length||!oldHist)STATE.reqHistory=hist;
+    // Migración automática del formato antiguo (documento único → subcolecciones)
+    if(oldAppts&&!appts.length){STATE.appointments=oldAppts.map(a=>Object.assign({},a,{id:a.id||nid()}));_legacy=true;}
+    if(oldHist&&!hist.length){STATE.reqHistory=oldHist.map(x=>Object.assign({},x,{hid:x.hid||("h"+Date.now()+Math.floor(Math.random()*99999))}));_legacy=true;}
+    STATE.reqHistory.sort((a,b)=>(b.at||0)-(a.at||0));
+    if(!_legacy){ // ya estaba migrado: registra la huella para no reescribir de más
+      STATE.appointments.forEach(a=>_written.appts[a.id]=JSON.stringify(a));
+      STATE.reqHistory.forEach(x=>_written.hist[x.hid]=JSON.stringify(x));
     }
     migrateSettings();migrateServices();
     mergeRequests(await loadRequests(uid));
     _loading=false;SAFE=true;            // ← desde aquí ya es seguro escribir
-    backupLocal(serializeBiz());
-    watchRequests(uid);
-    applyLang();refreshBiz();setSaveState("ok");
+    backupLocal();watchRequests(uid);
+    applyLang();refreshBiz();
+    if(_legacy)await finishMigration(ref);
+    else setSaveState("ok");
   }catch(e){
     console.warn("loadBiz:",e);
     _loading=false;SAFE=false;           // ← NO se escribe nada: protege los datos reales
     const bk=readBackup(uid);
-    if(bk&&bk.data)BIZ_KEYS.forEach(k=>{if(bk.data[k]!==undefined)STATE[k]=bk.data[k];});
+    if(bk&&bk.data)ALL_KEYS.forEach(k=>{if(bk.data[k]!==undefined)STATE[k]=bk.data[k];});
     migrateSettings();migrateServices();
     applyLang();refreshBiz();
     setSaveState("locked");showLoadBanner(t("load_err"));
   }
 }
-function serializeBiz(){const o={updatedAt:Date.now()};BIZ_KEYS.forEach(k=>o[k]=STATE[k]);return o;}
+/* Sube las citas antiguas a la subcolección y limpia el documento viejo. */
+async function finishMigration(ref){
+  const ok=await flushPersist();
+  if(!ok)return;
+  try{
+    await ref.update({
+      appointments:firebase.firestore.FieldValue.delete(),
+      reqHistory:firebase.firestore.FieldValue.delete()
+    });
+    _legacy=false;toast(t("migrated"));
+  }catch(e){console.warn("migracion:",e);}
+}
 function persist(){
   if(PUBLIC||!FB||!fbUser||_loading)return;
   if(!SAFE){setSaveState("locked");return;}
   clearTimeout(_persistT);setSaveState("saving");
   _persistT=setTimeout(flushPersist,700);
 }
+/* Escribe la config + solo las citas/historial que cambiaron desde el último guardado. */
+function diffOps(){
+  const ops=[],nowA={},nowH={};
+  STATE.appointments.forEach(a=>{if(!a.id)a.id=nid();nowA[a.id]=JSON.stringify(a);});
+  (STATE.reqHistory||[]).forEach(x=>{if(!x.hid)x.hid="h"+Date.now()+Math.floor(Math.random()*99999);nowH[x.hid]=JSON.stringify(x);});
+  STATE.appointments.forEach(a=>{if(_written.appts[a.id]!==nowA[a.id])ops.push(["set",apptCol().doc(a.id),a]);});
+  Object.keys(_written.appts).forEach(id=>{if(nowA[id]===undefined)ops.push(["del",apptCol().doc(id)]);});
+  (STATE.reqHistory||[]).forEach(x=>{if(_written.hist[x.hid]!==nowH[x.hid])ops.push(["set",histCol().doc(x.hid),x]);});
+  Object.keys(_written.hist).forEach(id=>{if(nowH[id]===undefined)ops.push(["del",histCol().doc(id)]);});
+  return {ops:ops,nowA:nowA,nowH:nowH};
+}
 function flushPersist(){
   clearTimeout(_persistT);_persistT=null;
   if(PUBLIC||!FB||!fbUser||!SAFE)return Promise.resolve(false);
-  if(bizSize()>800000)trimHeavy();
-  const data=serializeBiz();const size=byteSize(data);
-  backupLocal(data);
-  if(size>1000000){setSaveState("err");toast(t("too_big"));return Promise.resolve(false);}
   setSaveState("saving");
-  return fbDB.collection("businesses").doc(fbUser.uid).set(data,{merge:true})
-    .then(()=>{setSaveState("ok");publishPublic();return true;})
-    .catch(e=>{console.warn("persist:",e);setSaveState("err");toast(t("save_err"));return false;});
-}
-/* Aligera el documento si se acerca al límite de 1 MB de Firestore. */
-function trimHeavy(){
-  (STATE.reqHistory||[]).forEach(hh=>{if(hh.photo&&hh.photo.indexOf("data:")===0)hh.photo="";});
-  if(STATE.reqHistory&&STATE.reqHistory.length>40)STATE.reqHistory.length=40;
-  if(bizSize()<=800000)return;
-  STATE.appointments.slice().sort((a,b)=>(a.when||"").localeCompare(b.when||"")).forEach(a=>{
-    if(bizSize()<=800000)return;
-    if(a.status==="done"&&a.photo&&a.photo.indexOf("data:")===0)a.photo="";
-  });
-  toast(t("trimmed"));
+  const d=diffOps();
+  backupLocal();
+  let p=bizRef().set(serializeCfg(),{merge:true});
+  for(let i=0;i<d.ops.length;i+=400){
+    const chunk=d.ops.slice(i,i+400);
+    p=p.then(()=>{
+      const bt=fbDB.batch();
+      chunk.forEach(o=>{if(o[0]==="set")bt.set(o[1],o[2]);else bt.delete(o[1]);});
+      return bt.commit();
+    });
+  }
+  return p.then(()=>{_written={appts:d.nowA,hist:d.nowH};setSaveState("ok");publishPublic();return true;})
+          .catch(e=>{console.warn("persist:",e);setSaveState("err");toast(t("save_err"));return false;});
 }
 function uploadPhoto(dataUrl,folder,cb){
   if(!(FB&&fbStore&&fbUser)){cb(dataUrl);return;}
@@ -1051,8 +1104,7 @@ es:{
  sv_saving:"Guardando…",sv_ok:"Guardado ✓",sv_err:"Error al guardar",sv_locked:"Sin guardar · solo lectura",
  load_err:"No se pudieron leer tus datos. Para no borrar nada, el guardado está bloqueado. Reintenta.",
  retry:"Reintentar",save_err:"No se pudo guardar. Revisa tu conexión.",
- too_big:"Tus datos superan el límite de 1 MB. Descarga un respaldo y borra fotos antiguas.",
- trimmed:"Se liberaron fotos antiguas para poder seguir guardando.",
+ migrated:"Datos actualizados al nuevo formato sin límite ✓",
  new_request:"🔔 {n} solicitud(es) nueva(s)",
  sl_past:"pasó",sl_busy:"ocupado",sl_full:"día lleno",sl_closed:"cerrado",sl_ok:"Horario disponible",
  no_days:"Sin días disponibles",slot_gone:"Ese horario ya no está libre. Elige otro.",
@@ -1063,7 +1115,7 @@ es:{
  rm_empty:"Nada por recordar en este momento.",rm_nophone:"Ese cliente no tiene teléfono.",
  rm_msg2:"Hola 👋 Te recordamos la cita de {pet}: {date} a las {time} ({svc}). — {biz}",
  req_sendErr:"No se pudo enviar tu reserva. Revisa tu conexión e inténtalo de nuevo.",
- cfg_storage:"Espacio usado",cfg_storageSub:"Límite de 1 MB por negocio",
+ cfg_storageSub:"Citas e historial se guardan por separado: crecen sin límite.",
  cfg_backup:"Descargar respaldo",cfg_forceSave:"Guardar ahora",
  cfg_repeats:"Citas por recurrencia",cfg_repeatsSub:"Cuántas repeticiones se crean al aceptar",
  conflict_badge:"⚠️ Solapada"
@@ -1072,8 +1124,7 @@ en:{
  sv_saving:"Saving…",sv_ok:"Saved ✓",sv_err:"Save failed",sv_locked:"Not saving · read only",
  load_err:"Couldn't read your data. Saving is locked so nothing gets erased. Please retry.",
  retry:"Retry",save_err:"Couldn't save. Check your connection.",
- too_big:"Your data is over the 1 MB limit. Download a backup and clear old photos.",
- trimmed:"Old photos were cleared so saving can continue.",
+ migrated:"Data upgraded to the new unlimited format ✓",
  new_request:"🔔 {n} new request(s)",
  sl_past:"past",sl_busy:"booked",sl_full:"day full",sl_closed:"closed",sl_ok:"Slot available",
  no_days:"No days available",slot_gone:"That slot is no longer free. Pick another one.",
@@ -1084,7 +1135,7 @@ en:{
  rm_empty:"Nothing to remind right now.",rm_nophone:"That client has no phone number.",
  rm_msg2:"Hi 👋 Reminder for {pet}'s appointment: {date} at {time} ({svc}). — {biz}",
  req_sendErr:"We couldn't send your booking. Check your connection and try again.",
- cfg_storage:"Storage used",cfg_storageSub:"1 MB limit per business",
+ cfg_storageSub:"Appointments and history are stored separately: no size limit.",
  cfg_backup:"Download backup",cfg_forceSave:"Save now",
  cfg_repeats:"Recurring appointments",cfg_repeatsSub:"How many repeats are created on accept",
  conflict_badge:"⚠️ Overlapping"
@@ -1120,7 +1171,7 @@ const PALETTE=["#A8688A","#B5526E","#9B6FB0","#C77B8B","#7E6BA8","#C2A24F"];
 const VAN_COLORS=["#A8688A","#7E6BA8","#4F8A6B","#C2A24F","#C77B8B","#5E83B0"];
 const DOG_EMOJI=["🐶","🐕","🦮","🐩","🐕‍🦺"];
 const ADDR_SAMPLES=["412 Woodland St","1808 21st Ave S","2100 Belcourt Ave","515 Church St, Apt 4B","3000 Hillsboro Pike","920 Main St","1212 4th Ave N","700 12th Ave S, Unit 210","2400 Gallatin Ave","105 Music Sq E"];
-let _id=0;const nid=()=>"a"+(++_id);
+let _id=0;const nid=()=>"a"+Date.now().toString(36)+(++_id).toString(36)+Math.random().toString(36).slice(2,6);
 
 const STATE={
   lang:"es",apptView:"list",
@@ -1563,7 +1614,7 @@ function renderRequests(){
   }
   cont.innerHTML=html;
 }
-function logReq(a,outcome){STATE.reqHistory.unshift({hid:"h"+Date.now()+Math.floor(Math.random()*999),rid:a._reqId||"",pet:a.pet,breed:a.breed,size:a.size,svcs:svcIds(a),owner:a.owner,phone:a.phone,email:a.email||"",addr:a.addr,zone:a.zone,when:a.when,time:a.time,price:a.price,photo:a.photo||"",groomer:a.groomer,vanId:a.vanId,recurring:a.recurring||null,outcome:outcome,at:Date.now()});if(STATE.reqHistory.length>100)STATE.reqHistory.length=100;}
+function logReq(a,outcome){STATE.reqHistory.unshift({hid:"h"+Date.now()+Math.floor(Math.random()*999),rid:a._reqId||"",pet:a.pet,breed:a.breed,size:a.size,svcs:svcIds(a),owner:a.owner,phone:a.phone,email:a.email||"",addr:a.addr,zone:a.zone,when:a.when,time:a.time,price:a.price,photo:a.photo||"",groomer:a.groomer,vanId:a.vanId,recurring:a.recurring||null,outcome:outcome,at:Date.now()});}
 function genRepeats(a){
   if(!a.recurring)return;
   const every=Math.max(1,+a.recurring||4);const b0=new Date(a.when+"T12:00");
@@ -1930,11 +1981,8 @@ function renderConfig(){
   renderReminderPreview();
 }
 function renderStorageMeter(){
-  const bar=document.getElementById("szBar"),note=document.getElementById("szNote");
-  if(!bar||!note)return;
-  const sz=bizSize();const pct=Math.min(100,Math.round(sz/1048576*100));
-  bar.style.width=pct+"%";bar.className=pct>75?"hot":"";
-  note.textContent=(sz/1024).toFixed(0)+" KB / 1024 KB ("+pct+"%) · "+t("cfg_storageSub");
+  const note=document.getElementById("szNote");if(!note)return;
+  note.textContent=STATE.appointments.length+" "+t("tab_bookings").toLowerCase()+" · "+(STATE.reqHistory||[]).length+" "+t("req_history").toLowerCase()+" · "+t("cfg_storageSub");
 }
 function updatePrice(id,v){svcById(id).base=parseFloat(v)||0;toast(t("t_priceUpd"));}
 function updateDur(id,v){svcById(id).dur=parseInt(v)||30;}
