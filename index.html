@@ -502,6 +502,14 @@ body.public-mode .demo-bar .seg{display:none}
 .van-cap .hint{font-size:11.5px}
 .seat-pill{font-family:'Inter';font-size:11px;font-weight:700;background:#E9F3ED;color:var(--ok);border-radius:20px;padding:3px 10px;margin-left:6px;white-space:nowrap}
 .seat-pill.none{background:#FBE7EB;color:var(--bad)}
+.acc-box{background:#e9f4ee;border:1px solid rgba(79,138,107,.45);border-radius:12px;padding:13px 15px;margin-bottom:14px}
+.acc-box .acc-t{font-weight:700;color:#2f6b4a;font-size:14px}
+.acc-box .acc-s{font-size:12.5px;color:var(--muted);margin-top:2px}
+.creds{background:var(--blush-soft);border-radius:12px;padding:14px 16px;margin-top:6px}
+.creds .cr{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+.creds .cr:last-child{border:none}
+.creds .cr span{color:var(--muted)}
+.creds .cr b{color:var(--burgundy);font-family:ui-monospace,Menlo,monospace;font-size:14.5px;word-break:break-all;text-align:right}
 .dupe-warn{background:#fbe4e8;border:1px solid rgba(192,85,107,.5);color:#9c2740;font-size:12.5px;padding:11px 13px;border-radius:11px;line-height:1.5}
 .hist-card.unseen{border-left:4px solid var(--bad);background:#fffafb}
 .cancel-why{font-size:12.5px;color:var(--burgundy);background:var(--blush-soft);border-radius:9px;padding:7px 10px;margin:7px 0 4px;line-height:1.45}
@@ -1231,6 +1239,66 @@ function uploadPhoto(dataUrl,folder,cb){
   }catch(e){cb(dataUrl);}
 }
 
+/* ============================================================
+   CUENTAS DEL EQUIPO
+   La dueña crea el usuario y la contraseña. No se envía ningún
+   correo ni invitación: ella le pasa los datos a mano.
+   Se usa una segunda instancia de Firebase para que crear la
+   cuenta NO cierre la sesión de quien está dentro.
+   ============================================================ */
+let _worker=null;
+function workerApp(){
+  if(_worker)return _worker;
+  if(typeof firebase==="undefined"||!FB)return null;
+  try{
+    const ex=(firebase.apps||[]).filter(a=>a.name==="staffWorker")[0];
+    _worker=ex||firebase.initializeApp(FIREBASE_CONFIG,"staffWorker");
+  }catch(e){console.warn("worker:",e);return null;}
+  return _worker;
+}
+/* Crea (o reconecta) la cuenta y deja el enlace al negocio.
+   El enlace lo escribe la propia cuenta nueva, así cumple las reglas. */
+async function createStaffAccount(email,password,staff){
+  const app=workerApp();if(!app)throw new Error("sin conexión");
+  const auth=app.auth();
+  let cred=null,reused=false;
+  try{
+    cred=await auth.createUserWithEmailAndPassword(email,password);
+  }catch(e){
+    const code=((e&&e.code)||"").toString();
+    if(code.indexOf("email-already-in-use")>=0){
+      // Ya existe: si la contraseña es la correcta, se reutiliza esa cuenta.
+      cred=await auth.signInWithEmailAndPassword(email,password);
+      reused=true;
+    }else throw e;
+  }
+  const uid=cred.user.uid;
+  await app.firestore().collection("staffLinks").doc(uid).set({
+    bizId:BIZ_ID,staffId:staff.id,name:staff.name,role:staff.role,email:email,at:Date.now()});
+  try{await auth.signOut();}catch(e){}
+  return {uid:uid,reused:reused};
+}
+async function changeStaffPassword(email,oldPw,newPw){
+  const app=workerApp();if(!app)throw new Error("sin conexión");
+  const auth=app.auth();
+  const cred=await auth.signInWithEmailAndPassword(email,oldPw);
+  await cred.user.updatePassword(newPw);
+  try{await auth.signOut();}catch(e){}
+}
+async function revokeStaffAccess(uid){
+  if(!FB||!uid)return;
+  try{await fbDB.collection("staffLinks").doc(uid).delete();}catch(e){console.warn("revoke:",e);throw e;}
+}
+function randomPassword(){
+  const a="abcdefghijkmnpqrstuvwxyz",A="ABCDEFGHJKLMNPQRSTUVWXYZ",n="23456789";
+  const pick=set=>set[Math.floor(Math.random()*set.length)];
+  let out="";
+  for(let i=0;i<4;i++)out+=pick(a);
+  out+=pick(A)+pick(A);
+  for(let i=0;i<3;i++)out+=pick(n);
+  return out;
+}
+
 /* ===== portal público ===== */
 let PUBLIC=null;
 const PUBLIC_KEYS=["brand","categories","services","combos","zones","slots","hours","settings"];
@@ -1579,7 +1647,21 @@ const I18N={es:{
  combo_none:"Sin combos todavía.",combo_saved:"Combo guardado ✓",combo_deleted:"Combo eliminado",
  combo_needName:"Escribe nombre y precio",combo_apply:"Aplicar combo",combo_applied:"Combo aplicado: {n}",
  cfg_team:"Equipo",cfg_team_h:"Groomers, comisiones y acceso a la app.",
- cfg_team_note:"El groomer entra con su propio correo y contraseña, y solo ve sus citas.",
+ cfg_team_note:"Tú le creas el usuario y la contraseña. No se envía ningún correo: le pasas los datos y ella entra por la pestaña Groomer, donde solo ve sus citas.",
+ staff_create:"Crear acceso",staff_pass:"Contraseña",staff_passPh:"mínimo 6 caracteres",
+ staff_genPass:"Generar",staff_needPass:"Escribe una contraseña o deja el correo vacío.",
+ staff_passHint:"Tú defines el usuario y la contraseña. No se le envía ningún correo ni invitación: le pasas los datos por WhatsApp o se los dices.",
+ staff_ownerOnly:"Solo la dueña puede crear accesos.",
+ staff_created:"Acceso creado ✓",staff_credsHint:"Guarda o envía estos datos ahora. La contraseña no se vuelve a mostrar.",
+ staff_credsLine:"Hola {n}, ya tienes acceso a la app de {biz}.\nUsuario: {e}\nContraseña: {p}\nEntra por la pestaña Groomer.",
+ staff_copy:"Copiar",staff_sendWa:"Enviar por WhatsApp",
+ staff_hasAccess:"Acceso activo",staff_changePass:"Cambiar contraseña",staff_revoke:"Quitar acceso",
+ staff_revokeAsk:"¿Quitarle el acceso a {n}? Podrá volver a entrar solo si le creas uno nuevo.",
+ staff_revoked:"Acceso retirado",
+ staff_changeHint:"Necesitas la contraseña actual. Si no la tienes, quítale el acceso y créale uno nuevo.",
+ staff_oldPass:"Contraseña actual",staff_newPass:"Contraseña nueva",staff_oldWrong:"La contraseña actual no coincide.",
+ staff_takenPass:"Ese correo ya tiene cuenta y la contraseña no coincide. Usa otro correo o escribe la contraseña correcta.",
+ staff_reused:"Ese correo ya tenía cuenta. Se conectó a tu negocio con la contraseña que escribiste.",
  staff_add:"+ Agregar persona",staff_edit:"Editar persona",staff_new:"Persona nueva",staff_name:"Nombre",
  staff_email:"Correo de acceso",staff_emailHint:"Con este correo se registra en la app y ve solo su agenda.",
  staff_comm:"Comisión (%)",staff_role:"Rol",staff_roleAdmin:"Admin (ve todo)",staff_roleGroomer:"Groomer (solo lo suyo)",
@@ -1832,7 +1914,21 @@ const I18N={es:{
  combo_none:"No combos yet.",combo_saved:"Combo saved ✓",combo_deleted:"Combo deleted",
  combo_needName:"Enter name and price",combo_apply:"Apply combo",combo_applied:"Combo applied: {n}",
  cfg_team:"Team",cfg_team_h:"Groomers, commissions and app access.",
- cfg_team_note:"Each groomer signs in with their own email and password, and only sees their appointments.",
+ cfg_team_note:"You create the username and password. No email is sent: you hand over the details and they sign in from the Groomer tab, where they only see their own appointments.",
+ staff_create:"Create access",staff_pass:"Password",staff_passPh:"at least 6 characters",
+ staff_genPass:"Generate",staff_needPass:"Enter a password or leave the email blank.",
+ staff_passHint:"You set the username and password. No email or invitation is sent: you hand the details over yourself.",
+ staff_ownerOnly:"Only the owner can create access.",
+ staff_created:"Access created ✓",staff_credsHint:"Save or send these details now. The password is not shown again.",
+ staff_credsLine:"Hi {n}, you now have access to the {biz} app.\nUsername: {e}\nPassword: {p}\nSign in from the Groomer tab.",
+ staff_copy:"Copy",staff_sendWa:"Send on WhatsApp",
+ staff_hasAccess:"Access active",staff_changePass:"Change password",staff_revoke:"Remove access",
+ staff_revokeAsk:"Remove access for {n}? They can only get back in if you create a new one.",
+ staff_revoked:"Access removed",
+ staff_changeHint:"You need the current password. If you do not have it, remove access and create a new one.",
+ staff_oldPass:"Current password",staff_newPass:"New password",staff_oldWrong:"The current password does not match.",
+ staff_takenPass:"That email already has an account and the password does not match. Use another email or the correct password.",
+ staff_reused:"That email already had an account. It was linked to your business with the password you entered.",
  staff_add:"+ Add person",staff_edit:"Edit person",staff_new:"New person",staff_name:"Name",
  staff_email:"Login email",staff_emailHint:"They register in the app with this email and see only their schedule.",
  staff_comm:"Commission (%)",staff_role:"Role",staff_roleAdmin:"Admin (sees everything)",staff_roleGroomer:"Groomer (own work only)",
@@ -4421,7 +4517,7 @@ function setVanSlots(i,v){const n=parseInt(v);STATE.vans[i].slotsPerDay=(n>0?n:n
 function renderStaffEditor(){
   const el=document.getElementById("staffEditor");if(!el)return;
   el.innerHTML=(STATE.staff||[]).map((s,i)=>{
-    const status=s.email?(s.invited?t("staff_pending"):t("staff_active")):t("staff_noAccess");
+    const status=s.uid?("🔑 "+t("staff_active")):(s.invited?t("staff_pending"):t("staff_noAccess"));
     return '<div class="staff-row"><div class="av">'+initials(s.name)+'</div>'+
       '<div class="sn">'+esc(s.name)+'<span class="se">'+t("role_"+(s.role||"groomer"))+' · '+esc(s.email||"—")+' · '+status+'</span></div>'+
       '<input class="input comm" type="number" value="'+(+s.comm||0)+'" min="0" max="100" onchange="updateComm('+i+',this.value)">'+
@@ -4431,46 +4527,138 @@ function renderStaffEditor(){
 function updateComm(i,v){if(STATE.staff[i]){STATE.staff[i].comm=parseFloat(v)||0;renderFinance();markDirty();}}
 function openStaffEdit(sid){
   const s=sid?(STATE.staff||[]).find(x=>x.id===sid):null;
+  const tiene=!!(s&&s.uid);
+  const acceso=tiene
+    ? '<div class="acc-box ok"><div class="acc-t">✓ '+t("staff_hasAccess")+'</div>'+
+      '<div class="acc-s">'+esc(s.email||"")+'</div>'+
+      '<div class="hist-acts"><button class="btn btn-ghost btn-sm" onclick="openStaffPass(\''+s.id+'\')">'+t("staff_changePass")+'</button>'+
+      '<button class="btn btn-danger btn-sm" onclick="doRevoke(\''+s.id+'\')">'+t("staff_revoke")+'</button></div></div>'
+    : '<div class="field"><label>'+t("staff_email")+'</label><input class="input" id="se_email" inputmode="email" autocomplete="off" value="'+esc(s?s.email:"")+'" placeholder="ashley@lubis.com"></div>'+
+      '<div class="field"><label>'+t("staff_pass")+'</label>'+
+      '<div class="add-inline" style="margin-top:0"><input class="input" id="se_pass" autocomplete="new-password" placeholder="'+t("staff_passPh")+'">'+
+      '<button class="btn btn-ghost btn-sm" onclick="genPass()">'+t("staff_genPass")+'</button></div>'+
+      '<p class="hint" style="margin:8px 0 0">'+t("staff_passHint")+'</p></div>';
   openModal('<div class="modal-head"><div class="av">🧑‍🔧</div><div><h2>'+(s?t("staff_edit"):t("staff_new"))+'</h2></div><button class="x" onclick="closeModal()">×</button></div>'+
     '<div class="field"><label>'+t("staff_name")+'</label><input class="input" id="se_name" value="'+esc(s?s.name:"")+'"></div>'+
-    '<div class="field"><label>'+t("staff_email")+'</label><input class="input" id="se_email" inputmode="email" value="'+esc(s?s.email:"")+'"><p class="hint" style="margin:6px 0 0">'+t("staff_emailHint")+'</p></div>'+
     '<div class="row"><div class="field"><label>'+t("staff_comm")+'</label><input class="input" id="se_comm" type="number" min="0" max="100" value="'+(s?(+s.comm||0):35)+'"></div>'+
     '<div class="field"><label>'+t("staff_role")+'</label><select class="input" id="se_role">'+
       '<option value="groomer" '+((!s||s.role!=="admin")?"selected":"")+'>'+t("staff_roleGroomer")+'</option>'+
       '<option value="admin" '+((s&&s.role==="admin")?"selected":"")+'>'+t("staff_roleAdmin")+'</option></select></div></div>'+
+    acceso+
+    '<div id="se_msg" style="margin:6px 0 4px"></div>'+
     '<div class="modal-actions">'+(s?'<button class="btn btn-danger btn-sm" onclick="deleteStaff(\''+s.id+'\')">'+t("delete_btn")+'</button>':'')+
-    '<button class="btn btn-primary btn-sm'+(s?'':' full')+'" onclick="saveStaff(\''+(s?s.id:"")+'\')">'+t("save_btn")+'</button></div>');
+    '<button class="btn btn-primary btn-sm'+(s?'':' full')+'" id="se_save" onclick="saveStaff(\''+(s?s.id:"")+'\')">'+(tiene?t("save_btn"):t("staff_create"))+'</button></div>');
+}
+function genPass(){const el=document.getElementById("se_pass");if(el)el.value=randomPassword();}
+function seMsg(kind,html){
+  const el=document.getElementById("se_msg");if(!el)return;
+  el.innerHTML=html?('<div class="'+(kind==="ok"?"acc-box ok":"dupe-warn")+'">'+html+'</div>'):"";
 }
 async function saveStaff(sid){
   const g=x=>document.getElementById(x);
   const name=g("se_name").value.trim();
   if(!name){toast(t("staff_needName"));return;}
-  const email=g("se_email").value.trim().toLowerCase();
   const comm=parseFloat(g("se_comm").value)||0;
   const role=g("se_role").value;
+  const emEl=g("se_email"),pwEl=g("se_pass");
+  const email=emEl?emEl.value.trim().toLowerCase():"";
+  const pass=pwEl?pwEl.value:"";
+  const quiereAcceso=!!(emEl&&email&&pass);
+  // Todo se valida ANTES de tocar la lista: un error y un reintento no deben duplicar a nadie.
+  if(emEl&&email&&!pass){seMsg("err","⚠️ "+t("staff_needPass"));return;}
+  if(quiereAcceso&&pass.length<6){seMsg("err","⚠️ "+t("err_weak"));return;}
+  if(quiereAcceso&&(!FB||!BIZ_ID||!isOwner())){seMsg("err","⚠️ "+t("staff_ownerOnly"));return;}
+
   let s=sid?(STATE.staff||[]).find(x=>x.id===sid):null;
-  const oldName=s?s.name:"";
-  if(!s){s={id:"g"+Date.now().toString(36),name:name,comm:comm,email:email,role:role,invited:false};STATE.staff.push(s);}
+  const nuevo=!s;
+  if(nuevo)s={id:"g"+Date.now().toString(36),name:name,comm:comm,email:"",role:role};
   else{
-    s.name=name;s.comm=comm;s.role=role;
+    const oldName=s.name;
     if(oldName&&oldName!==name){
       STATE.appointments.forEach(a=>{if(a.groomer===oldName)a.groomer=name;});
       STATE.vans.forEach(v=>{if(v.groomer===oldName)v.groomer=name;});
     }
+    s.name=name;s.comm=comm;s.role=role;
   }
-  const emailChanged=s.email!==email;
-  s.email=email;
-  closeModal();refreshBiz();flushPersist();
-  if(email&&emailChanged&&FB&&BIZ_ID&&isOwner()){
-    try{
-      await fbDB.collection("staffInvites").doc(email).set({bizId:BIZ_ID,staffId:s.id,name:name,role:role,
-        bizName:STATE.brand.name||"",createdAt:Date.now()},{merge:true});
-      s.invited=true;renderStaffEditor();flushPersist();toast(t("staff_invited"));
-    }catch(e){console.warn("invite:",e);toast(t("staff_inviteErr")+" "+friendlyError(e));}
-  }else toast(t("staff_saved"));
+  if(!quiereAcceso){
+    if(email)s.email=email;
+    if(nuevo)STATE.staff.push(s);
+    closeModal();refreshBiz();flushPersist();toast(t("staff_saved"));return;
+  }
+  const btn=g("se_save");if(btn){btn.disabled=true;btn.textContent=t("connecting");}
+  try{
+    const r=await createStaffAccount(email,pass,s);
+    s.email=email;s.uid=r.uid;delete s.invited;
+    if(nuevo)STATE.staff.push(s);          // solo entra a la lista si la cuenta quedó creada
+    refreshBiz();await flushPersist();
+    showStaffCreds(name,email,pass,r.reused);
+  }catch(e){
+    console.warn("crear acceso:",e);
+    if(btn){btn.disabled=false;btn.textContent=t("staff_create");}
+    const code=((e&&e.code)||"").toString();
+    seMsg("err","⚠️ "+(code.indexOf("email-already-in-use")>=0?t("staff_takenPass"):friendlyError(e)));
+  }
+}
+/* Los datos se muestran una sola vez para que la dueña se los pase a mano. */
+function showStaffCreds(name,email,pass,reused){
+  const linea=t("staff_credsLine",{n:esc(name),e:esc(email),p:esc(pass),biz:esc(STATE.brand.name||"")});
+  openModal('<div class="modal-head"><div class="av">🔑</div><div><h2>'+t("staff_created")+'</h2><div class="mh-sub">'+esc(name)+'</div></div><button class="x" onclick="closeModal()">×</button></div>'+
+    (reused?'<div class="dupe-warn" style="margin-bottom:12px">'+t("staff_reused")+'</div>':'')+
+    '<p class="hint">'+t("staff_credsHint")+'</p>'+
+    '<div class="creds"><div class="cr"><span>'+t("staff_email")+'</span><b>'+esc(email)+'</b></div>'+
+    '<div class="cr"><span>'+t("staff_pass")+'</span><b>'+esc(pass)+'</b></div></div>'+
+    '<textarea class="input" id="cred_txt" style="min-height:96px;margin-top:12px">'+linea+'</textarea>'+
+    '<div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="copyCreds()">'+t("staff_copy")+'</button>'+
+    '<button class="btn btn-wa btn-sm" onclick="waCreds()">'+t("staff_sendWa")+'</button>'+
+    '<button class="btn btn-primary btn-sm full" onclick="closeModal()">'+t("ok_btn")+'</button></div>');
+}
+function copyCreds(){
+  const el=document.getElementById("cred_txt");if(!el)return;
+  el.select();
+  try{navigator.clipboard.writeText(el.value);}catch(e){try{document.execCommand("copy");}catch(x){}}
+  toast(t("t_copied"));
+}
+function waCreds(){
+  const el=document.getElementById("cred_txt");if(!el)return;
+  window.open("https://wa.me/?text="+encodeURIComponent(el.value),"_blank");
+}
+function openStaffPass(sid){
+  const s=(STATE.staff||[]).find(x=>x.id===sid);if(!s)return;
+  openModal('<div class="modal-head"><div class="av">🔑</div><div><h2>'+t("staff_changePass")+'</h2><div class="mh-sub">'+esc(s.email||"")+'</div></div><button class="x" onclick="closeModal()">×</button></div>'+
+    '<p class="hint">'+t("staff_changeHint")+'</p>'+
+    '<div class="field"><label>'+t("staff_oldPass")+'</label><input class="input" id="sp_old" autocomplete="off"></div>'+
+    '<div class="field"><label>'+t("staff_newPass")+'</label><div class="add-inline" style="margin-top:0"><input class="input" id="sp_new" autocomplete="off"><button class="btn btn-ghost btn-sm" onclick="document.getElementById(\'sp_new\').value=randomPassword()">'+t("staff_genPass")+'</button></div></div>'+
+    '<div id="sp_msg" style="margin:6px 0"></div>'+
+    '<div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="openStaffEdit(\''+sid+'\')">'+t("back")+'</button>'+
+    '<button class="btn btn-primary btn-sm" id="sp_save" onclick="doChangePass(\''+sid+'\')">'+t("save_btn")+'</button></div>');
+}
+async function doChangePass(sid){
+  const s=(STATE.staff||[]).find(x=>x.id===sid);if(!s)return;
+  const oldPw=document.getElementById("sp_old").value,newPw=document.getElementById("sp_new").value;
+  const msg=document.getElementById("sp_msg");
+  if(newPw.length<6){msg.innerHTML='<div class="dupe-warn">⚠️ '+t("err_weak")+'</div>';return;}
+  const btn=document.getElementById("sp_save");btn.disabled=true;btn.textContent=t("connecting");
+  try{
+    await changeStaffPassword(s.email,oldPw,newPw);
+    showStaffCreds(s.name,s.email,newPw,false);
+  }catch(e){
+    btn.disabled=false;btn.textContent=t("save_btn");
+    msg.innerHTML='<div class="dupe-warn">⚠️ '+t("staff_oldWrong")+'</div>';
+  }
+}
+async function doRevoke(sid){
+  const s=(STATE.staff||[]).find(x=>x.id===sid);if(!s||!s.uid)return;
+  if(!confirm(t("staff_revokeAsk",{n:s.name})))return;
+  try{
+    await revokeStaffAccess(s.uid);
+    delete s.uid;s.email="";
+    closeModal();refreshBiz();flushPersist();toast(t("staff_revoked"));
+  }catch(e){toast(friendlyError(e));}
 }
 function deleteStaff(sid){
   if(!confirm(t("confirm_del")))return;
+  const s=(STATE.staff||[]).find(x=>x.id===sid);
+  if(s&&s.uid)revokeStaffAccess(s.uid).catch(()=>{});
   STATE.staff=(STATE.staff||[]).filter(x=>x.id!==sid);
   closeModal();refreshBiz();flushPersist();toast(t("staff_deleted"));
 }
